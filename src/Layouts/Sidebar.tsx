@@ -7,10 +7,8 @@ import logoDark from "../assets/images/logo-dark.png";
 import logoLight from "../assets/images/logo-light.png";
 
 //Import Components
-import VerticalLayout from "./VerticalLayouts";
-import TwoColumnLayout from "./TwoColumnLayout";
+import VerticalLayout from "./VerticalLayouts/index";
 import { Container } from "reactstrap";
-import HorizontalLayout from "./HorizontalLayout";
 
 const Sidebar = ({ layoutType } : any) => {
 
@@ -64,22 +62,7 @@ const Sidebar = ({ layoutType } : any) => {
             <i className="ri-record-circle-line"></i>
           </button>
         </div>
-        {layoutType === "horizontal" ? (
-          <div id="scrollbar">
-            <Container fluid>
-              <div id="two-column-menu"></div>
-              <ul className="navbar-nav" id="navbar-nav">
-                <HorizontalLayout />
-              </ul>
-            </Container>
-          </div>
-        ) : layoutType === 'twocolumn' ? (
-          <React.Fragment>
-            <TwoColumnLayout layoutType={layoutType} />
-            <div className="sidebar-background"></div>
-          </React.Fragment>
-        ) : (
-          <React.Fragment>
+                 <React.Fragment>
             <SimpleBar id="scrollbar" className="h-100">
               <Container fluid>
                 <div id="two-column-menu"></div>
@@ -90,7 +73,6 @@ const Sidebar = ({ layoutType } : any) => {
             </SimpleBar>
             <div className="sidebar-background"></div>
           </React.Fragment>
-        )}
       </div>
       <div className="vertical-overlay"></div>
     </React.Fragment>
