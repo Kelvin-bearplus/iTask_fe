@@ -1,47 +1,54 @@
 //Include Both Helper File with needed methods
-import { getFirebaseBackend } from "../../../helpers/firebase_helper";
-import {
-  postFakeRegister,
-  postJwtRegister,
-} from "../../../helpers/fakebackend_helper";
-
+import { APIClient } from "../../../helpers/api_helper";
+import { registerUserAPI,getUserByEmail } from "../../../helpers/url_api";
 // action
 import {
   registerUserSuccessful,
   registerUserFailed,
   resetRegisterFlagChange,
 } from "./reducer";
+const api = new APIClient();
 
-// initialize relavant method of both Auth
-const fireBaseBackend : any = getFirebaseBackend();
-
-// Is user register successfull then direct plot user in redux.
 export const registerUser = (user : any) => async (dispatch : any) => {
   try {
     let response;
-
-    if (process.env.REACT_APP_DEFAULTAUTH === "firebase") {
-      response = fireBaseBackend.registerUser(user.email, user.password);
-      // yield put(registerUserSuccessful(response));
-    } else if (process.env.REACT_APP_DEFAULTAUTH === "jwt") {
-      // response = postJwtRegister('/post-jwt-register', user);
-      response = postJwtRegister('http://ec2-13-212-101-187.ap-southeast-1.compute.amazonaws.com:8080/api/v1/register', user);
-     console.log('kết quả'+response)
-      // yield put(registerUserSuccessful(response));
-    } else if (process.env.REACT_APP_API_URL) {
-      response = postFakeRegister(user);
-      const data : any = await response;
-
-      if (data.message === "success") {
-        dispatch(registerUserSuccessful(data));
-      } else {
-        dispatch(registerUserFailed(data));
+      try {
+       response = await api.create(registerUserAPI, user);
+        console.log('Kết quả:', response.data);
+        dispatch(registerUserSuccessful({ user: response.data } as any));
+        // Xử lý kết quả ở đây
+      } catch (error) {
+        console.error('Lỗi:', error);
+        const registrationError:string = "Failed to register user";
+        dispatch(registerUserFailed(registrationError));
       }
-    }
+      // yield put(registerUserSuccessful(response));
+
   } catch (error : any) {
     dispatch(registerUserFailed(error));
   }
 };
+
+export const checkEmail = async (email: string): Promise<boolean> => {
+    try{
+      const params = {
+        email: email
+      };
+    // const apiUrl=getUserByEmail+'?email='+email;
+      const response = await api.get(getUserByEmail,params);
+      console.log(response)
+      if(response.data) {
+        return true;
+      }
+      else{
+        return false;
+      }
+    }
+    catch(error){
+      console.log(error);
+      return false;
+    }
+  }
 
 export const resetRegisterFlag = () => {
   try {

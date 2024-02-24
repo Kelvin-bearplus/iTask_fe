@@ -1,5 +1,6 @@
 
 import { createSlice } from "@reduxjs/toolkit";
+import { PayloadAction } from "@reduxjs/toolkit";
 
 export const initialState = {
   registrationError: null,
@@ -21,7 +22,7 @@ const registerSlice = createSlice({
       state.success = true;
       state.registrationError = null;
     },
-    registerUserFailed(state : any, action : any) {
+    registerUserFailed(state : any, action :PayloadAction<string> ) {
       state.user = null;
       state.loading = false;
       state.registrationError = action.payload;

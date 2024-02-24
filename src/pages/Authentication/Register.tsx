@@ -9,7 +9,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 // action
-import { registerUser, resetRegisterFlag } from "../../slices/thunks";
+import { registerUser, resetRegisterFlag,checkEmail } from "../../slices/thunks";
 import ParticlesAuth from "../Authentication/ParticlesAuth";
 
 //redux
@@ -24,7 +24,6 @@ const Register = () => {
     const history = useNavigate();
     const dispatch: any = useDispatch();
     const [loader, setLoader] = useState<boolean>(false);
-
     const validation = useFormik({
         // enableReinitialize : use this flag when initial values needs to be changed
         enableReinitialize: true,
@@ -36,7 +35,7 @@ const Register = () => {
             // confirm_password: ''
         },
         validationSchema: Yup.object({
-            email: Yup.string().required("Please Enter Your Email"),
+            email: Yup.string().email('Invalid email').required("Please Enter Your Email"),
             // first_name: Yup.string().required("Please Enter Your Username"),
             password: Yup.string().required("Please Enter Your Password"),
             // confirm_password: Yup.string()
@@ -73,6 +72,33 @@ const Register = () => {
         }, 3000);
 
     }, [dispatch, success, error, history]);
+
+// custom function handleChange in useFormik
+const customHandleBlur = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    // Kiểm tra email
+    const checkEmailResponse: boolean = await checkEmail(e.target.value);
+    if (checkEmailResponse) {
+        // Đặt trạng thái touched của trường email là true
+        validation.setFieldTouched('email', true);
+        // Đặt thông báo lỗi cho trường email
+        validation.setFieldError('email', 'Email has been Register Before, Please Use Another Email Address...');
+        console.log('1');
+    } else {
+        // Nếu email không tồn tại, xóa thông báo lỗi cho trường email
+        validation.setFieldError('email', '');
+    }
+    
+    // Kích hoạt sự kiện onBlur của trường email
+    validation.handleBlur(e);
+    console.log('2');
+    
+    // Chờ cho đến khi setFieldError hoàn thành, sau đó log thông báo lỗi
+    await new Promise(resolve => setTimeout(resolve, 0));
+    validation.handleBlur(e);
+    console.log(validation.errors.email);
+}
+
+
 
     document.title = "SignUp Website";
 
@@ -125,12 +151,13 @@ const Register = () => {
                                                         placeholder="Enter email address"
                                                         type="email"
                                                         onChange={validation.handleChange}
-                                                        onBlur={validation.handleBlur}
+                                                        onBlur={customHandleBlur}
                                                      
                                                         invalid={
                                                             validation.touched.email && validation.errors.email ? true : false
                                                         }
                                                     />
+                                                 
                                                     {validation.touched.email && validation.errors.email ? (
                                                         <FormFeedback type="invalid"><div>{validation.errors.email}</div></FormFeedback>
                                                     ) : null}

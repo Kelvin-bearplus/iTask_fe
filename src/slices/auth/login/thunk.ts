@@ -39,7 +39,7 @@ export const loginUser = (user : any, history : any) => async (dispatch : any) =
         data = finallogin.data;
         if (finallogin.status === "success") {
           dispatch(loginSuccess(data));
-          history('/dashboard')
+          history('/dashboard-projects')
           console.log("khanh");
         } 
         else {
