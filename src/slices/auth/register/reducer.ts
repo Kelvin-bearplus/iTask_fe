@@ -37,6 +37,7 @@ const registerSlice = createSlice({
       state.loading = false;
       state.isUserLogout = false;
     }
+    
   }
 });
 

@@ -72,32 +72,42 @@ const Register = () => {
         }, 3000);
 
     }, [dispatch, success, error, history]);
+const [hasEmail, setHasEmail]= useState<boolean>(false);
+const [hasSubmit, setHasSubmit]= useState<boolean>(true);
+// useEffect(() => {
+// if (validation.errors.email!==undefined && validation.errors.email!=="") {
+    
+// }
 
+//   }, [validation.errors.email]);
 // custom function handleChange in useFormik
 const customHandleBlur = async (e: React.ChangeEvent<HTMLInputElement>) => {
     // Kiểm tra email
     const checkEmailResponse: boolean = await checkEmail(e.target.value);
+    console.log(checkEmailResponse)
     if (checkEmailResponse) {
         // Đặt trạng thái touched của trường email là true
+        setHasEmail(true);
         validation.setFieldTouched('email', true);
         // Đặt thông báo lỗi cho trường email
         validation.setFieldError('email', 'Email has been Register Before, Please Use Another Email Address...');
-        console.log('1');
+        setHasSubmit(false)
+        console.log(validation.errors.email)
+
     } else {
         // Nếu email không tồn tại, xóa thông báo lỗi cho trường email
         validation.setFieldError('email', '');
+        setHasEmail(false);
+        setHasSubmit(true)
+
     }
     
     // Kích hoạt sự kiện onBlur của trường email
-    validation.handleBlur(e);
-    console.log('2');
-    
-    // Chờ cho đến khi setFieldError hoàn thành, sau đó log thông báo lỗi
-    await new Promise(resolve => setTimeout(resolve, 0));
-    validation.handleBlur(e);
-    console.log(validation.errors.email);
+    validation.handleChange(e);
+    console.log(validation.errors.email)
+  console.log(hasSubmit);
+    // Log thông báo lỗi của trường email sau khi đã được cập nhật
 }
-
 
 
     document.title = "SignUp Website";
@@ -150,8 +160,8 @@ const customHandleBlur = async (e: React.ChangeEvent<HTMLInputElement>) => {
                                                         className="form-control"
                                                         placeholder="Enter email address"
                                                         type="email"
-                                                        onChange={validation.handleChange}
-                                                        onBlur={customHandleBlur}
+                                                        onChange={customHandleBlur}
+                                                        onBlur={validation.handleBlur}
                                                      
                                                         invalid={
                                                             validation.touched.email && validation.errors.email ? true : false
@@ -161,6 +171,7 @@ const customHandleBlur = async (e: React.ChangeEvent<HTMLInputElement>) => {
                                                     {validation.touched.email && validation.errors.email ? (
                                                         <FormFeedback type="invalid"><div>{validation.errors.email}</div></FormFeedback>
                                                     ) : null}
+                                                   {hasEmail && <div className="invalid-feedback" style={{display:'block'}}>Email has been Register Before, Please Use Another Email Address...</div>}
 
                                                 </div>
 
@@ -203,7 +214,7 @@ const customHandleBlur = async (e: React.ChangeEvent<HTMLInputElement>) => {
                                                 </div> */}
 
                                                 <div className="mt-4">
-                                                    <Button color="success" className="w-100" type="submit" disabled={loader && true}>
+                                                    <Button color="success" className="w-100" type="submit" disabled={loader || !hasSubmit}>
                                                         {loader && <Spinner size="sm" className='me-2'> Loading... </Spinner>}
                                                         Sign Up
                                                     </Button>
