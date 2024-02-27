@@ -18,23 +18,22 @@ import {
 // Formik Validation
 import * as Yup from "yup";
 import { useFormik } from "formik";
-
+import { UseSelector } from "react-redux/es/hooks/useSelector";
 //redux
 import { useSelector, useDispatch } from "react-redux";
-
 import avatar from "../../assets/images/users/avatar-1.jpg";
 // actions
-import { editProfile, resetProfileFlag } from "../../slices/thunks";
+import { editProfile, resetProfileFlag,getUserProfileByEmail  } from "../../slices/thunks";
 import { createSelector } from "reselect";
 
 const UserProfile = () => {
   const dispatch: any = useDispatch();
 
-  const [email, setemail] = useState("admin@gmail.com");
-  const [idx, setidx] = useState("1");
+  const [email, setemail] = useState("");
+  const [idx, setidx] = useState("");
 
-  const [userName, setUserName] = useState("Admin");
-
+  const [userName, setUserName] = useState("");
+const userInfo =useSelector((state:any) => state.Login.user);
 
 
   const selectLayoutState = (state: any) => state.Profile;
@@ -54,34 +53,35 @@ const UserProfile = () => {
 
   useEffect(() => {
     if (sessionStorage.getItem("authUser")) {
-      const storedUser = sessionStorage.getItem("authUser");
-      if (storedUser) {
-        const obj = JSON.parse(storedUser);
+      const storedUser = getUserProfileByEmail(userInfo.email);
+      console.log(storedUser);
+      // if (storedUser) {
+      //   const obj = storedUser.data;
 
-        if (process.env.REACT_APP_DEFAULTAUTH === "firebase") {
+      //   if (process.env.REACT_APP_DEFAULTAUTH === "firebase") {
 
-          obj.displayName = user.username;
-          setUserName(obj.displayName || "Admin");
-          setemail(obj.email || "admin@gmail.com");
-          setidx(obj.uid || '1');
-        } else if (process.env.REACT_APP_DEFAULTAUTH === "fake" ||
-          process.env.REACT_APP_DEFAULTAUTH === "jwt"
-        ) {
-          if (!isEmpty(user)) {
-            obj.data.first_name = user.first_name;
-            sessionStorage.removeItem("authUser");
-            sessionStorage.setItem("authUser", JSON.stringify(obj));
-          }
+      //     obj.displayName = user.username;
+      //     setUserName(obj.displayName || "Admin");
+      //     setemail(obj.email || "admin@gmail.com");
+      //     setidx(obj.uid || '1');
+      //   } else if (process.env.REACT_APP_DEFAULTAUTH === "fake" ||
+      //     process.env.REACT_APP_DEFAULTAUTH === "jwt"
+      //   ) {
+      //     if (!isEmpty(user)) {
+      //       obj.data.first_name = user.first_name;
+      //       sessionStorage.removeItem("authUser");
+      //       sessionStorage.setItem("authUser", JSON.stringify(obj));
+      //     }
 
-          setUserName(obj.data.first_name || "Admin");
-          setemail(obj.data.email || "admin@gmail.com");
-          setidx(obj.data._id || "1");
+      //     setUserName(obj.data.first_name || "Admin");
+      //     setemail(obj.data.email || "admin@gmail.com");
+      //     setidx(obj.data._id || "1");
 
-        }
-        setTimeout(() => {
-          dispatch(resetProfileFlag());
-        }, 3000);
-      }
+      //   }
+      //   setTimeout(() => {
+      //     dispatch(resetProfileFlag());
+      //   }, 3000);
+      // }
     }
   }, [dispatch, user]);
 

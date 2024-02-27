@@ -32,15 +32,15 @@ const Register = () => {
             email: '',
             // first_name: '',
             password: '',
-            // confirm_password: ''
+            confirm_password: ''
         },
         validationSchema: Yup.object({
             email: Yup.string().email('Invalid email').required("Please Enter Your Email"),
             // first_name: Yup.string().required("Please Enter Your Username"),
             password: Yup.string().required("Please Enter Your Password"),
-            // confirm_password: Yup.string()
-            //     .oneOf([Yup.ref('password'), ""],)
-            //     .required('Confirm Password is required')
+            confirm_password: Yup.string()
+                .oneOf([Yup.ref('password'), ""],)
+                .required('Confirm Password is required')
         }),
         onSubmit: (values) => {
             console.log(values);
@@ -90,7 +90,7 @@ const customHandleBlur = async (e: React.ChangeEvent<HTMLInputElement>) => {
         setHasEmail(true);
         validation.setFieldTouched('email', true);
         // Đặt thông báo lỗi cho trường email
-        validation.setFieldError('email', 'Email has been Register Before, Please Use Another Email Address...');
+        // validation.setFieldError('email', 'Email has been Register Before, Please Use Another Email Address...');
         setHasSubmit(false)
         console.log(validation.errors.email)
 
@@ -194,7 +194,7 @@ const customHandleBlur = async (e: React.ChangeEvent<HTMLInputElement>) => {
 
                                                 </div>
 
-                                                {/* <div className="mb-2">
+                                                <div className="mb-2">
                                                     <Label htmlFor="confirmPassword" className="form-label">Confirm Password <span className="text-danger">*</span></Label>
                                                     <Input
                                                         name="confirm_password"
@@ -211,7 +211,7 @@ const customHandleBlur = async (e: React.ChangeEvent<HTMLInputElement>) => {
                                                         <FormFeedback type="invalid"><div>{validation.errors.confirm_password}</div></FormFeedback>
                                                     ) : null}
 
-                                                </div> */}
+                                                </div>
 
                                                 <div className="mt-4">
                                                     <Button color="success" className="w-100" type="submit" disabled={loader || !hasSubmit}>

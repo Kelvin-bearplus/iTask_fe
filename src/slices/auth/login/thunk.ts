@@ -1,67 +1,54 @@
 //Include Both Helper File with needed methods
-import { getFirebaseBackend } from "../../../helpers/firebase_helper";
-import {
-  postFakeLogin,
-  postJwtLogin,
-} from "../../../helpers/fakebackend_helper";
+import { access } from "fs";
+import { APIClient } from "../../../helpers/api_helper";
+import { getUserLogin } from "../../../helpers/url_api";
 
 import { loginSuccess, logoutUserSuccess, apiError, reset_login_flag } from './reducer';
+import { string } from "yup";
+const api = new APIClient();
 
 export const loginUser = (user : any, history : any) => async (dispatch : any) => {
   try {
     let response;
-    if (process.env.REACT_APP_DEFAULTAUTH === "firebase") {
-      let fireBaseBackend : any = getFirebaseBackend();
-      response = fireBaseBackend.loginUser(
-        user.email,
-        user.password
-      );
-    } else if (process.env.REACT_APP_DEFAULTAUTH === "jwt") {
-      response = postJwtLogin({
-        email: user.email,
-        password: user.password
-      });
-
-    } else if (process.env.REACT_APP_DEFAULTAUTH) {
-      response = postFakeLogin({
-        email: user.email,
-        password: user.password,
-      });
-    }
+  
+      response = api.create (getUserLogin,user);
 
     var data = await response;
-        console.log(data);
-    if (data) {
-      sessionStorage.setItem("authUser", JSON.stringify(data));
+
+    if (data && data.accessToken) {
+      console.log(data.accessToken);
+      // Lưu trữ accessToken vào sessionStorage
+      sessionStorage.setItem("authUser", data.accessToken);
       if (process.env.REACT_APP_DEFAULTAUTH === "fake") {
         var finallogin : any = JSON.stringify(data);
         finallogin = JSON.parse(finallogin)
         data = finallogin.data;
         if (finallogin.status === "success") {
-          dispatch(loginSuccess(data));
+          dispatch(loginSuccess(user));
           history('/dashboard-projects')
-          console.log("khanh");
         } 
         else {
           dispatch(apiError(finallogin));
         }
       } else {
-        dispatch(loginSuccess(data));
-        history('/dashboard')
+        dispatch(loginSuccess(user));
+        history('/dashboard-projects')
       }
     }
   } catch (error) {
-    dispatch(apiError(error));
+    console.log(error);
+    var message:string = "lỗi"
+    dispatch(apiError(message));
   }
 };
 
 export const logoutUser = () => async (dispatch : any) => {
   try {
     sessionStorage.removeItem("authUser");
-    let fireBaseBackend : any = getFirebaseBackend();
+    // let fireBaseBackend : any = getFirebaseBackend();
     if (process.env.REACT_APP_DEFAULTAUTH === "firebase") {
-      const response = fireBaseBackend.logout;
-      dispatch(logoutUserSuccess(response));
+      // const response = fireBaseBackend.logout;
+      // dispatch(logoutUserSuccess(response));
     } else {
       dispatch(logoutUserSuccess(true));
     }
@@ -76,8 +63,8 @@ export const socialLogin = (type : any, history : any) => async (dispatch : any)
     let response;
 
     if (process.env.REACT_APP_DEFAULTAUTH === "firebase") {
-      const fireBaseBackend : any = getFirebaseBackend();
-      response = fireBaseBackend.socialLoginUser(type);
+      // const fireBaseBackend : any = getFirebaseBackend();
+      // response = fireBaseBackend.socialLoginUser(type);
     }
     //  else {
       //   response = postSocialLogin(data);

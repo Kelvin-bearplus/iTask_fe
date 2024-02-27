@@ -22,6 +22,7 @@ const loginSlice  = createSlice({
       state.user = action.payload
       state.loading = false;
       state.errorMsg = false;
+      console.log('loginSuccess:', state.user)
     },
     logoutUserSuccess(state, action) {
       state.isUserLogout = true
@@ -40,5 +41,5 @@ export const {
   logoutUserSuccess,
   reset_login_flag
 } = loginSlice.actions
-
+// export const selectUser = (state: any) => state.login.user;
 export default loginSlice.reducer;

@@ -8,13 +8,21 @@ import {
   resetRegisterFlagChange,
 } from "./reducer";
 const api = new APIClient();
-
+interface userInfo{
+  email:string,
+  password:string,
+}
 export const registerUser = (user : any) => async (dispatch : any) => {
   try {
     let response;
       try {
-       response = await api.create(registerUserAPI, user);
+        var userInfo:userInfo={
+          email: user.email,
+          password: user.password
+        }
+       response = await api.create(registerUserAPI, userInfo);
         console.log('Kết quả:', response.data);
+     
         dispatch(registerUserSuccessful({ user: response.data } as any));
         // Xử lý kết quả ở đây
       } catch (error) {

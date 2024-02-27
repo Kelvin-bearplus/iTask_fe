@@ -10,7 +10,7 @@ axios.defaults.headers.post["Content-Type"] = "application/json";
 
 // content type
 const authUser: any = sessionStorage.getItem("authUser")
-const token = JSON.parse(authUser) ? JSON.parse(authUser).token : null;
+const token = authUser;
 if (token)
   axios.defaults.headers.common["Authorization"] = "Bearer " + token;
 
@@ -101,7 +101,7 @@ const getLoggedinUser = () => {
   if (!user) {
     return null;
   } else {
-    return JSON.parse(user);
+    return user;
   }
 };
 
