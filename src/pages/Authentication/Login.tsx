@@ -68,6 +68,7 @@ const Login = (props: any) => {
             console.log(values);
             dispatch(loginUser(values, props.router.navigate));
             setLoader(true)
+            console.log(error);
         }
     });
 
@@ -117,7 +118,7 @@ const Login = (props: any) => {
                                         <div className="text-center mt-2">
                                             <h5 className="text-primary">Welcome Back !</h5>
                                         </div>
-                                        {error && error ? (<Alert color="danger"> {error} </Alert>) : null}
+                                        {/* {error && error ? (<Alert color="danger"> {error} </Alert>) : null} */}
                                         <div className="p-2 mt-4">
                                             <Form
                                                 onSubmit={(e) => {
@@ -126,7 +127,11 @@ const Login = (props: any) => {
                                                     return false;
                                                 }}
                                                 action="#">
-
+                                                {error && error ? (
+                                                    <Alert color="danger"><div>
+                                                        Email or password is incorrect </div></Alert>
+                                                ) : null}
+                                           
                                                 <div className="mb-3">
                                                     <Label htmlFor="email" className="form-label">Email</Label>
                                                     <Input
@@ -184,36 +189,8 @@ const Login = (props: any) => {
                                                         Sign In
                                                     </Button>
                                                 </div>
-
-                                                <div className="mt-4 text-center">
-                                                    <div className="signin-other-title">
-                                                        <h5 className="fs-13 mb-4 title">Sign In with</h5>
-                                                    </div>
-                                                    <div>
-                                                        <Link
-                                                            to="#"
-                                                            className="btn btn-primary btn-icon me-1"
-                                                            onClick={e => {
-                                                                e.preventDefault();
-                                                                socialResponse("facebook");
-                                                            }}
-                                                        >
-                                                            <i className="ri-facebook-fill fs-16" />
-                                                        </Link>
-                                                        <Link
-                                                            to="#"
-                                                            className="btn btn-danger btn-icon me-1"
-                                                            onClick={e => {
-                                                                e.preventDefault();
-                                                                socialResponse("google");
-                                                            }}
-                                                        >
-                                                            <i className="ri-google-fill fs-16" />
-                                                        </Link>
-                                                        <Button color="dark" className="btn-icon"><i className="ri-github-fill fs-16"></i></Button>{" "}
-                                                        <Button color="info" className="btn-icon"><i className="ri-twitter-fill fs-16"></i></Button>
-                                                    </div>
-                                                </div>
+                                               
+                                                
                                             </Form>
                                         </div>
                                     </CardBody>

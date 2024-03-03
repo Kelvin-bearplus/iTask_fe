@@ -1,9 +1,10 @@
 import { createSlice } from "@reduxjs/toolkit";
+interface EmptyObject {}
 
 export const initialState = {
   error: "",
-  success: "",
-  user: {}
+  success:"",
+  user:{}
 };
 
 const ProfileSlice = createSlice({
@@ -11,7 +12,7 @@ const ProfileSlice = createSlice({
   initialState,
   reducers: { 
     profileSuccess(state, action) {
-      state.success = action.payload.status;
+      state.success = action.payload.data;
       state.user = action.payload.data
     },
     profileError(state, action) {

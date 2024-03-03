@@ -13,16 +13,18 @@ const loginSlice  = createSlice({
   initialState,
   reducers: {
     apiError(state, action) {
-      state.error = action.payload.data;
+      state.error = action.payload;
       state.loading = true;
       state.isUserLogout = false;
       state.errorMsg = true;
+      console.log(state.error);
     },
     loginSuccess(state, action) {
       state.user = action.payload
       state.loading = false;
       state.errorMsg = false;
       console.log('loginSuccess:', state.user)
+      sessionStorage.setItem("userInfo",action.payload.email);
     },
     logoutUserSuccess(state, action) {
       state.isUserLogout = true

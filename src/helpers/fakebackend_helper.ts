@@ -28,7 +28,7 @@ export const postFakeForgetPwd = (data : any) => api.create(url.POST_FAKE_PASSWO
 // Edit profile
 export const postJwtProfile = (data : any) => api.create(url.POST_EDIT_JWT_PROFILE, data);
 
-export const postFakeProfile = (data : any) => api.update(url.POST_EDIT_PROFILE + '/' + data.idx, data);
+export const postFakeProfile = (data : any) => api.get(url.POST_EDIT_PROFILE + '/' + data.idx, data);
 
 // Register Method
 export const postJwtRegister = (url : string, data  :any) => {
@@ -128,7 +128,7 @@ export const deleteProducts = (product : any) => api.delete(url.DELETE_PRODUCT, 
 // add Products
 export const addNewProduct = (product : any) => api.create(url.ADD_NEW_PRODUCT, product);
 // update Products
-export const updateProduct = (product : any) => api.update(url.UPDATE_PRODUCT, product ); 
+export const updateProduct = (product : any) => api.get(url.UPDATE_PRODUCT, product ); 
 
 // get Orders
 export const getOrders = () => api.get(url.GET_ORDERS);
@@ -137,7 +137,7 @@ export const getOrders = () => api.get(url.GET_ORDERS);
 export const addNewOrder = (order : any) => api.create(url.ADD_NEW_ORDER, order);
 
 // update Order
-export const updateOrder = (order : any) => api.update(url.UPDATE_ORDER, order);
+export const updateOrder = (order : any) => api.get(url.UPDATE_ORDER, order);
 
 // delete Order
 export const deleteOrder = (order : any) => api.delete(url.DELETE_ORDER , { headers: { order } });
@@ -149,7 +149,7 @@ export const getCustomers = () => api.get(url.GET_CUSTOMERS);
 export const addNewCustomer = (customer : any) => api.create(url.ADD_NEW_CUSTOMER, customer);
 
 // update Customers
-export const updateCustomer = (customer : any) => api.update(url.UPDATE_CUSTOMER, customer);
+export const updateCustomer = (customer : any) => api.get(url.UPDATE_CUSTOMER, customer);
 
 // delete Customers
 export const deleteCustomer = (customer : any) => api.delete(url.DELETE_CUSTOMER, { headers: { customer } });
@@ -169,7 +169,7 @@ export const getTaskList = () => api.get(url.GET_TASK_LIST);
 export const addNewTask = (task : any) => api.create(url.ADD_NEW_TASK, task);
 
 // update Task
-export const updateTask = (task : any) => api.update(url.UPDATE_TASK, task);
+export const updateTask = (task : any) => api.get(url.UPDATE_TASK, task);
 
 // delete Task
 export const deleteTask = (task : any) => api.delete(url.DELETE_TASK, { headers: { task }});
@@ -188,7 +188,7 @@ export const getContacts = () => api.get(url.GET_CONTACTS);
 export const addNewContact = (contact : any) => api.create(url.ADD_NEW_CONTACT, contact);
 
 // update Contact
-export const updateContact = (contact : any) => api.update(url.UPDATE_CONTACT, contact);
+export const updateContact = (contact : any) => api.get(url.UPDATE_CONTACT, contact);
 
 // delete Contact
 export const deleteContact = (contact : any) => api.delete(url.DELETE_CONTACT, { headers: { contact }});
@@ -200,7 +200,7 @@ export const getCompanies = () => api.get(url.GET_COMPANIES);
 export const addNewCompanies = (company : any) => api.create(url.ADD_NEW_COMPANIES, company);
 
 // update Companies
-export const updateCompanies = (company : any) => api.update(url.UPDATE_COMPANIES, company);
+export const updateCompanies = (company : any) => api.get(url.UPDATE_COMPANIES, company);
 
 // delete Companies
 export const deleteCompanies = (company : any) => api.delete(url.DELETE_COMPANIES, { headers: {company}});
@@ -215,7 +215,7 @@ export const getLeads = () => api.get(url.GET_LEADS);
 export const addNewLead = (lead : any) => api.create(url.ADD_NEW_LEAD, lead);
 
 // update Lead
-export const updateLead = (lead : any) => api.update(url.UPDATE_LEAD, lead);
+export const updateLead = (lead : any) => api.get(url.UPDATE_LEAD, lead);
 
 // delete Lead
 export const deleteLead = (lead : any) => api.delete(url.DELETE_LEAD, { headers: {lead}});
@@ -235,7 +235,7 @@ export const getInvoices = () => api.get(url.GET_INVOICES);
 export const addNewInvoice = (invoice : any) => api.create(url.ADD_NEW_INVOICE, invoice);
 
 // update Invoice
-export const updateInvoice = (invoice : any) => api.update(url.UPDATE_INVOICE + '/' + invoice._id, invoice);
+export const updateInvoice = (invoice : any) => api.get(url.UPDATE_INVOICE + '/' + invoice._id, invoice);
 
 // delete Invoice
 export const deleteInvoice = (invoice : any) => api.delete(url.DELETE_INVOICE + '/' + invoice);
@@ -248,7 +248,7 @@ export const getTicketsList = () => api.get(url.GET_TICKETS_LIST);
 export const addNewTicket = (ticket : any) => api.create(url.ADD_NEW_TICKET, ticket);
 
 // update Tickets 
-export const updateTicket = (ticket : any) => api.update(url.UPDATE_TICKET, ticket);
+export const updateTicket = (ticket : any) => api.get(url.UPDATE_TICKET, ticket);
 
 // delete Tickets 
 export const deleteTicket = (ticket : any) => api.delete(url.DELETE_TICKET, { headers: {ticket}});
@@ -389,7 +389,7 @@ export const deleteJobApplicationList = (job: any) => api.delete(url.DELETE_APPL
 // candidate list
 export const getJobCandidateList = () => api.get(url.GET_CANDIDATE, '');
 export const addJobCandidate = (candidate : any) => api.create(url.ADD_NEW_CANDIDATE, candidate);
-export const updateJobCandidate = (candidate : any) => api.update(url.UPDATE_CANDIDATE, candidate);
+export const updateJobCandidate = (candidate : any) => api.get(url.UPDATE_CANDIDATE, candidate);
 export const deleteJobCandidate = (candidate : any) => api.delete(url.DELETE_CANDIDATE, { headers: {candidate} });
 
 // category list
