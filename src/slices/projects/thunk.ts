@@ -1,18 +1,20 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-
-//Include Both Helper File with needed methods
+import {getListProjects} from '../../helpers/url_api'
+import { APIClient } from "../../helpers/api_helper";
 import {
     getProjectList as getProjectListApi,
     addProjectList as addProjectListApi,
     updateProjectList as updateProjectListApi,
     deleteProjectList as deleteProjectListApi
 } from "../../helpers/fakebackend_helper";
-
-export const getProjectList = createAsyncThunk("projects/getProjectList", async () => {
+const api = new APIClient();
+export const getProjectList = createAsyncThunk(getListProjects, async () => {
     try {
-        const response = getProjectListApi();
+        const response = await api.get(getListProjects);
+        console.log(response);
+
         return response;
     } catch (error) {
         return error;

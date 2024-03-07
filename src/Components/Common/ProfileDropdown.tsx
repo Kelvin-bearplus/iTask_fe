@@ -19,7 +19,7 @@ const ProfileDropdown = () => {
     const [userName, setUserName] = useState("Admin");
 
     useEffect(() => {
-        const authUSer : any = sessionStorage.getItem("authUser");
+        const authUSer : any = localStorage.getItem("authUser");
         if (authUSer) {
             const obj : any = authUSer;
             setUserName(process.env.REACT_APP_DEFAULTAUTH === "fake" ? obj.username === undefined ? user.first_name ? user.first_name : obj.data.first_name : "Admin" || "Admin" :

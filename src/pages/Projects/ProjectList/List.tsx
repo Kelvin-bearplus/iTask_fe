@@ -59,6 +59,57 @@ const List = () => {
         }
     };
 
+    console.log(Date().toString());
+
+    function timeUpdate(time:string){
+        let date = new Date(time);
+        let current = new Date();
+        let timeUpdated = current.getTime() - date.getTime();
+        const elapsedDays = Math.floor(timeUpdated / (1000 * 60 * 60 * 24));
+        
+        if (elapsedDays >= 10) {
+            // Trả về ngày và tháng của thời gian được cập nhật
+            const options: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'short', day: 'numeric' };
+            return date.toLocaleDateString(undefined, options);
+        } else {
+            const elapsedHours = Math.floor((timeUpdated % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const elapsedMinutes = Math.floor((timeUpdated % (1000 * 60 * 60)) / (1000 * 60));
+            
+            if (elapsedDays === 0) {
+                if (elapsedHours === 0) {
+                    return `${elapsedMinutes} minutes ago`;
+                } else {
+                    return `${elapsedHours} hours ago`;
+                }
+            } else {
+                return `${elapsedDays} days ago`;
+            }
+        }
+    }
+    
+    function getProgress(complete:number , total:number){
+        return complete/total;
+    }
+    function formatDate(isoString:Date) {
+        // Tạo đối tượng Date từ chuỗi ISO 8601
+        const date = new Date(isoString);
+        
+        // Lấy ngày, tháng và năm từ đối tượng Date
+        const day = date.getDate();
+        const monthIndex = date.getMonth();
+        const year = date.getFullYear();
+        
+        // Danh sách các tháng
+        const months = [
+            "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+            "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+        ];
+        
+        // Định dạng lại chuỗi
+        const formattedDate = `${day} ${months[monthIndex]}, ${year}`;
+        
+        return formattedDate;
+    }
     return (
         <React.Fragment>
             <ToastContainer closeButton={false} />
@@ -95,16 +146,15 @@ const List = () => {
             </Row>
 
             <div className="row">
-                {(projectLists || []).map((item:any, index:any) => (
-                    <React.Fragment key={index}>
-                        {item.isDesign1 ?
+                {(projectLists.data || []).map((item:any, index:any) => (
+                    <React.Fragment key={item.id}>
                             <Col xxl={3} sm={6} className="project-card">
                                 <Card className="card-height-100">
                                     <CardBody>
                                         <div className="d-flex flex-column h-100">
                                             <div className="d-flex">
                                                 <div className="flex-grow-1">
-                                                    <p className="text-muted mb-4">{item.time}</p>
+                                                    <p className="text-muted mb-4">Updated {timeUpdate(item.updated_at)}</p>
                                                 </div>
                                                 <div className="flex-shrink-0">
                                                     <div className="d-flex gap-1 align-items-center">
@@ -132,13 +182,13 @@ const List = () => {
                                                 <div className="flex-shrink-0 me-3">
                                                     <div className="avatar-sm">
                                                         <span className={"avatar-title rounded p-2 bg-" + item.imgbgColor+"-subtle"}>
-                                                            <img src={item.img} alt="" className="img-fluid p-1" />
+                                                            <img src={item.thumbnail_url} alt="" className="img-fluid p-1" />
                                                         </span>
                                                     </div>
                                                 </div>
                                                 <div className="flex-grow-1">
-                                                    <h5 className="mb-1 fs-15"><Link to="/apps-projects-overview" className="text-body">{item.label}</Link></h5>
-                                                    <p className="text-muted text-truncate-two-lines mb-3">{item.caption}</p>
+                                                    <h5 className="mb-1 fs-15"><Link to="/apps-projects-overview" className="text-body">{item.name}</Link></h5>
+                                                    <p className="text-muted text-truncate-two-lines mb-3">{item.description}</p>
                                                 </div>
                                             </div>
                                             <div className="mt-auto">
@@ -147,13 +197,13 @@ const List = () => {
                                                         <div>Tasks</div>
                                                     </div>
                                                     <div className="flex-shrink-0">
-                                                        <div><i className="ri-list-check align-bottom me-1 text-muted"></i> {item.number}</div>
+                                                        <div><i className="ri-list-check align-bottom me-1 text-muted"></i> {item.completed_tasks}/{item.total_tasks}</div>
                                                     </div>
                                                 </div>
                                                 <div className="progress progress-sm animated-progess">
                                                     <div className="progress-bar bg-success"
                                                         role="progressbar" 
-                                                        style={{ width: item.progressBar }}>
+                                                        style={{ width: `${getProgress(item.completed_tasks, item.total_tasks) * 100}%` }}>
                                                     </div>
                                                 </div>
                                             </div>
@@ -163,11 +213,11 @@ const List = () => {
                                         <div className="d-flex align-items-center">
                                             <div className="flex-grow-1">
                                                 <div className="avatar-group">
-                                                    {item.subItem.map((item:any, key:any) => (
+                                                    {item.members.map((item:any, key:any) => (
                                                         <React.Fragment key={key}>
-                                                            {item.imgFooter ? <Link to="#" className="avatar-group-item" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Darline Williams">
+                                                            {item.account_info.profile_ava_url? <Link to="#" className="avatar-group-item" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Darline Williams">
                                                                 <div className="avatar-xxs">
-                                                                    <img src={item.imgFooter} alt="" className="rounded-circle img-fluid" />
+                                                                    <img src={item.account_info.profile_ava_url} alt="" className="rounded-circle img-fluid" />
                                                                 </div>
                                                             </Link> : <Link to="#" className="avatar-group-item" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Add Members">
                                                                 <div className="avatar-xxs">
@@ -178,196 +228,26 @@ const List = () => {
                                                             </Link>}
                                                         </React.Fragment>
                                                     ))}
+                                                    <Link to="#" className="avatar-group-item" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Add Members">
+                                                <div className="avatar-xs" data-bs-toggle="modal" data-bs-target="#inviteMembersModal">
+                                                    <div className="avatar-title fs-16 rounded-circle bg-light border-dashed border text-primary">
+                                                        +
+                                                    </div>
+                                                </div>
+                                            </Link>
                                                 </div>
                                             </div>
                                             <div className="flex-shrink-0">
                                                 <div className="text-muted">
-                                                    <i className="ri-calendar-event-fill me-1 align-bottom"></i> {item.date}
+                                                    <i className="ri-calendar-event-fill me-1 align-bottom"></i> {formatDate(item.created_at)}
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                 </Card>
                             </Col>
-                            : item.isDesign2 ?
-                                <Col xxl={3} sm={6} className="project-card">
-                                    <Card>
-                                        <CardBody>
-                                            <div className={`p-3 mt-n3 mx-n3 bg-${item.cardHeaderClass}-subtle rounded-top`}>
-                                                <div className="d-flex align-items-center">
-                                                    <div className="flex-grow-1">
-                                                        <h5 className="mb-0 fs-14"><Link to="/apps-projects-overview" className="text-body">{item.label}</Link></h5>
-                                                    </div>
-                                                    <div className="flex-shrink-0">
-                                                        <div className="d-flex gap-1 align-items-center my-n2">
-                                                            <button type="button" className={`btn avatar-xs mt-n1 p-0 favourite-btn ${item.ratingClass}`} onClick={(e) => activebtn(e.target)}>
-                                                                <span className="avatar-title bg-transparent fs-15">
-                                                                    <i className="ri-star-fill"></i>
-                                                                </span>
-                                                            </button>
-                                                            <UncontrolledDropdown direction='start'>
-                                                                <DropdownToggle tag="button" className="btn btn-link text-muted p-1 mt-n2 py-0 text-decoration-none fs-15">
-                                                                    <FeatherIcon icon="more-horizontal" className="icon-sm" />
-                                                                </DropdownToggle>
-
-                                                                <DropdownMenu className="dropdown-menu-end">
-                                                                    <DropdownItem href="apps-projects-overview"><i className="ri-eye-fill align-bottom me-2 text-muted"></i> View</DropdownItem>
-                                                                    <DropdownItem href="apps-projects-create"><i className="ri-pencil-fill align-bottom me-2 text-muted"></i> Edit</DropdownItem>
-                                                                    <div className="dropdown-divider"></div>
-                                                                    <DropdownItem href="#" onClick={() => onClickData(item)} data-bs-toggle="modal" data-bs-target="#removeProjectModal"><i className="ri-delete-bin-fill align-bottom me-2 text-muted"></i> Remove</DropdownItem>
-                                                                </DropdownMenu>
-                                                            </UncontrolledDropdown>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div className="py-3">
-                                                <Row className="gy-3">
-                                                    <Col xs={6}>
-                                                        <div>
-                                                            <p className="text-muted mb-1">Status</p>
-                                                            <div className={"fs-12 badge bg-" + item.statusClass+"-subtle text-" + item.statusClass}>{item.status}</div>
-                                                        </div>
-                                                    </Col>
-                                                    <Col xs={6}>
-                                                        <div>
-                                                            <p className="text-muted mb-1">Deadline</p>
-                                                            <h5 className="fs-14">{item.deadline}</h5>
-                                                        </div>
-                                                    </Col>
-                                                </Row>
-
-                                                <div className="d-flex align-items-center mt-3">
-                                                    <p className="text-muted mb-0 me-2">Team :</p>
-                                                    <div className="avatar-group">
-
-                                                        {item.subItem.map((item:any, key:any) => (
-                                                            <React.Fragment key={key}>
-                                                                {item.imgTeam ? <Link to="#" className="avatar-group-item" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Darline Williams">
-                                                                    <div className="avatar-xxs">
-                                                                        <img src={item.imgTeam} alt="" className="rounded-circle img-fluid" />
-                                                                    </div>
-                                                                </Link> : <Link to="#" className="avatar-group-item" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Donna Kline">
-                                                                    <div className="avatar-xxs">
-                                                                        <div className={item.bgColor ? "avatar-title rounded-circle bg-" + item.bgColor : "avatar-title fs-16 rounded-circle bg-light border-dashed border text-primary"}>
-                                                                            {item.imgNumber}
-                                                                        </div>
-                                                                    </div>
-                                                                </Link>}
-                                                            </React.Fragment>
-                                                        ))}
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div>
-                                                <div className="d-flex mb-2">
-                                                    <div className="flex-grow-1">
-                                                        <div>Progress</div>
-                                                    </div>
-                                                    <div className="flex-shrink-0">
-                                                        <div>{item.progressBar}</div>
-                                                    </div>
-                                                </div>
-                                                <div className="progress progress-sm animated-progess">
-                                                    <div className="progress-bar bg-success"
-                                                        role="progressbar" 
-                                                        style={{ width: item.progressBar }}>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </CardBody>
-                                    </Card>
-                                </Col>
-                                : item.isDesign3 ?
-                                    <Col xxl={3} sm={6} className="project-card">
-                                        <Card>
-                                            <CardBody>
-                                                <div className={`p-3 mt-n3 mx-n3 bg-${item.cardHeaderClass} rounded-top`}>
-                                                    <div className="d-flex gap-1 align-items-center justify-content-end my-n2">
-                                                        <button type="button" className={`btn avatar-xs mt-n1 p-0 favourite-btn ${item.ratingClass}`} onClick={(e) => activebtn(e.target)}>
-                                                            <span className="avatar-title bg-transparent fs-15">
-                                                                <i className="ri-star-fill"></i>
-                                                            </span>
-                                                        </button>
-                                                        <UncontrolledDropdown>
-
-                                                            <DropdownToggle tag="button" className="btn btn-link text-muted p-1 mt-n2 py-0 text-decoration-none fs-15">
-                                                                <FeatherIcon icon="more-horizontal" className="icon-sm" />
-                                                            </DropdownToggle>
-
-                                                            <DropdownMenu className="dropdown-menu-end">
-                                                                <DropdownItem href="/apps-projects-overview"><i className="ri-eye-fill align-bottom me-2 text-muted"></i> View</DropdownItem>
-                                                                <DropdownItem href="/apps-projects-create"><i className="ri-pencil-fill align-bottom me-2 text-muted"></i> Edit</DropdownItem>
-                                                                <DropdownItem divider />
-                                                                <DropdownItem href="#" onClick={() => onClickData(item)} data-bs-toggle="modal" data-bs-target="#removeProjectModal"><i className="ri-delete-bin-fill align-bottom me-2 text-muted"></i> Remove</DropdownItem>
-                                                            </DropdownMenu>
-                                                        </UncontrolledDropdown>
-                                                    </div>
-                                                    <div className="text-center pb-3">
-                                                        <img src={item.img} alt="" height="32" />
-                                                    </div>
-                                                </div>
-
-                                                <div className="py-3">
-                                                    <h5 className="fs-14 mb-3"><Link to="/apps-projects-overview" className="text-body">{item.label}</Link></h5>
-                                                    <Row className="gy-3">
-                                                        <Col xs={6}>
-                                                            <div>
-                                                                <p className="text-muted mb-1">Status</p>
-                                                                <div className={"fs-12 badge bg-" + item.statusClass+"-subtle text-"+ item.statusClass}>{item.status}</div>
-                                                            </div>
-                                                        </Col>
-                                                        <Col xs={6}>
-                                                            <div>
-                                                                <p className="text-muted mb-1">Deadline</p>
-                                                                <h5 className="fs-14">{item.deadline}</h5>
-                                                            </div>
-                                                        </Col>
-                                                    </Row>
-
-                                                    <div className="d-flex align-items-center mt-3">
-                                                        <p className="text-muted mb-0 me-2">Team :</p>
-                                                        <div className="avatar-group">
-                                                            {item.subItem.map((item:any, key:any) => (
-                                                                <React.Fragment key={key}>
-                                                                    {item.imgTeam ? <Link to="#" className="avatar-group-item" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Darline Williams">
-                                                                        <div className="avatar-xxs">
-                                                                            <img src={item.imgTeam} alt="" className="rounded-circle img-fluid" />
-                                                                        </div>
-                                                                    </Link> : <Link to="#" className="avatar-group-item" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Donna Kline">
-                                                                        <div className="avatar-xxs">
-                                                                            <div className={item.bgColor ? "avatar-title rounded-circle bg-" + item.bgColor : "avatar-title fs-16 rounded-circle bg-light border-dashed border text-primary"}>
-                                                                                {item.imgNumber}
-                                                                            </div>
-                                                                        </div>
-                                                                    </Link>}
-                                                                </React.Fragment>
-                                                            ))}
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div>
-                                                    <div className="d-flex mb-2">
-                                                        <div className="flex-grow-1">
-                                                            <div>Tasks</div>
-                                                        </div>
-                                                        <div className="flex-shrink-0">
-                                                            <div><i className="ri-list-check align-bottom me-1 text-muted"></i> {item.number}</div>
-                                                        </div>
-                                                    </div>
-                                                    <div className="progress progress-sm animated-progess">
-                                                        <div className="progress-bar bg-success"
-                                                            role="progressbar"
-                                                            style={{ width: item.progressBar }}>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </CardBody>
-                                        </Card>
-                                    </Col>
-                                    : null
-                        }
+                           
+                        
                     </React.Fragment>
                 ))}
                 

@@ -49,7 +49,7 @@ const UserProfile = () => {
   };
   const [userInfoApi, setUserInfoApi] = useState<UserInfo>(initialUserInfo);
 
-  const userInfo: string = sessionStorage.getItem("userInfo") ?? "";
+  const userInfo: string = localStorage.getItem("userInfo") ?? "";
   const [selectedDate, setSelectedDate] = useState<string>('');
 
   const handleDateChange = (date: Date[]) => {
@@ -95,7 +95,7 @@ useEffect(()=>{
   }
 },[userInfoApi]);
   useEffect(() => {
-    if (sessionStorage.getItem("authUser")) {
+    if (localStorage.getItem("authUser")) {
       fetchUserProfile();
 
     }

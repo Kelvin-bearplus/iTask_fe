@@ -2,11 +2,9 @@
 import { access } from "fs";
 import { APIClient } from "../../../helpers/api_helper";
 import { getUserLogin } from "../../../helpers/url_api";
-
 import { loginSuccess, logoutUserSuccess, apiError, reset_login_flag } from './reducer';
 import { string } from "yup";
 const api = new APIClient();
-
 export const loginUser = (user : any, history : any) => async (dispatch : any) => {
   try {
     let response;
@@ -17,8 +15,8 @@ export const loginUser = (user : any, history : any) => async (dispatch : any) =
 
     if (data && data.accessToken) {
       console.log(data.accessToken);
-      // Lưu trữ accessToken vào sessionStorage
-      sessionStorage.setItem("authUser", data.accessToken);
+      // Lưu trữ accessToken vào localStorage
+      localStorage.setItem("authUser", data.accessToken);
       if (process.env.REACT_APP_DEFAULTAUTH === "fake") {
         var finallogin : any = JSON.stringify(data);
         finallogin = JSON.parse(finallogin)
@@ -44,7 +42,7 @@ export const loginUser = (user : any, history : any) => async (dispatch : any) =
 
 export const logoutUser = () => async (dispatch : any) => {
   try {
-    sessionStorage.removeItem("authUser");
+    localStorage.removeItem("authUser");
     // let fireBaseBackend : any = getFirebaseBackend();
     if (process.env.REACT_APP_DEFAULTAUTH === "firebase") {
       // const response = fireBaseBackend.logout;
@@ -72,7 +70,7 @@ export const socialLogin = (type : any, history : any) => async (dispatch : any)
       
       const socialdata = await response;
     if (socialdata) {
-      sessionStorage.setItem("authUser", JSON.stringify(response));
+      localStorage.setItem("authUser", JSON.stringify(response));
       dispatch(loginSuccess(response));
       history('/dashboard')
     }
