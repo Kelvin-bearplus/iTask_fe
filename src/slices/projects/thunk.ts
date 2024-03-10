@@ -9,8 +9,9 @@ import {
     updateProjectList as updateProjectListApi,
     deleteProjectList as deleteProjectListApi
 } from "../../helpers/fakebackend_helper";
+import {resetProjectFlagChange} from "./reducer"
 const api = new APIClient();
-export const getProjectList = createAsyncThunk(getListProjects, async () => {
+export const getProjectList = createAsyncThunk("getListProjects", async () => {
     try {
         const response = await api.get(getListProjects);
         console.log(response);
@@ -21,15 +22,23 @@ export const getProjectList = createAsyncThunk(getListProjects, async () => {
     }
 });
 
-export const addProjectList = createAsyncThunk("projects/addProjectList", async (project:any) => {
+export const addProjectList = createAsyncThunk("addProject", async (project:any) => {
     try {
-        const response = addProjectListApi(project);
-        const data = await response;
-        toast.success("project-list Added Successfully", { autoClose: 3000 });
-        return data;
+        console.log(project)
+        const response = await api.create(getListProjects,project);
+        const data =  response;
+        // toast.success("project-list Added Successfully", { autoClose: 3000 });
+     const   dataReturn={
+            data:data,
+            toastData:"project-list Added Successfully",
+        }
+        
+        return dataReturn;
     } catch (error) {
-        toast.error("project-list Added Failed", { autoClose: 3000 });
-        return error;
+        // toast.error("project-list Added Failed", { autoClose: 3000 });
+        return {
+            error:error,
+        }
     }
 });
 
@@ -56,3 +65,11 @@ export const deleteProjectList = createAsyncThunk("projects/deleteProjectList", 
         return error;
     }
 });
+export const resetProjectFlag = () => {
+    try {
+      const response = resetProjectFlagChange();
+      return response;
+    } catch (error) {
+      return error;
+    }
+  };

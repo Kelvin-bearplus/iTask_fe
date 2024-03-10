@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Card, CardBody, Col, DropdownItem, DropdownMenu, DropdownToggle, Input, Row, UncontrolledDropdown } from 'reactstrap';
 import DeleteModal from "../../../Components/Common/DeleteModal";
 import { ToastContainer } from 'react-toastify';
+import { createSelector } from "reselect";
 
 //redux
 import { useSelector, useDispatch } from 'react-redux';
@@ -15,8 +16,6 @@ import {
     getProjectList as onGetProjectList,
     deleteProjectList as onDeleteProjectList,
 } from "../../../slices/thunks";
-import { createSelector } from 'reselect';
-
 const List = () => {
     const dispatch:any = useDispatch();
 
@@ -110,6 +109,7 @@ const List = () => {
         
         return formattedDate;
     }
+    console.log(projectLists)
     return (
         <React.Fragment>
             <ToastContainer closeButton={false} />
@@ -188,7 +188,7 @@ const List = () => {
                                                 </div>
                                                 <div className="flex-grow-1">
                                                     <h5 className="mb-1 fs-15"><Link to="/apps-projects-overview" className="text-body">{item.name}</Link></h5>
-                                                    <p className="text-muted text-truncate-two-lines mb-3">{item.description}</p>
+                                                    <div className="text-muted text-truncate-two-lines mb-3" dangerouslySetInnerHTML={{ __html: item.description }} />
                                                 </div>
                                             </div>
                                             <div className="mt-auto">

@@ -1,18 +1,20 @@
-import React,{useState} from 'react';
+import React,{useEffect, useState} from 'react';
 import { Link } from 'react-router-dom';
-import { Card, CardBody, CardHeader, Col, Container, Input, Label, Row } from 'reactstrap';
+import { Card, CardBody, CardHeader, Col, Container, Input, Label, Row,Form,FormFeedback ,Alert} from 'reactstrap';
 import BreadCrumb from '../../../Components/Common/BreadCrumb';
-//Import Flatepicker
-import Flatpickr from "react-flatpickr";
+
 import Select from "react-select";
 import { CKEditor } from "@ckeditor/ckeditor5-react";
 import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
-
+import * as Yup from "yup";
+import { useFormik } from "formik";
 import Dropzone from "react-dropzone";
-
-//Import Images
-import avatar3 from "../../../assets/images/users/avatar-3.jpg";
-import avatar4 from "../../../assets/images/users/avatar-4.jpg";
+import{ formatDateCreateProject} from"../../../helpers/format";
+import DatePicker from "react-flatpickr";
+import { useSelector, useDispatch } from "react-redux";
+import {addProjectList,resetProjectFlag} from "../../../slices/thunks"
+import { toast,ToastContainer } from 'react-toastify';
+import { createSelector } from 'reselect';
 
 const CreateProject = () => {
     const SingleOptions = [
@@ -22,6 +24,28 @@ const CreateProject = () => {
         { value: '20% off', label: '20% off' },
         { value: '4 star', label: '4 star' },
       ];
+      const dispatch: any = useDispatch();
+      const selectLayoutState = (state: any) => state.Projects;
+      const projectData = createSelector(
+          selectLayoutState,
+          (state) => ({
+            toastData: state.toastData,
+              error: state.error
+          })
+      );
+      var {
+        toastData, error
+    } = useSelector(projectData);
+    useEffect(()=>{
+        if(toastData){
+            setTimeout(()=>{
+                window.location.reload();
+            },2000)
+        }
+        setTimeout(() => {
+            dispatch(resetProjectFlag());
+        }, 3000);
+    },[toastData,error,dispatch]);
 
     const [selectedMulti, setselectedMulti] = useState<any>(null);
 
@@ -45,6 +69,7 @@ const CreateProject = () => {
         /**
      * Formats the size
      */
+    
     const formatBytes = (bytes:any, decimals = 2) => {
         if (bytes === 0) return "0 Bytes";
         const k = 1024;
@@ -54,76 +79,194 @@ const CreateProject = () => {
         const i = Math.floor(Math.log(bytes) / Math.log(k));
         return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + " " + sizes[i];
     }
+    const [editorData, setEditorData] = useState("");
+    const handleEditorChange = (event:any, editor:any) => {
+        const data = editor.getData();
+        setEditorData(data);
+      };
+    const [selectedStart, setSelectedStart] = useState<string>('');
 
-document.title="Create Project | Velzon - React Admin & Dashboard Template";
+    const handleStartChange = (date: Date[]) => {
+        setSelectedStart(formatDateCreateProject(date[0])); // Lấy ngày đầu tiên trong mảng date
+        console.log('Selected Start:', setSelectedStart);
+    };
+    const [selectedDeadline, setSelectedDeadline] = useState<string>('');
+
+    const handleDeadlineChange = (date: Date[]) => {
+        setSelectedDeadline(formatDateCreateProject(date[0])); // Lấy ngày đầu tiên trong mảng date
+        console.log('Selected Start:', setSelectedDeadline);
+    };
+    const userIdString:string|null = localStorage.getItem('userId'); 
+    var userId:number=0;
+    if (userIdString!=null){
+         userId = parseInt(userIdString);
+    }
+ const [showError, setShowError] = useState(false);
+      const validation = useFormik({
+        // enableReinitialize : use this flag when initial values needs to be changed
+        enableReinitialize: true,
+
+        initialValues: {
+       name:"",
+       privacy:"Private",
+         status:1,
+    //    description: "",
+
+        },
+        validationSchema: Yup.object({
+            name: Yup.string().required("Please Enter Your Project Title"),
+            // description: Yup.string().required("Please Enter Your Description"),
+        }),
+            onSubmit: (values) => {
+                    setShowError(true);
+                    console.log(selectedStart)
+            var valueSubmit={
+                name:values.name,
+                description:editorData,
+                thumnail_url:"test.png",
+               privacy:values.privacy,
+               status: parseInt(values.status.toString()),
+               deadline:selectedDeadline,
+               started_at:selectedStart,
+               created_by:userId, 
+            }
+            console.log(typeof values.status.toString());
+            if (selectedDeadline&&selectedStart){
+                dispatch(addProjectList(valueSubmit))
+
+            }
+            }
+    });
+document.title="Create Project For My Team";
 
     return (
         <React.Fragment>
             <div className="page-content">
+            {toastData && toastData ? (
+                                                    <>
+                                                        {toast("Add Project Success", { position: "top-right", hideProgressBar: false, className: 'bg-success text-white', progress: undefined, toastId: "" })}
+                                                        <ToastContainer autoClose={2000} limit={1} />
+                                                    </>
+                                                ) : null}
+              {error && error ? (
+                                                    <>
+                                                        {toast("project-list Added Failed", { position: "top-right", hideProgressBar: false, className: 'bg-danger text-white', progress: undefined, toastId: "" })}
+                                                        <ToastContainer autoClose={2000} limit={1} />
+                                                
+                                                    </>
+                                                ) : null}
                 <Container fluid>
                     <BreadCrumb title="Create Project" pageTitle="Projects" />
+                    <Form
+                    onSubmit={(e) => {
+                        e.preventDefault();
+                        validation.handleSubmit();
+                        return false;
+                    }}
+                    >
                     <Row>
-                        <Col lg={8}>
+                        <Col lg={12}>
                             <Card>
                                 <CardBody>
+
                                     <div className="mb-3">
                                         <Label className="form-label" htmlFor="project-title-input">Project Title</Label>
-                                        <Input type="text" className="form-control" id="project-title-input"
-                                            placeholder="Enter project title" />
+                                        <Input type="text" className="form-control" id="project-title-input" name="name"
+                                            placeholder="Enter project title"   onChange={validation.handleChange}
+                                            onBlur={validation.handleBlur}
+                                            value={validation.values.name || ""}
+                                            invalid={
+                                                validation.touched.name && validation.errors.name ? true : false
+                                            } />
+                                             {validation.touched.name && validation.errors.name ? (
+                                                                <FormFeedback type="invalid">{validation.errors.name}</FormFeedback>
+                                                            ) : null}
                                     </div>
 
                                     <div className="mb-3">
                                         <Label className="form-label" htmlFor="project-thumbnail-img">Thumbnail Image</Label>
-                                        <Input className="form-control" id="project-thumbnail-img" type="file" accept="image/png, image/gif, image/jpeg" />
+                                        <Input className="form-control" name="thumnail_url" id="project-thumbnail-img" type="file" accept="image/png, image/gif, image/jpeg" />
                                     </div>
 
                                     <div className="mb-3">
                                         <Label className="form-label">Project Description</Label>
                                         <CKEditor
                                             editor={ClassicEditor}
-                                            data="<p>Hello from CKEditor 5!</p>"
+                                            data={editorData}
+                                            onChange={handleEditorChange}
                                             onReady={(editor) => {
-                                                // You can store the "editor" and use when it is needed.
-                                                
                                             }}
-                                            // onChange={(editor) => {
-                                            //     editor.getData();
-                                            // }}
                                             />
                                     </div>
-
                                     <Row>
-                                        <Col lg={4}>
-                                            <div className="mb-3 mb-lg-0">
-                                                <Label htmlFor="choices-priority-input" className="form-label">Priority</Label>
-                                                <select className="form-select" data-choices data-choices-search-false
-                                                    id="choices-priority-input">
-                                                    <option defaultValue="High">High</option>
-                                                    <option value="Medium">Medium</option>
-                                                    <option value="Low">Low</option>
-                                                </select>
-                                            </div>
+                                    <Col lg={4}>
+                                    <div>
+                                        <Label htmlFor="choices-privacy-status-input" className="form-label">Privacy</Label>
+                                        <select className="form-select" data-choices data-choices-search-false
+                                            id="choices-privacy-status-input" name='privacy' onChange={validation.handleChange}
+                                            onBlur={validation.handleBlur}
+                                            value={validation.values.privacy || "Private"}>
+                                            <option value="Private">Private</option>
+                                            <option value="Team">Team</option>
+                                            <option value="Public">Public</option>
+                                        </select>
+                                    </div>
                                         </Col>
                                         <Col lg={4}>
                                             <div className="mb-3 mb-lg-0">
                                                 <Label htmlFor="choices-status-input" className="form-label">Status</Label>
                                                 <select className="form-select" data-choices data-choices-search-false
-                                                    id="choices-status-input">
-                                                    <option defaultValue="Inprogress">Inprogress</option>
-                                                    <option value="Completed">Completed</option>
+                                                    id="choices-status-input" name='status' onChange={validation.handleChange}
+                                                    onBlur={validation.handleBlur}
+                                                    value={validation.values.status || 1} >
+                                                    <option value="1">Inprogress</option>
+                                                    <option value="2">Completed</option>
                                                 </select>
                                             </div>
                                         </Col>
                                         <Col lg={4}>
                                             <div>
-                                                <Label htmlFor="datepicker-deadline-input" className="form-label">Deadline</Label>
-                                                <Flatpickr
-                                                    className="form-control"
-                                                    options={{
-                                                    dateFormat: "d M, Y"
+                                                <Label htmlFor="datepicker-deadline-input" className="form-label">Start at</Label>
+                                                <DatePicker
+                                                            onChange={handleStartChange}
+                                                            placeholder="Enter start day"
+                                                            className={`form-control `}
+                                                            options={{
+                                                                dateFormat: "d-m-Y", // Định dạng ngày tháng thành "dd-mm-yyyy"
+                                                            }}
+                                                            // defaultValue={dob}
+                                                            />
+                                                            {showError && !selectedStart && <div  className="invalid-feedback" style={{display:"block"}}>Please Enter Start day</div>}
+                                            </div>
+                                        </Col>
+                                    </Row>
+                                    <Row className='mt-3'>
+                                        <Col lg={8}>
+                                            <div>
+                                                <Label htmlFor="choices-text-input" className="form-label">Tag</Label>
+                                                <Select
+                                                    value={selectedMulti}
+                                                    isMulti={true}
+                                                    onChange={(selectedMulti: any) => {
+                                                        handleMulti(selectedMulti);
                                                     }}
-                                                    placeholder="Enter due date"
+                                                    options={SingleOptions}
                                                 />
+                                            </div>
+                                        </Col>
+                                        <Col lg={4}>
+                                        <div>
+                                                <Label htmlFor="datepicker-deadline-input" className="form-label">Deadline</Label>
+                                                <DatePicker
+                                                            onChange={handleDeadlineChange}
+                                                            placeholder="Enter deadline day"
+                                                            className={`form-control `}
+                                                            options={{
+                                                                dateFormat: "d-m-Y", // Định dạng ngày tháng thành "dd-mm-yyyy"
+                                                            }}
+                                                            // defaultValue={dob}
+                                                            />
+                                                             {showError &&!selectedDeadline && <div  className="invalid-feedback" style={{display:"block"}}>Please Enter Start day</div>}
                                             </div>
                                         </Col>
                                     </Row>
@@ -199,109 +342,14 @@ document.title="Create Project | Velzon - React Admin & Dashboard Template";
                             </Card>
 
                             <div className="text-end mb-4">
-                                <button type="submit" className="btn btn-danger w-sm me-1">Delete</button>
-                                <button type="submit" className="btn btn-secondary w-sm me-1">Draft</button>
+                            
                                 <button type="submit" className="btn btn-success w-sm">Create</button>
                             </div>
                         </Col>
 
-                        <Col lg={4}>
-                            <div className="card">
-                                <div className="card-header">
-                                    <h5 className="card-title mb-0">Privacy</h5>
-                                </div>
-                                <CardBody>
-                                    <div>
-                                        <Label htmlFor="choices-privacy-status-input" className="form-label">Status</Label>
-                                        <select className="form-select" data-choices data-choices-search-false
-                                            id="choices-privacy-status-input">
-                                            <option defaultValue="Private">Private</option>
-                                            <option value="Team">Team</option>
-                                            <option value="Public">Public</option>
-                                        </select>
-                                    </div>
-                                </CardBody>
-                            </div>
-
-                            <div className="card">
-                                <div className="card-header">
-                                    <h5 className="card-title mb-0">Tags</h5>
-                                </div>
-                                <CardBody>
-                                    <div className="mb-3">
-                                        <Label htmlFor="choices-categories-input" className="form-label">Categories</Label>
-                                        <select className="form-select" data-choices data-choices-search-false
-                                            id="choices-categories-input">
-                                            <option defaultValue="Designing">Designing</option>
-                                            <option value="Development">Development</option>
-                                        </select>
-                                    </div>
-
-                                    <div>
-                                        <Label htmlFor="choices-text-input" className="form-label">Skills</Label>
-                                        <Select
-                                            value={selectedMulti}
-                                            isMulti={true}                                                            
-                                            onChange={(selectedMulti:any) => {
-                                                handleMulti(selectedMulti);
-                                            }}
-                                            options={SingleOptions}
-                                        />
-                                    </div>
-                                </CardBody>
-                            </div>
-
-                            <Card>
-                                <CardHeader>
-                                    <h5 className="card-title mb-0">Members</h5>
-                                </CardHeader>
-                                <CardBody>
-                                    <div className="mb-3">
-                                        <Label htmlFor="choices-lead-input" className="form-label">Team Lead</Label>
-                                        <select className="form-select" data-choices data-choices-search-false
-                                            id="choices-lead-input">
-                                            <option defaultValue="Brent Gonzalez">Brent Gonzalez</option>
-                                            <option value="Darline Williams">Darline Williams</option>
-                                            <option value="Sylvia Wright">Sylvia Wright</option>
-                                            <option value="Ellen Smith">Ellen Smith</option>
-                                            <option value="Jeffrey Salazar">Jeffrey Salazar</option>
-                                            <option value="Mark Williams">Mark Williams</option>
-                                        </select>
-                                    </div>
-
-                                    <div>
-                                        <Label className="form-label">Team Members</Label>
-                                        <div className="avatar-group">
-                                            <Link to="#" className="avatar-group-item" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Brent Gonzalez">
-                                                <div className="avatar-xs">
-                                                    <img src={avatar3} alt="" className="rounded-circle img-fluid" />
-                                                </div>
-                                            </Link>
-                                            <Link to="#" className="avatar-group-item" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Sylvia Wright">
-                                                <div className="avatar-xs">
-                                                    <div className="avatar-title rounded-circle bg-secondary">
-                                                        S
-                                                    </div>
-                                                </div>
-                                            </Link>
-                                            <Link to="#" className="avatar-group-item" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Ellen Smith">
-                                                <div className="avatar-xs">
-                                                    <img src={avatar4} alt="" className="rounded-circle img-fluid" />
-                                                </div>
-                                            </Link>
-                                            <Link to="#" className="avatar-group-item" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Add Members">
-                                                <div className="avatar-xs" data-bs-toggle="modal" data-bs-target="#inviteMembersModal">
-                                                    <div className="avatar-title fs-16 rounded-circle bg-light border-dashed border text-primary">
-                                                        +
-                                                    </div>
-                                                </div>
-                                            </Link>
-                                        </div>
-                                    </div>
-                                </CardBody>
-                            </Card>
-                        </Col>
+                        
                     </Row>
+                    </Form>
                 </Container>
             </div>
         </React.Fragment>

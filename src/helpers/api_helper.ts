@@ -95,13 +95,34 @@ class APIClient {
     return axios.delete(url, { ...config });
   };
 }
+const isGreaterThanCurrentTime = (inputTime: string | null): boolean => {
+  if (inputTime != null) {
+    // Tạo một đối tượng Date từ chuỗi thời gian đầu vào
+    const [time, date] = inputTime.split(' ');
+    const [hours, minutes, seconds] = time.split(':');
+    const [day, month, year] = date.split('-');
+    const inputDate = new Date(parseInt(year), parseInt(month) - 1, parseInt(day), parseInt(hours), parseInt(minutes), parseInt(seconds));
+console.log(inputDate)
+    // Tạo một đối tượng Date đại diện cho thời gian hiện tại
+    const currentTime = new Date();
+    console.log(currentTime)
+    // So sánh thời gian đầu vào với thời gian hiện tại
+    return inputDate.getTime() > currentTime.getTime();
+  } else {
+    return false;
+  }
+};
 
 const getLoggedinUser = () => {
+var timeExpire:string|null=localStorage.getItem("timeExpire");
+
+const timeExpireLocal=isGreaterThanCurrentTime(timeExpire);
+console.log(timeExpire)
   const user = localStorage.getItem("authUser");
-  if (!user) {
-    return null;
-  } else {
+  if (timeExpireLocal &&user ) {
     return user;
+  } else {
+    return null;
   }
 };
 

@@ -2,26 +2,37 @@ import { createSlice } from "@reduxjs/toolkit";
 import { getProjectList, addProjectList, updateProjectList, deleteProjectList } from './thunk';
 export const initialState : any= {
     projectLists: [],
-    error: {},
+    error: "",
+    toastData: "",
 };
-
-
 const ProjectsSlice = createSlice({
     name: 'ProjectsSlice',
     initialState,
-    reducers: {},
+    reducers: {
+        resetProjectFlagChange(state : any) {
+            state.toastData = "";
+            state.error = "";
+          },
+    },
     extraReducers: (builder) => {
         builder.addCase(getProjectList.fulfilled, (state:any, action:any) => {
-            state.projectLists = action.payload;
+            state.projectLists = action.payload.data;
         });
         builder.addCase(getProjectList.rejected,(state:any, action:any) => {
             state.error = action.payload.error || null;
         });
         builder.addCase(addProjectList.fulfilled, (state:any, action:any) => {
             state.projectLists.push(action.payload);
+            state.toastData=action.payload.toastData;
+           if (action.payload.error){
+            state.error=action.payload.error;
+           }
+           console.log(state.error)
+
         });
         builder.addCase(addProjectList.rejected, (state:any, action:any) => {
-            state.error = action.payload.error || null;
+            console.log(action.payload)
+            state.error = action.payload || null;
         });
         builder.addCase(updateProjectList.fulfilled, (state:any, action:any) => {
             state.projectLists = state.projectLists.map((project:any) =>
@@ -41,5 +52,7 @@ const ProjectsSlice = createSlice({
         });
     }
 });
-
+export const {
+    resetProjectFlagChange
+  } = ProjectsSlice.actions;
 export default ProjectsSlice.reducer;

@@ -1,10 +1,18 @@
 //Include Both Helper File with needed methods
-import { access } from "fs";
 import { APIClient } from "../../../helpers/api_helper";
-import { getUserLogin } from "../../../helpers/url_api";
+import { getUserLogin,getUserByEmail } from "../../../helpers/url_api";
 import { loginSuccess, logoutUserSuccess, apiError, reset_login_flag } from './reducer';
-import { string } from "yup";
 const api = new APIClient();
+export const timeExpire=(date:Date):string=>{
+  const hours = date.getHours().toString().padStart(2, '0');
+  const minutes = date.getMinutes().toString().padStart(2, '0');
+  const seconds = date.getSeconds().toString().padStart(2, '0');
+  const day = date.getDate().toString().padStart(2, '0');
+  const month = (date.getMonth() + 1).toString().padStart(2, '0'); // Lưu ý: Tháng trong JavaScript là từ 0 đến 11, nên cần cộng thêm 1
+  const year = date.getFullYear();
+
+  return `${hours}:${minutes}:${seconds} ${day}-${month}-${year}`;
+}
 export const loginUser = (user : any, history : any) => async (dispatch : any) => {
   try {
     let response;
@@ -14,9 +22,13 @@ export const loginUser = (user : any, history : any) => async (dispatch : any) =
     var data = await response;
 
     if (data && data.accessToken) {
-      console.log(data.accessToken);
+      // console.log(data.accessToken);
       // Lưu trữ accessToken vào localStorage
-      localStorage.setItem("authUser", data.accessToken);
+      if (data.expiresAt) {
+        const timeExpireFormatted: string = timeExpire(new Date(data.expiresAt * 1000));
+        localStorage.setItem("authUser", data.accessToken);
+        localStorage.setItem("timeExpire", timeExpireFormatted);
+      }
       if (process.env.REACT_APP_DEFAULTAUTH === "fake") {
         var finallogin : any = JSON.stringify(data);
         finallogin = JSON.parse(finallogin)
@@ -29,6 +41,11 @@ export const loginUser = (user : any, history : any) => async (dispatch : any) =
           dispatch(apiError(finallogin));
         }
       } else {
+        const params = {
+          email: user.email
+        };
+        const responseInfo = await api.get(getUserByEmail,params );
+        localStorage.setItem('userId', responseInfo.data.id);
         dispatch(loginSuccess(user));
         history('/dashboard-projects')
       }
