@@ -45,6 +45,8 @@ export const loginUser = (user : any, history : any) => async (dispatch : any) =
           email: user.email
         };
         const responseInfo = await api.get(getUserByEmail,params );
+        localStorage.setItem('user_avatar_url', responseInfo.data.profile_ava_url);
+        localStorage.setItem('user_name', responseInfo.data.full_name);
         localStorage.setItem('userId', responseInfo.data.id);
         dispatch(loginSuccess(user));
         history('/dashboard-projects')

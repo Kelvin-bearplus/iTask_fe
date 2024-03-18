@@ -229,7 +229,7 @@ const List = () => {
                                                         </DropdownToggle>
 
                                                         <DropdownMenu className="dropdown-menu-end">
-                                                            <DropdownItem href="apps-projects-overview"><i className="ri-eye-fill align-bottom me-2 text-muted"></i> View</DropdownItem>
+                                                            <DropdownItem href={`apps-projects-overview?id=${item.id}`}><i className="ri-eye-fill align-bottom me-2 text-muted"></i> View</DropdownItem>
                                                             {
                                                                 userId != null && userId == item.owner.id && (
                                                                     <DropdownItem

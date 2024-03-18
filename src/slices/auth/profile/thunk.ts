@@ -1,6 +1,6 @@
 //Include Both Helper File with needed methods
 
-import { getUserByEmail,getUserProfile } from "../../../helpers/url_api";
+import { getUserByEmail,getUserProfile,changePassword } from "../../../helpers/url_api";
 import { APIClient } from "../../../helpers/api_helper";
 import { AxiosResponse } from 'axios';
 
@@ -28,6 +28,23 @@ export const editProfile = (user : any,id:internal) => async (dispatch : any) =>
         dispatch(profileError(error));
     }
 };
+export const changePasswordUser=(data:any) => async (dispatch:any)=>{
+    try {
+      console.log(data);
+        const response=await api.create(changePassword,data);
+        // console.log(response.);
+        data={
+          data:"Change Password Success"
+        }
+        dispatch(profileSuccess(data));
+        return response;
+    } catch (error) {
+      // console.log(error);
+      dispatch(profileError("Please enter the correct current password"))
+        return error;
+    }
+
+}
 export const getUserProfileByEmail = (email: string) => async (dispatch: any) => {
     try {
       const params = {

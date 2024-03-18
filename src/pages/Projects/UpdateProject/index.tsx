@@ -72,7 +72,10 @@ const UpdateProject = () => {
         label: item.trim()
     }));
     console.log(data.payload.data.tags)
-    setselectedMulti(items)
+    if(items[0].value!=""){
+        setselectedMulti(items)
+
+    }
    }
         console.log(dataProjectById);
         return data;
@@ -188,9 +191,7 @@ useEffect(()=>{
  const [showError, setShowError] = useState(false);
 const getThumbnail = async (e:any) => {
         var file = e.target.files[0];
-
-        // console.log(formData);
-       
+        // console.log(formData); 
         var urlThumbnail = await getPathImage(file);
         urlThumbnail="https://"+urlThumbnail;
         console.log(urlThumbnail)

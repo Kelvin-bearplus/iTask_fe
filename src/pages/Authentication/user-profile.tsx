@@ -8,7 +8,7 @@ import { useFormik } from "formik";
 //import images
 import progileBg from '../../assets/images/profile-bg.jpg';
 import avatar1 from '../../assets/images/users/avatar-1.jpg';
-import { editProfile, resetProfileFlag, getUserProfileByEmail, getPathImage } from "../../slices/thunks";
+import { editProfile, resetProfileFlag, getUserProfileByEmail, getPathImage,changePasswordUser } from "../../slices/thunks";
 import { useSelector, useDispatch } from "react-redux";
 import { createSelector } from "reselect";
 import internal from "stream";
@@ -125,7 +125,40 @@ const Settings = () => {
             fetchUserProfile();
 
         }
-    }, [userInfo]);
+    }, []);
+    const validationChangePW=useFormik(
+        {
+            enableReinitialize: true,
+
+            initialValues: {
+               passwordOld:"",
+               passwordNew:"",
+                passwordConfirm:""
+            },
+            validationSchema: Yup.object({
+                passwordNew: Yup.string().required("Please Enter Your New Password"),
+                passwordOld: Yup.string().required("Please Enter Your Old Password"),
+                passwordConfirm: Yup.string()
+                    .oneOf([Yup.ref('passwordNew'), ""],)
+                    .required('Confirm New Password  is required')
+            }),
+            onSubmit: (values) => {
+                var infoSubmit = {
+                    old_password:values.passwordOld,
+                    new_password:values.passwordNew,
+                }
+                if (userInfoApi.id) {
+                    dispatch(changePasswordUser(infoSubmit));
+                //    if(!error){
+                //     setTimeout(()=>{
+                //         window.location.reload();
+                //     },2000)
+                //    }
+                }
+    
+            }
+        }
+    )
     const validation = useFormik({
         // enableReinitialize : use this flag when initial values needs to be changed
         enableReinitialize: true,
@@ -158,9 +191,12 @@ const Settings = () => {
                 dob: selectedDate,
             }
             if (userInfoApi.id) {
-                // localStorage.setItem('user_avatar_url', thumbnail);
-                // localStorage.setItem('user_name', values.full_name);
+                localStorage.setItem('user_avatar_url', thumbnail);
+                localStorage.setItem('user_name', values.full_name);
                 dispatch(editProfile(infoSubmit, userInfoApi.id));
+                setTimeout(()=>{
+                    window.location.reload();
+                },2000)
             }
 
         }
@@ -177,13 +213,13 @@ const Settings = () => {
         const clearFlags = () => {
             dispatch(resetProfileFlag());
         };
-
         if (error || success) {
+console.log("khanh123")
             const timeout = setTimeout(clearFlags, 3000);
             return () => clearTimeout(timeout);
         }
-    }, [dispatch, error, success]);
-    document.title = "Profile Settings | Velzon - React Admin & Dashboard Template";
+    }, [ error, success]);
+    document.title = "Profile Settings ";
 
     return (
         <React.Fragment>
@@ -501,15 +537,39 @@ const Settings = () => {
                                         </TabPane>
 
                                         <TabPane tabId="2">
-                                            <Form>
+                                            <Form
+                                                className="form-horizontal"
+                                                onSubmit={(e) => {
+                                                    e.preventDefault();
+                                                    validationChangePW.handleSubmit();
+                                                    return false;
+                                                }}>
                                                 <Row className="g-2">
+                                                {error && error ? (
+                                                    <Alert color="danger"><div>
+                                                        {error} </div></Alert>
+                                                ) : null}
+                                                {success && success ? (
+                                                    <Alert color="success"><div>
+                                                        {success} </div></Alert>
+                                                ) : null}
                                                     <Col lg={4}>
                                                         <div>
                                                             <Label htmlFor="oldpasswordInput" className="form-label">Old
                                                                 Password*</Label>
-                                                            <Input type="password" className="form-control"
+                                                            <Input type="password" className="form-control" name='passwordOld'
                                                                 id="oldpasswordInput"
-                                                                placeholder="Enter current password" />
+                                                                placeholder="Enter current password" 
+                                                                onChange={validationChangePW.handleChange}
+                                                                onBlur={validationChangePW.handleBlur}
+                                                                value={validationChangePW.values.passwordOld || ""}
+                                                                invalid={
+                                                                    validationChangePW.touched.passwordOld && validationChangePW.errors.passwordOld ? true : false
+                                                                }
+                                                                />
+                                                                   {validationChangePW.touched.passwordOld && validationChangePW.errors.passwordOld ? (
+                                                                <FormFeedback type="invalid">{validationChangePW.errors.passwordOld}</FormFeedback>
+                                                            ) : null}
                                                         </div>
                                                     </Col>
 
@@ -517,8 +577,17 @@ const Settings = () => {
                                                         <div>
                                                             <Label htmlFor="newpasswordInput" className="form-label">New
                                                                 Password*</Label>
-                                                            <Input type="password" className="form-control"
-                                                                id="newpasswordInput" placeholder="Enter new password" />
+                                                            <Input type="password" className="form-control" name='passwordNew'
+                                                                id="newpasswordInput" placeholder="Enter new password"
+                                                                onChange={validationChangePW.handleChange}
+                                                                onBlur={validationChangePW.handleBlur}
+                                                                value={validationChangePW.values.passwordNew || ""}
+                                                                invalid={
+                                                                    validationChangePW.touched.passwordNew && validationChangePW.errors.passwordNew ? true : false
+                                                                } />
+                                                                   {validationChangePW.touched.passwordNew && validationChangePW.errors.passwordNew ? (
+                                                                <FormFeedback type="invalid">{validationChangePW.errors.passwordNew}</FormFeedback>
+                                                            ) : null}
                                                         </div>
                                                     </Col>
 
@@ -526,9 +595,18 @@ const Settings = () => {
                                                         <div>
                                                             <Label htmlFor="confirmpasswordInput" className="form-label">Confirm
                                                                 Password*</Label>
-                                                            <Input type="password" className="form-control"
+                                                            <Input type="password" className="form-control"name='passwordConfirm'
                                                                 id="confirmpasswordInput"
-                                                                placeholder="Confirm password" />
+                                                                placeholder="Confirm password"
+                                                                onChange={validationChangePW.handleChange}
+                                                                onBlur={validationChangePW.handleBlur}
+                                                                value={validationChangePW.values.passwordConfirm || ""}
+                                                                invalid={
+                                                                    validationChangePW.touched.passwordConfirm && validationChangePW.errors.passwordConfirm ? true : false
+                                                                } />
+                                                                   {validationChangePW.touched.passwordConfirm && validationChangePW.errors.passwordConfirm ? (
+                                                                <FormFeedback type="invalid">{validationChangePW.errors.passwordConfirm}</FormFeedback>
+                                                            ) : null}
                                                         </div>
                                                     </Col>
 
@@ -542,7 +620,7 @@ const Settings = () => {
 
                                                     <Col lg={12}>
                                                         <div className="text-end">
-                                                            <button type="button" className="btn btn-success">Change
+                                                            <button type="submit" className="btn btn-success">Change
                                                                 Password</button>
                                                         </div>
                                                     </Col>
@@ -629,7 +707,7 @@ const Settings = () => {
                                                                         Title</Label>
                                                                     <Input type="text" className="form-control"
                                                                         id="jobTitle" placeholder="Job title"
-                                                                        defaultValue="Lead Designer / Developer" />
+                                                                        defaultValue="Fouder" />
                                                                 </div>
                                                             </Col>
 
