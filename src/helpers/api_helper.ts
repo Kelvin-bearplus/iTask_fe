@@ -76,7 +76,13 @@ class APIClient {
   create = (url: string, data: any): Promise<AxiosResponse> => {
     return axios.post(url, data);
   };
-
+  createFile =  (url: string, data: FormData): Promise<AxiosResponse> => {
+    return axios.post(url, data, {
+      headers: {
+        'Content-Type': 'multipart/form-data' // Thiết lập Content-Type là multipart/form-data
+      }
+    });
+  };
   /**
    * Updates data
    */

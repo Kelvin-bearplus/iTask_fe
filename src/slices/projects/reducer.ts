@@ -1,9 +1,10 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { getProjectList, addProjectList, updateProjectList, deleteProjectList } from './thunk';
+import { getProjectList, addProjectList, deleteProjectList,getProjectById,updateProjectById } from './thunk';
 export const initialState : any= {
     projectLists: [],
     error: "",
     toastData: "",
+    
 };
 const ProjectsSlice = createSlice({
     name: 'ProjectsSlice',
@@ -16,7 +17,7 @@ const ProjectsSlice = createSlice({
     },
     extraReducers: (builder) => {
         builder.addCase(getProjectList.fulfilled, (state:any, action:any) => {
-            state.projectLists = action.payload.data;
+            state.projectLists = action.payload;
         });
         builder.addCase(getProjectList.rejected,(state:any, action:any) => {
             state.error = action.payload.error || null;
@@ -34,18 +35,29 @@ const ProjectsSlice = createSlice({
             console.log(action.payload)
             state.error = action.payload || null;
         });
-        builder.addCase(updateProjectList.fulfilled, (state:any, action:any) => {
-            state.projectLists = state.projectLists.map((project:any) =>
-                project._id.toString() === action.payload.data._id.toString()
-                    ? { ...project, ...action.payload.data }
-                    : project
-            );
+        builder.addCase(getProjectById.fulfilled, (state:any, action:any) => {
+            state.projectLists.push(action.payload);
+           if (action.payload.error){
+            state.error=action.payload.error;
+           }
         });
-        builder.addCase(updateProjectList.rejected, (state:any, action:any) => {
-            state.error = action.payload.error || null;
+        builder.addCase(getProjectById.rejected, (state:any, action:any) => {
+            console.log(action.payload)
+            state.error = action.payload || null;
         });
+        builder.addCase(updateProjectById.fulfilled, (state:any, action:any) => {
+            // state.projectLists.push(action.payload);
+           if (action.payload.error){
+            state.error=action.payload.error;
+           }
+        });
+        builder.addCase(updateProjectById.rejected, (state:any, action:any) => {
+            console.log(action.payload)
+            state.error = action.payload || null;
+        });
+
         builder.addCase(deleteProjectList.fulfilled, (state:any, action:any) => {
-            state.projectLists = state.projectLists.filter((project:any) => project.id.toString() !== action.payload.id.toString());
+            // state.projectLists = state.projectLists.filter((project:any) => project.id.toString() !== action.payload.id.toString());
         });
         builder.addCase(deleteProjectList.rejected, (state:any, action:any) => {
             state.error = action.payload.error || null;

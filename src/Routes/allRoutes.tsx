@@ -17,6 +17,7 @@ import Chat from "../pages/Chat";
 import ProjectList from "../pages/Projects/ProjectList";
 import ProjectOverview from "../pages/Projects/ProjectOverview";
 import CreateProject from "../pages/Projects/CreateProject";
+import UpdateProject from "../pages/Projects/UpdateProject";
 
 // //Task
 import TaskDetails from "../pages/Tasks/TaskDetails";
@@ -59,6 +60,7 @@ const authProtectedRoutes = [
   { path: "/apps-projects-list", component: <ProjectList /> },
   { path: "/apps-projects-overview", component: <ProjectOverview /> },
   { path: "/apps-projects-create", component: <CreateProject /> },
+  { path: "/apps-projects-update", component: <UpdateProject /> },
 
   // //Task
   { path: "/apps-tasks-kanban", component: <Kanbanboard /> },

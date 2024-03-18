@@ -12,12 +12,78 @@ import Dropzone from "react-dropzone";
 import{ formatDateCreateProject} from"../../../helpers/format";
 import DatePicker from "react-flatpickr";
 import { useSelector, useDispatch } from "react-redux";
-import {addProjectList,resetProjectFlag,getPathImage,getProjectById} from "../../../slices/thunks"
+import {updateProjectById,resetProjectFlag,getPathImage,getProjectById} from "../../../slices/thunks"
 import { toast,ToastContainer } from 'react-toastify';
 import { createSelector } from 'reselect';
 
-const CreateProject = () => {
-    
+const UpdateProject = () => {
+    const searchParams = new URLSearchParams(window.location.search);
+    const id = searchParams.get('id');
+    // console.log(id);
+
+
+    interface Project {
+        id: number;
+        name: string;
+        description: string;
+        status: number;
+        thumbnail_url: string;
+        privacy: number;
+        owner: {};
+        deadline: string;
+        started_at: string;
+        total_tasks: number;
+        completed_tasks: number;
+        members: [];
+    }
+
+    const unitProject: Project = {
+        id: 0,
+        name: '',
+        description: '',
+        status: 0,
+        thumbnail_url: '',
+        privacy: 0,
+        owner: {},
+        deadline: '',
+        started_at: '',
+        total_tasks: 0,
+        completed_tasks: 0,
+        members: []
+    };
+    const initData:Date=new Date();
+ const [dataDeadline,setDataDeadline]=useState<Date>(initData);
+ const [dataStart,setDataStart]=useState<Date>(initData);
+    const [dataProjectById, setDataProjectById] = useState<Project>(unitProject);
+    const getDataProject = async (id: number) => {
+        const data = await dispatch(getProjectById(id));
+        setDataProjectById(data.payload.data);
+        setThumbnail_avai(data.payload.data.thumbnail_url)
+        setEditorData(data.payload.data.description)
+        const deadlineData = new Date(data.payload.data.deadline);
+        const startData = new Date(data.payload.data.started_at);
+        setSelectedDeadline(formatDateCreateProject(deadlineData))
+        setSelectedStart(formatDateCreateProject(startData))
+        setDataDeadline(deadlineData)
+        setDataStart(startData)
+   if (data.payload.data.taga!=""){
+    const items: { value: string; label: string }[] = data.payload.data.tags.split(',').map((item: string) => ({
+        value: item.trim(),
+        label: item.trim()
+    }));
+    console.log(data.payload.data.tags)
+    setselectedMulti(items)
+   }
+        console.log(dataProjectById);
+        return data;
+    };
+useEffect(()=>{
+    if(id !=undefined){
+        console.log(id);
+       var id_parse=parseInt(id);
+          getDataProject(id_parse);
+    }
+},[]);
 
     const SingleOptions = [
         { value: 'Watches', label: 'Watches' },
@@ -53,6 +119,7 @@ const CreateProject = () => {
     const [dataTag, setDataTag] = useState<any>("");
 
     const handleMulti = (selectedMulti:any) => {
+        console.log(selectedMulti)
     setselectedMulti(selectedMulti);
         var selectedData="";
         let lastIndex = selectedMulti.length - 1;
@@ -106,13 +173,12 @@ const CreateProject = () => {
 
     const handleStartChange = (date: Date[]) => {
         setSelectedStart(formatDateCreateProject(date[0])); // Lấy ngày đầu tiên trong mảng date
-        console.log('Selected Start:', setSelectedStart);
+      
     };
     const [selectedDeadline, setSelectedDeadline] = useState<string>('');
 
     const handleDeadlineChange = (date: Date[]) => {
         setSelectedDeadline(formatDateCreateProject(date[0])); // Lấy ngày đầu tiên trong mảng date
-        console.log('Selected Start:', setSelectedDeadline);
     };
     const userIdString:string|null = localStorage.getItem('userId'); 
     var userId:number=0;
@@ -128,17 +194,19 @@ const getThumbnail = async (e:any) => {
         var urlThumbnail = await getPathImage(file);
         urlThumbnail="https://"+urlThumbnail;
         console.log(urlThumbnail)
+        setThumbnail_avai(urlThumbnail)
         setThumbnail(urlThumbnail);
 }
 
+const [thumbnail_avai, setThumbnail_avai] = useState("");
       const validation = useFormik({
         // enableReinitialize : use this flag when initial values needs to be changed
         enableReinitialize: true,
 
         initialValues: {
-            name:  '',
-            privacy: "Private",
-            status: 1,
+            name: dataProjectById.name ? dataProjectById.name : '',
+            privacy: dataProjectById.privacy ? dataProjectById.privacy : 'Private',
+            status: dataProjectById.status ? dataProjectById.status : 2,
             // description: "",
         },
         validationSchema: Yup.object({
@@ -158,15 +226,14 @@ const getThumbnail = async (e:any) => {
                created_by:userId, 
                tags:dataTag,
             }
-            console.log(typeof values.status.toString());
-            if (selectedDeadline&&selectedStart){
-                dispatch(addProjectList(valueSubmit))
-
+            console.log(valueSubmit);
+            if (selectedDeadline && selectedStart && id != null) {
+                dispatch(updateProjectById({ id, project: valueSubmit }));
             }
             }
     });
 
-document.title="Create Project For My Team";
+document.title="Update Project For My Team";
 
     return (
         <React.Fragment>
@@ -185,7 +252,7 @@ document.title="Create Project For My Team";
                                                     </>
                                                 ) : null}
                 <Container fluid>
-                    <BreadCrumb title="Create Project" pageTitle="Projects" />
+                    <BreadCrumb title="Update Project" pageTitle="Projects" />
                     <Form
                     onSubmit={(e) => {
                         e.preventDefault();
@@ -215,7 +282,7 @@ document.title="Create Project For My Team";
                                     <div className="mb-3">
                                         <Label className="form-label" htmlFor="project-thumbnail-img">Thumbnail Image</Label>
                                         <Input className="form-control" name="thumnail_url" id="project-thumbnail-img" type="file" accept="image/png, image/gif, image/jpeg" onChange={getThumbnail}/>
-                                        {thumbnail && <img src={thumbnail} className='mt-2 __thumb_avai'/>}
+                                        {thumbnail_avai && <img src={thumbnail_avai} className='mt-2 __thumb_avai'/>}
                                     </div>
 
                                     <div className="mb-3">
@@ -235,7 +302,7 @@ document.title="Create Project For My Team";
                                         <select className="form-select" data-choices data-choices-search-false
                                             id="choices-privacy-status-input" name='privacy' onChange={validation.handleChange}
                                             onBlur={validation.handleBlur}
-                                            value={validation.values.privacy || "Private"}>
+                                            value={validation.values.privacy || "Private"} >
                                             <option value="0">Private</option>
                                             <option value="1">Public</option>
                                         </select>
@@ -247,9 +314,11 @@ document.title="Create Project For My Team";
                                                 <select className="form-select" data-choices data-choices-search-false
                                                     id="choices-status-input" name='status' onChange={validation.handleChange}
                                                     onBlur={validation.handleBlur}
-                                                    value={validation.values.status || 1} >
-                                                    <option value="1">Pending</option>
+                                                    value={validation.values.status || 1}
+                                                     >
+                                                     <option value="1">Pending</option>
                                                     <option value="2">Inprogress</option>
+                                                    <option value="3">Completed</option>
                                                 </select>
                                             </div>
                                         </Col>
@@ -263,6 +332,7 @@ document.title="Create Project For My Team";
                                                             options={{
                                                                 dateFormat: "d-m-Y", // Định dạng ngày tháng thành "dd-mm-yyyy"
                                                             }}
+                                                            value={dataStart ? dataStart : new Date()}
                                                             // defaultValue={dob}
                                                             />
                                                             {showError && !selectedStart && <div  className="invalid-feedback" style={{display:"block"}}>Please Enter Start day</div>}
@@ -279,6 +349,7 @@ document.title="Create Project For My Team";
                                                     onChange={(selectedMulti: any) => {
                                                         handleMulti(selectedMulti);
                                                     }}
+                                                    
                                                     options={SingleOptions}
                                                 />
                                                 {/* <div onClick={khanh}>check</div> */}
@@ -291,6 +362,7 @@ document.title="Create Project For My Team";
                                                             onChange={handleDeadlineChange}
                                                             placeholder="Enter deadline day"
                                                             className={`form-control `}
+                                                            value={dataDeadline ? dataDeadline : new Date()}
                                                             options={{
                                                                 dateFormat: "d-m-Y", // Định dạng ngày tháng thành "dd-mm-yyyy"
                                                             }}
@@ -373,7 +445,7 @@ document.title="Create Project For My Team";
 
                             <div className="text-end mb-4">
                             
-                                <button type="submit" className="btn btn-success w-sm" onClick={() => setShowError(!showError)}>Create</button>
+                                <button type="submit" className="btn btn-success w-sm" onClick={() => setShowError(!showError)}>Update</button>
                             </div>
                         </Col>
 
@@ -386,4 +458,4 @@ document.title="Create Project For My Team";
     );
 };
 
-export default CreateProject;
+export default UpdateProject;
