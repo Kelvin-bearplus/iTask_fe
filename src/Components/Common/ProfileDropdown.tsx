@@ -17,7 +17,11 @@ const ProfileDropdown = () => {
     const user = useSelector(profiledropdownData);
 
     const [userName, setUserName] = useState("Admin");
-
+//   var name:string=localStorage.getItem("user_name")||"";
+//     setUserName(name);
+//     const [userAvatar, setUserAvatar] = useState("");
+//     var avatar:string=localStorage.getItem("user_avatar_url")||"";
+//     setUserAvatar(avatar);
     useEffect(() => {
         const authUSer : any = localStorage.getItem("authUser");
         if (authUSer) {

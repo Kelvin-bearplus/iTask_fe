@@ -8,11 +8,13 @@ import { useFormik } from "formik";
 //import images
 import progileBg from '../../assets/images/profile-bg.jpg';
 import avatar1 from '../../assets/images/users/avatar-1.jpg';
-import { editProfile, resetProfileFlag, getUserProfileByEmail } from "../../slices/thunks";
+import { editProfile, resetProfileFlag, getUserProfileByEmail, getPathImage } from "../../slices/thunks";
 import { useSelector, useDispatch } from "react-redux";
 import { createSelector } from "reselect";
 import internal from "stream";
 import DatePicker from "react-flatpickr";
+import{ formatDateCreateProject} from"../../helpers/format";
+
 const Settings = () => {
     const [activeTab, setActiveTab] = useState("1");
 
@@ -29,9 +31,11 @@ const Settings = () => {
         "phone": string;
         "dob": string;
         "bio": string;
+      "profile_cover_url":string
 
     }
     const initialUserInfo: UserInfo = {
+        profile_cover_url:"",
         profile_ava_url: "",
         username: "",
         full_name: "",
@@ -40,6 +44,9 @@ const Settings = () => {
         dob: "",
         bio: "",
     };
+    const initData:Date=new Date();
+ const [dataStart,setDataStart]=useState<Date>(initData);
+
     const [userInfoApi, setUserInfoApi] = useState<UserInfo>(initialUserInfo);
 
     const userInfo: string = localStorage.getItem("userInfo") ?? "";
@@ -58,11 +65,30 @@ const Settings = () => {
             error: state.error
         })
     );
+    const [thumbnail, setThumbnail] = useState("");
+    const [thumbnailCover, setThumbnailCover] = useState("");
+    const getThumbnail = async (e: any) => {
+        var file = e.target.files[0];
+        // console.log("khanh"); 
+        var urlThumbnail = await getPathImage(file);
+        urlThumbnail = "https://" + urlThumbnail;
+        console.log(urlThumbnail)
+        setThumbnail(urlThumbnail);
+    }
+    const getThumbnailCover = async (e: any) => {
+        var file = e.target.files[0];
+        // console.log("khanh"); 
+        var urlThumbnail = await getPathImage(file);
+        urlThumbnail = "https://" + urlThumbnail;
+        console.log(urlThumbnail)
+        setThumbnailCover(urlThumbnail);
+    }
     // Inside your component
     const {
         user, success, error
     } = useSelector(userprofileData);
     const [dob, setDob] = useState<string>("");
+    const [name, setName] = useState<string>("");
     const fetchUserProfile = async () => {
         try {
             // console.log(userInfo.email)
@@ -70,6 +96,13 @@ const Settings = () => {
             // return storedUser;
             if (storedUser) {
                 setUserInfoApi(storedUser);
+                const dob_avai = new Date(storedUser.dob);
+                setThumbnail(storedUser.profile_ava_url);
+                setThumbnailCover(storedUser.profile_cover_url);
+                setSelectedDate(formatDateCreateProject(dob_avai))
+                setDataStart(dob_avai)
+                setName(storedUser.full_name)
+                
             }
             console.log(storedUser);
         } catch (error) {
@@ -115,7 +148,8 @@ const Settings = () => {
         }),
         onSubmit: (values) => {
             var infoSubmit: UserInfo = {
-                profile_ava_url: "test",
+                profile_ava_url: thumbnail,
+                profile_cover_url: thumbnailCover,
                 full_name: values.full_name,
                 username: values.username,
                 phone: values.phone,
@@ -124,6 +158,8 @@ const Settings = () => {
                 dob: selectedDate,
             }
             if (userInfoApi.id) {
+                // localStorage.setItem('user_avatar_url', thumbnail);
+                // localStorage.setItem('user_name', values.full_name);
                 dispatch(editProfile(infoSubmit, userInfoApi.id));
             }
 
@@ -155,12 +191,12 @@ const Settings = () => {
                 <Container fluid>
                     <div className="position-relative mx-n4 mt-n4">
                         <div className="profile-wid-bg profile-setting-img">
-                            <img src={progileBg} className="profile-wid-img" alt="" />
+                            <img src={thumbnailCover == "" ? progileBg : thumbnailCover} className="profile-wid-img" alt="" />
                             <div className="overlay-content">
                                 <div className="text-end p-3">
                                     <div className="p-0 ms-auto rounded-circle profile-photo-edit">
                                         <Input id="profile-foreground-img-file-input" type="file"
-                                            className="profile-foreground-img-file-input" />
+                                            className="profile-foreground-img-file-input" accept="image/png, image/gif, image/jpeg" onChange={getThumbnailCover} />
                                         <Label htmlFor="profile-foreground-img-file-input"
                                             className="profile-photo-edit btn btn-light">
                                             <i className="ri-image-edit-line align-bottom me-1"></i> Change Cover
@@ -176,12 +212,12 @@ const Settings = () => {
                                 <CardBody className="p-4">
                                     <div className="text-center">
                                         <div className="profile-user position-relative d-inline-block mx-auto  mb-4">
-                                            <img src={avatar1}
+                                            <img src={thumbnail == "" ? avatar1 : thumbnail}
                                                 className="rounded-circle avatar-xl img-thumbnail user-profile-image"
                                                 alt="user-profile" />
                                             <div className="avatar-xs p-0 rounded-circle profile-photo-edit">
                                                 <Input id="profile-img-file-input" type="file"
-                                                    className="profile-img-file-input" />
+                                                    className="profile-img-file-input" onChange={getThumbnail} />
                                                 <Label htmlFor="profile-img-file-input"
                                                     className="profile-photo-edit avatar-xs">
                                                     <span className="avatar-title rounded-circle bg-light text-body">
@@ -190,7 +226,7 @@ const Settings = () => {
                                                 </Label>
                                             </div>
                                         </div>
-                                        <h5 className="fs-16 mb-1">Anna Adame</h5>
+                                        <h5 className="fs-16 mb-1">{name}</h5>
                                         <p className="text-muted mb-0">Lead Designer / Developer</p>
                                     </div>
                                 </CardBody>
@@ -412,7 +448,7 @@ const Settings = () => {
                                                             options={{
                                                                 dateFormat: "d-m-Y", // Định dạng ngày tháng thành "dd-mm-yyyy"
                                                             }}
-                                                            defaultValue={dob}
+                                                            value={dataStart ? dataStart : new Date()}
                                                         />
                                                     </Col>
                                                     <Col md={6} xs={12} className="mb-3">
