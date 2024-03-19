@@ -13,26 +13,35 @@ import * as Yup from "yup";
 import { useFormik } from "formik";
 
 // action
-import { userForgetPassword,userForgetPasswordFlagNew } from "../../slices/thunks";
+import { userResetPassword,userForgetPasswordFlagNew } from "../../slices/thunks";
 import { createSelector } from "reselect";
 
 const ForgetPasswordPage = (props : any) => {
   const dispatch : any = useDispatch();
-
+  const searchParams = new URLSearchParams(window.location.search);
+  const email = searchParams.get('email');
   const validation : any = useFormik({
     // enableReinitialize : use this flag when initial values needs to be changed
     enableReinitialize: true,
 
     initialValues: {
-      email: '',
+      password: '',
+      password_confirmation: '',
     },
     validationSchema: Yup.object({
-      email: Yup.string().required("Please Enter Your  Email"),
+      password: Yup.string().required("Please Enter Your  password"),
+      password_confirmation: Yup.string()
+      .oneOf([Yup.ref('password'), ""],)
+      .required('Confirm Password is required')
     }),
+
     onSubmit:async (values) => {
-    const data= await dispatch(userForgetPassword(values.email, props.history));
+      const user={email:email,password:values.password}
+    const data= await dispatch(userResetPassword(user, props.history));
    if(data=="Success"){
-   window.location.href='/verify-email?email='+values.email;
+   setTimeout(()=>{
+    window.location.href='/login';
+   },2000)
    }
     }
   });
@@ -97,26 +106,43 @@ const ForgetPasswordPage = (props : any) => {
                       }}
                     >
                       <div className="mb-4">
-                        <Label className="form-label">Email </Label>
+                        <Label className="form-label">Password </Label>
                         <Input
-                          name="email"
+                          name="password"
                           className="form-control"
-                          placeholder="Enter email "
-                          type="email"
+                          placeholder="Password email "
+                          type="text"
                           onChange={validation.handleChange}
                           onBlur={validation.handleBlur}
-                          value={validation.values.email || ""}
+                          value={validation.values.password || ""}
                           invalid={
-                            validation.touched.email && validation.errors.email ? true : false
+                            validation.touched.password && validation.errors.password ? true : false
                           }
                         />
-                        {validation.touched.email && validation.errors.email ? (
-                          <FormFeedback type="invalid"><div>{validation.errors.email}</div></FormFeedback>
+                        {validation.touched.password && validation.errors.password ? (
+                          <FormFeedback type="invalid"><div>{validation.errors.password}</div></FormFeedback>
                         ) : null}
                       </div>
-
+                      <div className="mb-4">
+                        <Label className="form-label">Password Confirm </Label>
+                        <Input
+                          name="password_confirmation"
+                          className="form-control"
+                          placeholder="Enter password confirm "
+                          type="text"
+                          onChange={validation.handleChange}
+                          onBlur={validation.handleBlur}
+                          value={validation.values.password_confirmation || ""}
+                          invalid={
+                            validation.touched.password_confirmation && validation.errors.password_confirmation ? true : false
+                          }
+                        />
+                        {validation.touched.password_confirmation && validation.errors.password_confirmation ? (
+                          <FormFeedback type="invalid"><div>{validation.errors.password_confirmation}</div></FormFeedback>
+                        ) : null}
+                      </div>
                       <div className="text-center mt-4">
-                        <button className="btn btn-success w-100" type="submit">Send Reset Link</button>
+                        <button className="btn btn-success w-100" type="submit">Reset Password</button>
                       </div>
                     </Form>
                   </div>

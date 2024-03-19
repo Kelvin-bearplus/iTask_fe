@@ -30,8 +30,10 @@ import TaskList from "../pages/Tasks/TaskList";
 // //login
 import Login from "../pages/Authentication/Login";
 import ForgetPasswordPage from "../pages/Authentication/ForgetPassword";
+import VerifyEmail from "../pages/Authentication/VerifyEmail";
 import Logout from "../pages/Authentication/Logout";
 import Register from "../pages/Authentication/Register";
+import ChangePassword from "../pages/Authentication/ChangePW";
 
 
 
@@ -86,6 +88,8 @@ const publicRoutes = [
   { path: "/logout", component: <Logout /> },
   { path: "/login", component: <Login /> },
   { path: "/forgot-password", component: <ForgetPasswordPage /> },
+  { path: "/verify-email", component: <VerifyEmail /> },
+  { path: "/change-password", component: <ChangePassword /> },
   { path: "/register", component: <Register /> },
 
   // //AuthenticationInner pages

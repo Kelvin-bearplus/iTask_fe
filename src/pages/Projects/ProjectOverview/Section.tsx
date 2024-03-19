@@ -9,7 +9,7 @@ import DocumentsTab from './DocumentsTab';
 import ActivitiesTab from './ActivitiesTab';
 import TeamTab from './TeamTab';
 
-const Section = () => {
+const Section = (dataProject:any) => {
     //Tab 
     const [activeTab, setActiveTab] = useState<any>('1');
     const toggleTab = (tab:any) => {
@@ -17,6 +17,7 @@ const Section = () => {
             setActiveTab(tab);
         }
     };
+    console.log(dataProject)
     return (
         <React.Fragment>
             <Row>
@@ -36,7 +37,7 @@ const Section = () => {
                                             </div>
                                             <div className="col-md">
                                                 <div>
-                                                    <h4 className="fw-bold">Velzon - Admin & Dashboard</h4>
+                                                    <h4 className="fw-bold">{dataProject.prop.name}</h4>
                                                     <div className="hstack gap-3 flex-wrap">
                                                         <div><i className="ri-building-line align-bottom me-1"></i> Themesbrand</div>
                                                         <div className="vr"></div>
@@ -109,7 +110,7 @@ const Section = () => {
                 <Col lg={12}>
                     <TabContent activeTab={activeTab} className="text-muted">
                     <TabPane tabId="1">
-                        <OverviewTab />
+                        <OverviewTab prop={dataProject}/>
                     </TabPane>
                     <TabPane tabId="2">
                         <DocumentsTab />

@@ -15,12 +15,17 @@ const forgotPasswordSlice = createSlice({
       userForgetPasswordError(state, action) {
           state.forgetError = action.payload
       },
+      userForgetPasswordFlag(state) {
+        state.forgetError = null;
+        state.forgetSuccessMsg=null;
+    },
   },
 });
 
 export const {
   userForgetPasswordSuccess,
-  userForgetPasswordError
+  userForgetPasswordError,
+  userForgetPasswordFlag
 } = forgotPasswordSlice.actions
 
 export default forgotPasswordSlice.reducer;

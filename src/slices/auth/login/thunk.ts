@@ -52,7 +52,7 @@ export const loginUser = (user : any, history : any) => async (dispatch : any) =
         history('/dashboard-projects')
       }
     }
-  } catch (error) {
+  } catch (error:any) {
     console.log(error);
     var message:string = "lỗi"
     dispatch(apiError(message));

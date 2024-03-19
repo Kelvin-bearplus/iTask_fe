@@ -1,6 +1,7 @@
-import React from 'react';
+// import React from 'react';
 import { Link } from 'react-router-dom';
 import { Card, CardBody, CardHeader, Col, DropdownItem, DropdownMenu, DropdownToggle, Row, UncontrolledDropdown } from 'reactstrap';
+import React, { useEffect, useState } from 'react';
 
 //import images
 import avatar8 from "../../../assets/images/users/avatar-8.jpg";
@@ -13,10 +14,13 @@ import avatar7 from "../../../assets/images/users/avatar-7.jpg";
 import image4 from "../../../assets/images/small/img-4.jpg";
 import image5 from "../../../assets/images/small/img-5.jpg";
 
+
 //SimpleBar
 import SimpleBar from "simplebar-react";
 
-const OverviewTab = () => {
+const OverviewTab = (dataProject:any) => {
+    
+
     return (
         <React.Fragment>
             <Row>
