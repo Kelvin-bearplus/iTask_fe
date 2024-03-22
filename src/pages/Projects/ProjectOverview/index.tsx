@@ -13,10 +13,13 @@ const ProjectOverview = () => {
     const id = searchParams.get('id');
     const getDataProject = async (id: number) => {
         const data = await dispatch(getProjectById(id));
+        console.log(data);
         setDataProject(data.payload.data);
         return data;
     };
+    console.log(id)
     useEffect(() => {
+        console.log(id)
         if (id != undefined) {
             console.log(id);
             var id_parse = parseInt(id);
@@ -26,11 +29,11 @@ const ProjectOverview = () => {
     console.log(dataProject)
     return (
         <React.Fragment>
-            <div className="page-content">
+        {dataProject &&    <div className="page-content">
                 <Container fluid>                    
                 <Section prop={dataProject}/>
                 </Container>
-            </div>
+            </div>}
         </React.Fragment>
     );
 };

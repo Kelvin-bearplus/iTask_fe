@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Card, CardBody, Col, Nav, NavItem, NavLink, Row, TabContent, TabPane } from 'reactstrap';
 import classnames from 'classnames';
 
@@ -15,8 +15,32 @@ const Section = (dataProject:any) => {
     const toggleTab = (tab:any) => {
         if (activeTab !== tab) {
             setActiveTab(tab);
+            console.log(activeTab)
         }
     };
+    const[startDate,setStartDate]=useState<any>();
+    const[deadlineDate,setDeadlineDate]=useState<any>();
+    function formatDate(inputDate:string) {
+        // Tạo một đối tượng Date từ chuỗi đầu vào
+        const date = new Date(inputDate);
+        
+        // Mảng các tháng
+        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      
+        // Lấy ngày, tháng và năm từ đối tượng Date
+        const day = date.getDate();
+        const monthIndex = date.getMonth();
+        const year = date.getFullYear();
+      
+        // Tạo định dạng ngày mới
+        const formattedDate = `${day} ${months[monthIndex]}, ${year}`;
+      
+        return formattedDate;
+      }
+      useEffect(() => {
+        setStartDate(formatDate(dataProject.prop.started_at))
+      setDeadlineDate(formatDate(dataProject.prop.deadline))
+      },[])
     console.log(dataProject)
     return (
         <React.Fragment>
@@ -31,22 +55,22 @@ const Section = (dataProject:any) => {
                                             <div className="col-md-auto">
                                                 <div className="avatar-md">
                                                     <div className="avatar-title bg-white rounded-circle">
-                                                        <img src={slack} alt="" className="avatar-xs" />
+                                                        <img src={dataProject.prop.thumbnail_url?dataProject.prop.thumbnail_url:slack} alt="" className="avatar-xs" />
                                                     </div>
                                                 </div>
                                             </div>
                                             <div className="col-md">
                                                 <div>
-                                                    <h4 className="fw-bold">{dataProject.prop.name}</h4>
+                                                    <h4 className="fw-bold">{dataProject.prop.name?dataProject.prop.name:""}</h4>
                                                     <div className="hstack gap-3 flex-wrap">
                                                         <div><i className="ri-building-line align-bottom me-1"></i> Themesbrand</div>
                                                         <div className="vr"></div>
-                                                        <div>Create Date : <span className="fw-medium">15 Sep, 2021</span></div>
+                                                        <div>Create Date : <span className="fw-medium">{startDate}</span></div>
                                                         <div className="vr"></div>
-                                                        <div>Due Date : <span className="fw-medium">29 Dec, 2021</span></div>
+                                                        <div>Due Date : <span className="fw-medium">{deadlineDate}</span></div>
                                                         <div className="vr"></div>
-                                                        <div className="badge rounded-pill bg-info fs-12">New</div>
-                                                        <div className="badge rounded-pill bg-danger fs-12">High</div>
+                                                        {/* <div className="badge rounded-pill bg-info fs-12">New</div> */}
+                                                        <div className="badge rounded-pill bg-danger fs-12">{dataProject.prop.priority}</div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -68,38 +92,38 @@ const Section = (dataProject:any) => {
                                 </Row>
 
                                 <Nav className="nav-tabs-custom border-bottom-0" role="tablist">
-                                    <NavItem>
+                                    {/* <NavItem>
                                         <NavLink
                                             className={classnames({ active: activeTab === '1' }, "fw-semibold")}
                                             onClick={() => { toggleTab('1'); }}
                                             href="#">
                                             Overview
                                         </NavLink>
-                                    </NavItem>
-                                    <NavItem>
+                                    </NavItem> */}
+                                    {/* <NavItem>
                                         <NavLink
                                             className={classnames({ active: activeTab === '2' }, "fw-semibold")}
                                             onClick={() => { toggleTab('2'); }}
                                             href="#">
                                             Documents
                                         </NavLink>
-                                    </NavItem>
-                                    <NavItem>
+                                    </NavItem> */}
+                                    {/* <NavItem>
                                         <NavLink
                                             className={classnames({ active: activeTab === '3' }, "fw-semibold")}
                                             onClick={() => { toggleTab('3'); }}
                                             href="#">
                                             Activities
                                         </NavLink>
-                                    </NavItem>
-                                    <NavItem>
+                                    </NavItem> */}
+                                    {/* <NavItem>
                                         <NavLink
                                             className={classnames({ active: activeTab === '4' }, "fw-semibold")}
                                             onClick={() => { toggleTab('4'); }}
                                             href="#">
                                             Team
                                         </NavLink>
-                                    </NavItem>
+                                    </NavItem> */}
                                 </Nav>
                             </CardBody>
                         </div>
@@ -108,20 +132,11 @@ const Section = (dataProject:any) => {
             </Row>
             <Row>
                 <Col lg={12}>
-                    <TabContent activeTab={activeTab} className="text-muted">
-                    <TabPane tabId="1">
-                        <OverviewTab prop={dataProject}/>
-                    </TabPane>
-                    <TabPane tabId="2">
-                        <DocumentsTab />
-                    </TabPane>
-                    <TabPane tabId="3">
-                        <ActivitiesTab />
-                    </TabPane>
-                    <TabPane tabId="4">
-                        <TeamTab />
-                    </TabPane>
-                    </TabContent>
+
+                    <OverviewTab dataProject={dataProject} startDate={startDate} deadlineDate={deadlineDate}/>
+          {/* {activeTab === '2' && <DocumentsTab />}
+          {activeTab === '3' && <ActivitiesTab />}
+          {activeTab === '4' && <TeamTab />} */}
                 </Col>
             </Row>
         </React.Fragment>

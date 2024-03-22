@@ -11,6 +11,8 @@ import DashboardProject from "../pages/DashboardProject";
 // //Chat
 import Chat from "../pages/Chat";
 
+import BasicSuccessMsg from '../pages/Authentication/SuccessMessage/BasicSuccessMsg';
+import FailMsg from '../pages/Authentication/FailMessage/FailMsg';
 
 
 // // Project
@@ -57,6 +59,7 @@ const authProtectedRoutes = [
   // //Chat
   { path: "/apps-chat", component: <Chat /> },
 
+  { path: "/auth-success", component: <BasicSuccessMsg /> },
 
   // //Projects
   { path: "/apps-projects-list", component: <ProjectList /> },
@@ -68,6 +71,7 @@ const authProtectedRoutes = [
   { path: "/apps-tasks-kanban", component: <Kanbanboard /> },
   { path: "/apps-tasks-list-view", component: <TaskList /> },
   { path: "/apps-tasks-details", component: <TaskDetails /> },
+  { path: "/auth-fail", component: <FailMsg /> },
 
 
   //User Profile

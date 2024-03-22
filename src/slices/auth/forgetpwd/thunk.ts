@@ -44,29 +44,23 @@ export const userVerifyCode = (user: any, history: any) => async (dispatch: any)
 export const userResetPassword = (user: any, history: any) => async (dispatch: any) => {
     try {
         const url = resetPassword + '?email=' + user.email;
-        const data_body = {
-            newpassword: user.password,
-        };
+       const data_body={
+        password:user.password,
+       }
+        const data = await api.create(url, data_body);
 
-        const response = await api.create(url, data_body);
-
-        // Kiểm tra trạng thái của phản hồi
-        if (response.status === 200) {
-            dispatch(userForgetPasswordSuccess("Reset password success"));
+        if (data) {
+            dispatch(userForgetPasswordSuccess(
+                "Reset password success"
+            ))
             return "Success";
-        } else {
-            // Xử lý lỗi 400 hoặc các trạng thái lỗi khác ở đây
-         console.log(response)
-            // dispatch(userForgetPasswordError(errorMessage));
-            return "Fail";
         }
-    } catch (error) {
-        console.error(error);
-        dispatch(userForgetPasswordError("Reset password fail"));
+    } catch (forgetError) {
+        console.log(forgetError)
+        dispatch(userForgetPasswordError("Reset password fail"))
         return "Fail";
     }
-};
-
+}
 export const userForgetPasswordFlagNew = () => async (dispatch: any) => {
     try {
         const response = dispatch(userForgetPasswordFlag());

@@ -106,7 +106,6 @@ const Login = (props: any) => {
                                             <img src={logoLight} alt="" height="20" />
                                         </Link>
                                     </div>
-                                    <p className="mt-3 fs-15 fw-medium">Premium Admin & Dashboard Template</p>
                                 </div>
                             </Col>
                         </Row>
@@ -129,7 +128,7 @@ const Login = (props: any) => {
                                                 action="#">
                                                 {error && error ? (
                                                     <Alert color="danger"><div>
-                                                        Email or password is incorrect </div></Alert>
+                                                        Email or password is incorrect or Account has not verified email </div></Alert>
                                                 ) : null}
                                            
                                                 <div className="mb-3">

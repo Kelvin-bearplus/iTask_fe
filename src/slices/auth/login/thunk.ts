@@ -13,14 +13,15 @@ export const timeExpire=(date:Date):string=>{
 
   return `${hours}:${minutes}:${seconds} ${day}-${month}-${year}`;
 }
+var data:any;
 export const loginUser = (user : any, history : any) => async (dispatch : any) => {
   try {
     let response;
   
       response = api.create (getUserLogin,user);
 
-    var data = await response;
-
+     data = await response;
+    console.log(data.error)
     if (data && data.accessToken) {
       // console.log(data.accessToken);
       // Lưu trữ accessToken vào localStorage
@@ -53,7 +54,7 @@ export const loginUser = (user : any, history : any) => async (dispatch : any) =
       }
     }
   } catch (error:any) {
-    console.log(error);
+    console.log(data);
     var message:string = "lỗi"
     dispatch(apiError(message));
   }

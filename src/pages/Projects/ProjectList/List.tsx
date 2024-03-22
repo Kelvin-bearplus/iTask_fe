@@ -259,7 +259,7 @@ const List = () => {
                                                 </div>
                                             </div>
                                             <div className="flex-grow-1">
-                                                <h5 className="mb-1 fs-15"><Link to="/apps-projects-overview" className="text-body">{item.name}</Link></h5>
+                                                <h5 className="mb-1 fs-15"><div  className="text-body">{item.name}</div></h5>
                                                 <div className="text-muted text-truncate-two-lines mb-3" dangerouslySetInnerHTML={{ __html: item.description }} />
                                             </div>
                                         </div>
