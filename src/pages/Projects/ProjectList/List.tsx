@@ -199,7 +199,7 @@ const List = () => {
                             <option value="30">Last 30 Days</option>
                             <option value="365">Last Year</option>
                             <option value="0">Today</option>
-                            <option value="1" >Yesterday</option>
+                      
                         </select>
                     </div>
                 </div>

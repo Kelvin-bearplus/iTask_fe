@@ -24,7 +24,10 @@ const OverviewTab = ({ dataProject, startDate, deadlineDate }: { dataProject: an
         items = dataProject.prop.tags.split(', ');
    console.log(items);
     }
-
+    const parseHTML = (htmlString: string) => {
+        return <div dangerouslySetInnerHTML={{ __html: htmlString }} />;
+      };
+// console.log(dataProject.prop)
     return (
         <React.Fragment>
             <Row>
@@ -33,7 +36,8 @@ const OverviewTab = ({ dataProject, startDate, deadlineDate }: { dataProject: an
                         <CardBody>
                             <div className="text-muted">
                                 <h6 className="mb-3 fw-semibold text-uppercase">Summary</h6>
-                                <p>{dataProject.prop.description}</p>
+                                {/* <p>{dataProject.prop.description}</p> */}
+                               { parseHTML(dataProject.prop.description)}
 
                                 <div>
                                     <button type="button" className="btn btn-link link-success p-0">Read more</button>
@@ -160,7 +164,7 @@ const OverviewTab = ({ dataProject, startDate, deadlineDate }: { dataProject: an
 
                         <CardBody>
 
-                            <SimpleBar style={{ height: "300px" }} className="px-3 mx-n3 mb-2">
+                            {/* <SimpleBar style={{ height: "300px" }} className="px-3 mx-n3 mb-2">
                                 <div className="d-flex mb-4">
                                     <div className="flex-shrink-0">
                                         <img src={avatar8} alt="" className="avatar-xs rounded-circle" />
@@ -219,7 +223,7 @@ const OverviewTab = ({ dataProject, startDate, deadlineDate }: { dataProject: an
                                         </div>
                                     </div>
                                 </div>
-                            </SimpleBar>
+                            </SimpleBar> */}
                             <form className="mt-4">
                                 <Row className="g-3">
                                     <Col xs={12} >
@@ -264,31 +268,36 @@ const OverviewTab = ({ dataProject, startDate, deadlineDate }: { dataProject: an
                         <CardBody>
                             <SimpleBar data-simplebar style={{ height: "235px" }} className="mx-n3 px-3">
                                 <div className="vstack gap-3">
-                                   {dataProject.members!=null&&dataProject.members.map((member: any, index: number) => {
-                                     <div className="d-flex align-items-center">
-                                     <div className="avatar-xs flex-shrink-0 me-3">
-                                         <img src={dataProject.prop.members?.account_info.profile_ava_url} alt="" className="img-fluid rounded-circle" />
-                                     </div>
-                                     <div className="flex-grow-1">
-                                         <h5 className="fs-13 mb-0"><Link to="#" className="text-body d-block">{dataProject.prop.members?.account_info.full_name}</Link></h5>
-                                     </div>
-                                     <div className="flex-shrink-0">
-                                         <div className="d-flex align-items-center gap-1">
-                                             <button type="button" className="btn btn-light btn-sm">Message</button>
-                                             <UncontrolledDropdown>
-                                                 <DropdownToggle type="button" className="btn btn-icon btn-sm fs-16 text-muted dropdown" tag="button">
-                                                     <i className="ri-more-fill"></i>
-                                                 </DropdownToggle>
-                                                 <DropdownMenu>
-                                                     <li><DropdownItem><i className="ri-eye-fill text-muted me-2 align-bottom"></i>View</DropdownItem></li>
-                                                     <li><DropdownItem><i className="ri-star-fill text-muted me-2 align-bottom"></i>Favourite</DropdownItem></li>
-                                                     <li><DropdownItem><i className="ri-delete-bin-5-fill text-muted me-2 align-bottom"></i>Delete</DropdownItem></li>
-                                                 </DropdownMenu>
-                                             </UncontrolledDropdown>
-                                         </div>
-                                     </div>
-                                 </div>
-                                   })}
+                                {dataProject.prop.members && dataProject.prop.members.map((member: any, index: number) => (
+                                    
+  <div key={index} className="d-flex align-items-center">
+    <script>console.log("khanh")</script>
+
+    <div className="avatar-xs flex-shrink-0 me-3">
+      <img src={member.account_info.profile_ava_url} alt="" className="img-fluid rounded-circle" />
+    </div>
+    <div className="flex-grow-1">
+      <h5 className="fs-13 mb-0">
+        <Link to="#" className="text-body d-block">{member.account_info.full_name}</Link>
+      </h5>
+    </div>
+    <div className="flex-shrink-0">
+      <div className="d-flex align-items-center gap-1">
+        <button type="button" className="btn btn-light btn-sm">Message</button>
+        <UncontrolledDropdown>
+          <DropdownToggle type="button" className="btn btn-icon btn-sm fs-16 text-muted dropdown" tag="button">
+            <i className="ri-more-fill"></i>
+          </DropdownToggle>
+          <DropdownMenu>
+            <li><DropdownItem><i className="ri-eye-fill text-muted me-2 align-bottom"></i>View</DropdownItem></li>
+            <li><DropdownItem><i className="ri-star-fill text-muted me-2 align-bottom"></i>Favourite</DropdownItem></li>
+            <li><DropdownItem><i className="ri-delete-bin-5-fill text-muted me-2 align-bottom"></i>Delete</DropdownItem></li>
+          </DropdownMenu>
+        </UncontrolledDropdown>
+      </div>
+    </div>
+  </div>
+))}
 
                                 </div>
                             </SimpleBar>

@@ -151,12 +151,13 @@ const getThumbnail = async (e:any) => {
                 name:values.name,
                 description:editorData,
                 thumbnail_url:thumbnail,
-               privacy:values.privacy,
+               privacy:parseInt(values.privacy),
                status: parseInt(values.status.toString()),
                deadline:selectedDeadline,
                started_at:selectedStart,
                created_by:userId, 
                tags:dataTag,
+               priority: 2,
             }
             console.log(typeof values.status.toString());
             if (selectedDeadline&&selectedStart){

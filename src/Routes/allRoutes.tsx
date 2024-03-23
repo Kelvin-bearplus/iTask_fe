@@ -59,7 +59,6 @@ const authProtectedRoutes = [
   // //Chat
   { path: "/apps-chat", component: <Chat /> },
 
-  { path: "/auth-success", component: <BasicSuccessMsg /> },
 
   // //Projects
   { path: "/apps-projects-list", component: <ProjectList /> },
@@ -71,7 +70,6 @@ const authProtectedRoutes = [
   { path: "/apps-tasks-kanban", component: <Kanbanboard /> },
   { path: "/apps-tasks-list-view", component: <TaskList /> },
   { path: "/apps-tasks-details", component: <TaskDetails /> },
-  { path: "/auth-fail", component: <FailMsg /> },
 
 
   //User Profile
@@ -89,12 +87,15 @@ const authProtectedRoutes = [
 
 const publicRoutes = [
   // Authentication Page
+  { path: "/auth-fail", component: <FailMsg /> },
+
   { path: "/logout", component: <Logout /> },
   { path: "/login", component: <Login /> },
   { path: "/forgot-password", component: <ForgetPasswordPage /> },
   { path: "/verify-email", component: <VerifyEmail /> },
   { path: "/change-password", component: <ChangePassword /> },
   { path: "/register", component: <Register /> },
+  { path: "/auth-success", component: <BasicSuccessMsg /> },
 
   // //AuthenticationInner pages
 

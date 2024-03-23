@@ -23,7 +23,7 @@ const ProjectsSlice = createSlice({
             state.error = action.payload.error || null;
         });
         builder.addCase(addProjectList.fulfilled, (state:any, action:any) => {
-            state.projectLists.push(action.payload);
+            // state.projectLists.push(action.payload.data);
             state.toastData=action.payload.toastData;
            if (action.payload.error){
             state.error=action.payload.error;
@@ -50,10 +50,13 @@ const ProjectsSlice = createSlice({
            if (action.payload.error){
             state.error=action.payload.error;
            }
+           else{
+            state.toastData="Update success";
+           }
         });
         builder.addCase(updateProjectById.rejected, (state:any, action:any) => {
             console.log(action.payload)
-            state.error = action.payload || null;
+            state.error = "Update Fail";
         });
 
         builder.addCase(deleteProjectList.fulfilled, (state:any, action:any) => {

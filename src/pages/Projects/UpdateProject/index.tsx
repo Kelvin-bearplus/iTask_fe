@@ -241,13 +241,13 @@ const UpdateProject = () => {
             <div className="page-content">
                 {toastData && toastData ? (
                     <>
-                        {toast("Add Project Success", { position: "top-right", hideProgressBar: false, className: 'bg-success text-white', progress: undefined, toastId: "" })}
+                        {toast("Update Project Success", { position: "top-right", hideProgressBar: false, className: 'bg-success text-white', progress: undefined, toastId: "" })}
                         <ToastContainer autoClose={2000} limit={1} />
                     </>
                 ) : null}
                 {error && error ? (
                     <>
-                        {toast("project-list Added Failed", { position: "top-right", hideProgressBar: false, className: 'bg-danger text-white', progress: undefined, toastId: "" })}
+                        {toast("Project-list Updated Failed", { position: "top-right", hideProgressBar: false, className: 'bg-danger text-white', progress: undefined, toastId: "" })}
                         <ToastContainer autoClose={2000} limit={1} />
 
                     </>

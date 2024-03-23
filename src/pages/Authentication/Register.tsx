@@ -64,7 +64,7 @@ const Register = () => {
 
     useEffect(() => {
         if (success) {
-            setTimeout(() => history("/login"), 3000);
+            setTimeout(() => history("/login"), 10000);
         }
 
         setTimeout(() => {
@@ -140,9 +140,9 @@ const customHandleBlur = async (e: React.ChangeEvent<HTMLInputElement>) => {
                                                 {success && success ? (
                                                     <>
                                                         {toast("Your Redirect To Login Page...", { position: "top-right", hideProgressBar: false, className: 'bg-success text-white', progress: undefined, toastId: "" })}
-                                                        <ToastContainer autoClose={2000} limit={1} />
+                                                        <ToastContainer autoClose={9000} limit={1} />
                                                         <Alert color="success">
-                                                            Register User Successfully and Your Redirect To Login Page...
+                                                            Register User Successfully. Please check your email and complete the verification process to ensure accuracy and security. Thank you.
                                                         </Alert>
                                                     </>
                                                 ) : null}

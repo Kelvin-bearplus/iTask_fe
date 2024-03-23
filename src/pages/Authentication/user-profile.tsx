@@ -287,7 +287,7 @@ console.log("khanh123")
                                 </CardBody>
                             </Card>
                             <Card>
-                                <CardBody>
+                                {/* <CardBody>
                                     <div className="d-flex align-items-center mb-4">
                                         <div className="flex-grow-1">
                                             <h5 className="card-title mb-0">Portfolio</h5>
@@ -333,7 +333,7 @@ console.log("khanh123")
                                         <Input type="text" className="form-control" id="pinterestName"
                                             placeholder="Username" defaultValue="Advance Dave" />
                                     </div>
-                                </CardBody>
+                                </CardBody> */}
                             </Card>
                         </Col>
 
