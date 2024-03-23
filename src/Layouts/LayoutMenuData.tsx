@@ -161,7 +161,7 @@ const Navdata = () => {
                     stateVariables: isProjects,
                     childItems: [
                         { id: 1, label: "List", link: "/apps-projects-list", parentId: "apps", },
-                        { id: 2, label: "Overview", link: "/apps-projects-overview", parentId: "apps", },
+                        // { id: 2, label: "Overview", link: "/apps-projects-overview", parentId: "apps", },
                         { id: 3, label: "Create Project", link: "/apps-projects-create", parentId: "apps", },
                     ]
                 },

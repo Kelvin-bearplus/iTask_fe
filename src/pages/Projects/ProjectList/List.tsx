@@ -166,7 +166,7 @@ const List = () => {
     };
     const handleSelectSearch: React.ChangeEventHandler<HTMLSelectElement> = async (event) => {
         setCreatedDaRange(event.currentTarget.value);
-        dataProject = await dispatch(onGetProjectList({ inPage: inPage, limit: limit, keyword: keyWord, created_day_range: createdDayRange }));
+        dataProject = await dispatch(onGetProjectList({ inPage: inPage, limit: limit, keyword: keyWord, created_day_range: event.currentTarget.value }));
         setTotalPage(Math.ceil(dataProject.payload.paging.total / limit))
     };
     console.log(projectLists)
@@ -193,7 +193,7 @@ const List = () => {
                         </div>
 
                         <select className="form-control w-md" data-choices data-choices-search-false onChange={handleSelectSearch}>
-                            <option value="">All</option>
+                            <option value="-1">All</option>
                             <option value="1">Last 1 Days</option>
                             <option value="7">Last 7 Days</option>
                             <option value="30">Last 30 Days</option>

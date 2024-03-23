@@ -13,48 +13,35 @@ export const timeExpire=(date:Date):string=>{
 
   return `${hours}:${minutes}:${seconds} ${day}-${month}-${year}`;
 }
-var data:any;
-export const loginUser = (user : any, history : any) => async (dispatch : any) => {
+// var data:any;
+export const loginUser = (user : any, history : any) => async (dispatch : any,req:any, res:any) => {
   try {
     let response;
-  
       response = api.create (getUserLogin,user);
-
-     data = await response;
-    console.log(data.error)
-    if (data && data.accessToken) {
-      // console.log(data.accessToken);
-      // Lưu trữ accessToken vào localStorage
-      if (data.expiresAt) {
-        const timeExpireFormatted: string = timeExpire(new Date(data.expiresAt * 1000));
-        localStorage.setItem("authUser", data.accessToken);
-        localStorage.setItem("timeExpire", timeExpireFormatted);
+    const data = await response;
+    console.log(data)
+ if (data.accessToken){
+  if (data.expiresAt) {
+    const timeExpireFormatted: string = timeExpire(new Date(data.expiresAt * 1000));
+    localStorage.setItem("authUser", data.accessToken);
+    localStorage.setItem("timeExpire", timeExpireFormatted);
+  }
+  const params = {
+    email: user.email
+  };
+  const responseInfo = await api.get(getUserByEmail,params );
+  localStorage.setItem('user_avatar_url', responseInfo.data.profile_ava_url);
+  localStorage.setItem('user_name', responseInfo.data.full_name);
+  localStorage.setItem('userId', responseInfo.data.id);
+  dispatch(loginSuccess(user));
+  console.log("loggined");
+  history('/dashboard-projects')
+  return data;
+ }
       }
-      if (process.env.REACT_APP_DEFAULTAUTH === "fake") {
-        var finallogin : any = JSON.stringify(data);
-        finallogin = JSON.parse(finallogin)
-        data = finallogin.data;
-        if (finallogin.status === "success") {
-          dispatch(loginSuccess(user));
-          history('/dashboard-projects')
-        } 
-        else {
-          dispatch(apiError(finallogin));
-        }
-      } else {
-        const params = {
-          email: user.email
-        };
-        const responseInfo = await api.get(getUserByEmail,params );
-        localStorage.setItem('user_avatar_url', responseInfo.data.profile_ava_url);
-        localStorage.setItem('user_name', responseInfo.data.full_name);
-        localStorage.setItem('userId', responseInfo.data.id);
-        dispatch(loginSuccess(user));
-        history('/dashboard-projects')
-      }
-    }
-  } catch (error:any) {
-    console.log(data);
+    
+  catch (error:any) {
+    console.log(res)
     var message:string = "lỗi"
     dispatch(apiError(message));
   }
