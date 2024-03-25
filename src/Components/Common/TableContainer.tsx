@@ -1,4 +1,4 @@
-import React, { Fragment } from "react";
+import React, { Fragment,useState } from "react";
 import PropTypes from "prop-types";
 import {
   useTable,
@@ -66,14 +66,18 @@ function GlobalFilter({
   const [value, setValue] = React.useState(globalFilter);
   const onChange = useAsyncDebounce((value  :any) => {
     setGlobalFilter(value || undefined);
+    console.log(globalFilter)
   }, 200);
-
+  const [filters, setFilters] = useState({});
+  const handleFilterChange = (newFilters:any) => {
+    setFilters(newFilters);
+};
   return (
     <React.Fragment>
       <CardBody className="border border-dashed border-end-0 border-start-0">
         <form>
           <Row>
-            <Col sm={5}>
+            <Col sm={4}>
               <div className={(isProductsFilter || isContactsFilter || isCompaniesFilter || isNFTRankingFilter) ? "search-box me-2 mb-2 d-inline-block" : "search-box me-2 mb-2 d-inline-block col-12"}>
                 <input
                   onChange={(e) => {
@@ -120,7 +124,7 @@ function GlobalFilter({
               <NFTRankingGlobalFilter />
             )}
             {isTaskListFilter && (
-              <TaskListGlobalFilter />
+              <TaskListGlobalFilter onFilterChange={onChange} />
             )}
           </Row>
         </form>
@@ -165,6 +169,8 @@ interface TableContainerProps {
     handleCompanyClick ?:any;
     handleContactClick ?:any;
     handleTicketClick ?:any;
+    onFilter?:any;
+    // Remove the duplicate declaration of 'onFilter'
 }
 
 const TableContainer = ({
@@ -197,9 +203,7 @@ const TableContainer = ({
   trClass,
   thClass,
   divClass,
-  SearchPlaceholder,
-  
-} : TableContainerProps) => {
+  SearchPlaceholder} : TableContainerProps) => {
   const {
     getTableProps,
     getTableBodyProps,
@@ -229,6 +233,8 @@ const TableContainer = ({
           },
         ],
       },
+       // Replace `handleFilterChange` with the actual function or provide an initializer.
+      
     },
     useGlobalFilter,
     useFilters,

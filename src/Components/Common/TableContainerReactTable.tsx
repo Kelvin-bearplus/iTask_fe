@@ -1,4 +1,4 @@
-import React, { Fragment } from "react";
+import React, { Fragment,useState } from "react";
 import PropTypes from "prop-types";
 import {
   useTable,
@@ -43,7 +43,11 @@ interface GlobalFilterProps {
   isTaskListFilter?: any;
   isLeadsFilter?: any;
 }
+const [filters, setFilters] = useState({});
 
+const handleFilterChange = (newFilters:any) => {
+  setFilters(newFilters);
+};
 // Define a default UI for filtering
 function GlobalFilter({
   globalFilter,
@@ -118,7 +122,7 @@ function GlobalFilter({
               <NFTRankingGlobalFilter />
             )}
             {isTaskListFilter && (
-              <TaskListGlobalFilter />
+              <TaskListGlobalFilter onFilterChange={handleFilterChange} />
             )}
           </Row>
         </form>

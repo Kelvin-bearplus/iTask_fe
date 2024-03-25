@@ -3,7 +3,6 @@ import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 //Include Both Helper File with needed methods
 import {
-    getTaskList as getTaskListApi,
     addNewTask as addNewTaskApi,
     updateTask as updateTaskApi,
     deleteTask as deleteTaskApi,
@@ -12,10 +11,14 @@ import {
     updateTasks as updateTasksApi,
     deleteTasks as deleteTasksApi
 } from "../../helpers/fakebackend_helper";
+import { getTaskListAPI } from '../../helpers/url_api'
+import { APIClient } from "../../helpers/api_helper";
+const api = new APIClient();
 export const getTaskList = createAsyncThunk("tasks/getTaskList", async () => {
     try {
-        const response = getTaskListApi();
-        return response;
+        const response =await api.get(getTaskListAPI);
+        console.log(response)
+        return response.data;
     } catch (error) {
         return error;
     }

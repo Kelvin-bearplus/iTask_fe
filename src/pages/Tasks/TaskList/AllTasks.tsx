@@ -271,7 +271,11 @@ const AllTasks = () => {
     setSelectedCheckBoxDelete(ele);
   };
 
+  const [filters, setFilters] = useState({});
 
+    const handleFilterChange = (newFilters:any) => {
+        setFilters(newFilters);
+    };
   const columns = useMemo(
     () => [
       {
@@ -283,7 +287,7 @@ const AllTasks = () => {
       },
       {
         Header: "Order ID",
-        accessor: "taskId",
+        accessor: "id",
         filterable: false,
         Cell: (cellProps: any) => {
           return <OrdersId {...cellProps} />;
@@ -291,7 +295,7 @@ const AllTasks = () => {
       },
       {
         Header: "Project",
-        accessor: "project",
+        accessor: "project_id",
         filterable: false,
         Cell: (cellProps: any) => {
           return <Project {...cellProps} />;
@@ -299,7 +303,7 @@ const AllTasks = () => {
       },
       {
         Header: "Tasks",
-        accessor: "task",
+        accessor: "name",
         filterable: false,
         Cell: (cellProps: any) => {
           return <React.Fragment>
@@ -330,35 +334,35 @@ const AllTasks = () => {
       },
       {
         Header: "Created By",
-        accessor: "creater",
+        accessor: "owner.full_name",
         filterable: false,
         Cell: (cellProps: any) => {
           return <CreateBy {...cellProps} />;
         },
       },
-      {
-        Header: "Assigned To",
-        accessor: "subItem",
-        filterable: false,
-        Cell: (cell: any) => {
-          const assigned = cell.value.map((item: any) => item.img ? item.img : item);
-          return (<React.Fragment>
-            <div className="avatar-group">
-              {assigned.map((item: any, index: any) => (
-                <Link key={index} to="#" className="avatar-group-item">
-                  <img src={item} alt="" className="rounded-circle avatar-xxs" />
-                  {/* process.env.REACT_APP_API_URL + "/images/users/" + */}
-                </Link>
-              ))}
+      // {
+      //   Header: "Assigned To",
+      //   accessor: "subItem",
+      //   filterable: false,
+      //   Cell: (cell: any) => {
+      //     const assigned = cell.value.map((item: any) => item.img ? item.img : item);
+      //     return (<React.Fragment>
+      //       <div className="avatar-group">
+      //         {assigned.map((item: any, index: any) => (
+      //           <Link key={index} to="#" className="avatar-group-item">
+      //             <img src={item} alt="" className="rounded-circle avatar-xxs" />
+      //             {/* process.env.REACT_APP_API_URL + "/images/users/" + */}
+      //           </Link>
+      //         ))}
 
-            </div>
-          </React.Fragment>);
-        },
-      },
+      //       </div>
+      //     </React.Fragment>);
+      //   },
+      // },
       {
         Header: "Due Date",
-        accessor: "dueDate",
-        filterable: false,
+        accessor: "due_date",
+        filterable: true,
         Cell: (cellProps: any) => {
           return <DueDate {...cellProps} />;
         },
@@ -366,7 +370,7 @@ const AllTasks = () => {
       {
         Header: "Status",
         accessor: "status",
-        filterable: false,
+        filterable: true,
         Cell: (cellProps: any) => {
           return <Status {...cellProps} />;
         },
@@ -429,6 +433,7 @@ console.log(TaskList);
                   handleTaskClick={handleTaskClicks}
                   isTaskListFilter={true}
                   SearchPlaceholder="Search for tasks or something..."
+                  // isAddCustList={true}
                 />
               ) : (<Loader error={error} />)
               }

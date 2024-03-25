@@ -86,15 +86,13 @@ const DueDate = (cell:any) => {
 const Status = (cell:any) => {
     return (
         <React.Fragment>
-            {cell.value === "Inprogress" ?
-                <span className="badge bg-secondary-subtle text-secondary text-uppercase">{cell.value}</span>
+            {cell.value ==1 ?
+                <span className="badge bg-secondary-subtle text-secondary text-uppercase">Pending</span>
                 :
-                cell.value === "New" ?
-                    <span className="badge bg-info-subtle text-info text-uppercase">{cell.value}</span>
-                    : cell.value === "Completed" ?
-                        <span className="badge bg-success-subtle text-success text-uppercase">{cell.value}</span>
-                        : cell.value === "Pending" ?
-                            <span className="badge bg-warning-subtle text-warning text-uppercase">{cell.value}</span>
+                cell.value ==2 ?
+                    <span className="badge bg-info-subtle text-info text-uppercase">In-progress</span>
+                    : cell.value ==3 ?
+                        <span className="badge bg-success-subtle text-success text-uppercase">Completed</span>
                             : null
             }
         </React.Fragment>
@@ -104,13 +102,13 @@ const Status = (cell:any) => {
 const Priority = (cell:any) => {
     return (
         <React.Fragment>
-            {cell.value === "Medium" ?
-                <span className="badge bg-warning text-uppercase">{cell.value}</span>
+            {cell.value ==1 ?
+                <span className="badge  bg-danger  text-uppercase">High</span>
                 :
-                cell.value === "High" ?
-                    <span className="badge bg-danger text-uppercase">{cell.value}</span>
-                    : cell.value === "Low" ?
-                        <span className="badge bg-success text-uppercase">{cell.value}</span>
+                cell.value === 2?
+                    <span className="badge bg-warning text-uppercase">Medium</span>
+                    : cell.value === 3?
+                        <span className="badge bg-success text-uppercase">Low</span>
                         : null
             }
         </React.Fragment>

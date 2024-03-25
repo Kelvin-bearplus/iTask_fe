@@ -413,7 +413,25 @@ const NFTRankingGlobalFilter = () => {
     );
 };
 
-const TaskListGlobalFilter = () => {
+const TaskListGlobalFilter = ({ onFilterChange }: { onFilterChange: any }) => {
+    const [dateRange, setDateRange] = useState(null);
+    const [status, setStatus] = useState('');
+
+    const handleDateChange = (selectedDates:any, dateStr:any, instance:any) => {
+        setDateRange(selectedDates);
+    };
+
+    const handleStatusChange = (event:any) => {
+        setStatus(event.target.value);
+    };
+
+    const handleFilterClick = () => {
+        // Gọi hàm callback để thông báo về việc thay đổi bộ lọc
+        if (onFilterChange) {
+            onFilterChange({ dateRange, status });
+        }
+    };
+
     return (
         <React.Fragment>
             <div className="col-xxl-3 col-sm-4">
@@ -424,24 +442,32 @@ const TaskListGlobalFilter = () => {
                         mode: "range",
                         dateFormat: "d M, Y"
                     }}
+                    onChange={handleDateChange}
                 />
             </div>
 
             <div className="col-xxl-3 col-sm-4">
                 <div className="input-light">
-                    <select className="form-control" data-choices data-choices-search-false name="status" id="idStatus">
+                    <select
+                        className="form-control"
+                        data-choices
+                        data-choices-search-false
+                        name="status"
+                        id="idStatus"
+                        onChange={handleStatusChange}
+                    >
                         <option value="">Status</option>
-                        <option defaultValue="all"  >All</option>
-                        <option value="New">New</option>
+                        <option value="all">All</option>
                         <option value="Pending">Pending</option>
-                        <option value="Inprogress">Inprogress</option>
+                        <option value="In-progress">Inprogress</option>
                         <option value="Completed">Completed</option>
                     </select>
                 </div>
             </div>
-            <div className="col-xxl-1 col-sm-4">
-                <button type="button" className="btn btn-primary w-100"> <i className="ri-equalizer-fill me-1 align-bottom"></i>
-                    Filters
+
+            <div className="col-xxl-2 col-sm-4">
+                <button type="button" className="btn btn-primary w-100" onClick={handleFilterClick}>
+                    <i className="ri-equalizer-fill me-1 align-bottom"></i> Filters
                 </button>
             </div>
         </React.Fragment>
