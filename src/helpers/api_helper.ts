@@ -15,30 +15,57 @@ if (token)
   axios.defaults.headers.common["Authorization"] = "Bearer " + token;
 
 // intercepting to capture errors
-axios.interceptors.response.use(
-  function (response) {
-    return response.data ? response.data : response;
+// axios.interceptors.response.use(
+//   function (response) {
+//     return response.data ? response.data : response;
+//   },
+//   function (error) {
+//     // Any status codes that falls outside the range of 2xx cause this function to trigger
+//     let message;
+//     switch (error.status) {
+//       case 500:
+//         message = "Internal Server Error";
+//         break;
+//       case 401:
+//         message = "Invalid credentials";
+//         break;
+//       case 404:
+//         message = "Sorry! the data you are looking for could not be found";
+//         break;
+//       default:
+//         message = error.message || error;
+//     }
+//     return Promise.reject(message);
+//   }
+// );
+axios.interceptors.request.use(
+  (config) => {
+    // Thực hiện các hành động bạn muốn trước khi gửi yêu cầu
+    console.log('Making request to: ', config.url);
+    
+    // Đừng quên trả về config, nếu không yêu cầu sẽ không được gửi đi
+    return config;
   },
-  function (error) {
-    // Any status codes that falls outside the range of 2xx cause this function to trigger
-    let message;
-    switch (error.status) {
-      case 500:
-        message = "Internal Server Error";
-        break;
-      case 401:
-        message = "Invalid credentials";
-        break;
-      case 404:
-        message = "Sorry! the data you are looking for could not be found";
-        break;
-      default:
-        message = error.message || error;
-    }
-    return Promise.reject(message);
+  (error) => {
+    // Xử lý lỗi trong quá trình gửi yêu cầu
+    return Promise.reject(error);
+  }
+);
+axios.interceptors.response.use(
+  (response) => {
+    // Thực hiện các hành động bạn muốn sau khi nhận được phản hồi
+    console.log('Response received: ', response.data);
+    
+    // Đừng quên trả về response, nếu không phản hồi sẽ không được xử lý tiếp
+    return response.data;
+  },
+  (error) => {
+    // Xử lý lỗi trong quá trình nhận phản hồi
+    return Promise.reject(error);
   }
 );
 /**
+ * 
  * Sets the default authorization
  * @param {*} token
  */

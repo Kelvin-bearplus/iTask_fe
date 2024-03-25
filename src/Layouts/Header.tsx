@@ -78,7 +78,7 @@ const Header = ({ onChangeLayoutMode, layoutModeType, headerClass } : any) => {
                                 </Link>
                             </div>
 
-                            <button
+                            {/* <button
                                 onClick={toogleMenuBtn}
                                 type="button"
                                 className="btn btn-sm px-3 fs-16 header-item vertical-menu-btn topnav-hamburger"
@@ -88,7 +88,7 @@ const Header = ({ onChangeLayoutMode, layoutModeType, headerClass } : any) => {
                                     <span></span>
                                     <span></span>
                                 </span>
-                            </button>
+                            </button> */}
 
 
                             <SearchOption />
@@ -122,10 +122,7 @@ const Header = ({ onChangeLayoutMode, layoutModeType, headerClass } : any) => {
                             <FullScreenDropdown />
 
                             {/* Dark/Light Mode set */}
-                            <LightDark
-                                layoutMode={layoutModeType}
-                                onChangeLayoutMode={onChangeLayoutMode}
-                            />
+                        
 
                             {/* NotificationDropdown */}
                             <NotificationDropdown />

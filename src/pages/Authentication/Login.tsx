@@ -128,7 +128,7 @@ const Login = (props: any) => {
                                                 action="#">
                                                 {error && error ? (
                                                     <Alert color="danger"><div>
-                                                        Email or password is incorrect or Account has not verified email </div></Alert>
+                                                        {error}</div></Alert>
                                                 ) : null}
                                            
                                                 <div className="mb-3">

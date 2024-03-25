@@ -253,8 +253,8 @@ const List = () => {
                                         <div className="d-flex mb-2">
                                             <div className="flex-shrink-0 me-3">
                                                 <div className="avatar-sm">
-                                                    <span className={"avatar-title rounded p-2 bg-" + item.imgbgColor + "-subtle"}>
-                                                        <img src={item.thumbnail_url} alt="" className="img-fluid p-1" />
+                                                    <span className={"avatar-title rounded  bg-" + item.imgbgColor + "-subtle"}>
+                                                        <img src={item.thumbnail_url} alt="" className="img-fluid " />
                                                     </span>
                                                 </div>
                                             </div>
@@ -324,10 +324,14 @@ const List = () => {
                 ))}
 
             </div>
-            <Row className="g-0 text-center text-sm-start align-items-center mb-4">
+            {projectLists.data &&<Row className="g-0 text-center text-sm-start align-items-center mb-4">
                 <Col sm={6}>
                     <div>
-                        <p className="mb-sm-0 text-muted">Showing <span className="fw-semibold">1</span> to <span className="fw-semibold">10</span> of <span className="fw-semibold text-decoration-underline">12</span> entries</p>
+                        <p className="mb-sm-0 text-muted">Showing <span className="fw-semibold">{(projectLists.paging.page-1)*limit +1}</span> to <span className="fw-semibold">{((projectLists.paging.page) * limit) < projectLists.paging.total ? 
+  (projectLists.paging.page) * limit
+ : (
+projectLists.paging.total
+)}</span> of <span className="fw-semibold text-decoration-underline">{projectLists.paging.total}</span> entries</p>
                     </div>
                 </Col>
 
@@ -349,7 +353,7 @@ const List = () => {
                     </ul>
                 </Col>
 
-            </Row>
+            </Row>}
         </React.Fragment>
     );
 };

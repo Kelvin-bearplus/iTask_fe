@@ -137,8 +137,9 @@ const getThumbnail = async (e:any) => {
 
         initialValues: {
             name:  '',
-            privacy: "Private",
+            privacy: "0",
             status: 1,
+            priority:1
             // description: "",
         },
         validationSchema: Yup.object({
@@ -157,7 +158,7 @@ const getThumbnail = async (e:any) => {
                started_at:selectedStart,
                created_by:userId, 
                tags:dataTag,
-               priority: 2,
+               priority: parseInt(values.priority.toString()),
             }
             console.log(typeof values.status.toString());
             if (selectedDeadline&&selectedStart){
@@ -271,7 +272,7 @@ document.title="Create Project For My Team";
                                         </Col>
                                     </Row>
                                     <Row className='mt-3'>
-                                        <Col lg={8}>
+                                        <Col lg={4}>
                                             <div>
                                                 <Label htmlFor="choices-text-input" className="form-label">Tag</Label>
                                                 <Select
@@ -282,6 +283,20 @@ document.title="Create Project For My Team";
                                                     }}
                                                     options={SingleOptions}
                                                 />
+                                                {/* <div onClick={khanh}>check</div> */}
+                                            </div>
+                                        </Col>
+                                        <Col lg={4}>
+                                            <div>
+                                                <Label htmlFor="choices-text-input" className="form-label">Priority</Label>
+                                                <select className="form-select" data-choices data-choices-search-false
+                                            id="choices-privacy-status-input" name='priority' onChange={validation.handleChange}
+                                            onBlur={validation.handleBlur}
+                                            value={validation.values.priority }>
+                                            <option value="1">High</option>
+                                            <option value="2">Medium</option>
+                                            <option value="3">Low</option>
+                                        </select>
                                                 {/* <div onClick={khanh}>check</div> */}
                                             </div>
                                         </Col>

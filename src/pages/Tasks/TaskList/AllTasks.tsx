@@ -382,7 +382,7 @@ const AllTasks = () => {
     ],
     [handleCustomerClick, checkedAll]
   );
-
+console.log(TaskList);
   return (
     <React.Fragment>
       <DeleteModal

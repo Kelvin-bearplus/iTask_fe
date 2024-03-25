@@ -25,6 +25,7 @@ const loginSlice  = createSlice({
       state.errorMsg = false;
       console.log('loginSuccess:', state.user)
       localStorage.setItem("userInfo",action.payload.email);
+      
      
     },
     logoutUserSuccess(state, action) {

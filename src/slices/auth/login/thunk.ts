@@ -14,13 +14,13 @@ export const timeExpire=(date:Date):string=>{
   return `${hours}:${minutes}:${seconds} ${day}-${month}-${year}`;
 }
 // var data:any;
-export const loginUser = (user : any, history : any) => async (dispatch : any,req:any, res:any) => {
+export const loginUser = (user : any, history : any) => async (dispatch : any) => {
   try {
     let response;
       response = api.create (getUserLogin,user);
     const data = await response;
     console.log(data)
- if (data.accessToken){
+ if (data&&data.accessToken){
   if (data.expiresAt) {
     const timeExpireFormatted: string = timeExpire(new Date(data.expiresAt * 1000));
     localStorage.setItem("authUser", data.accessToken);
@@ -34,15 +34,16 @@ export const loginUser = (user : any, history : any) => async (dispatch : any,re
   localStorage.setItem('user_name', responseInfo.data.full_name);
   localStorage.setItem('userId', responseInfo.data.id);
   dispatch(loginSuccess(user));
-  console.log("loggined");
+  // console.log("loggined");
   history('/dashboard-projects')
   return data;
  }
       }
     
   catch (error:any) {
-    console.log(res)
-    var message:string = "lỗi"
+    // var log =Promise.reject(error);
+    console.log(error.response)
+    var message:string = error.response.data.error.message;
     dispatch(apiError(message));
   }
 };

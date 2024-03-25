@@ -1,4 +1,4 @@
-import React, { useState, useEffect} from "react"
+import React, { useState, useEffect } from "react"
 import {
   Card,
   CardBody,
@@ -355,7 +355,7 @@ const TasksKanban = () => {
   }, [card])
 
 
-
+console.log(cards)
 
   return (
     <React.Fragment>

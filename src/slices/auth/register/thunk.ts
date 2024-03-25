@@ -25,9 +25,9 @@ export const registerUser = (user : any) => async (dispatch : any) => {
      
         dispatch(registerUserSuccessful({ user: response.data } as any));
         // Xử lý kết quả ở đây
-      } catch (error) {
+      } catch (error:any) {
         console.error('Lỗi:', error);
-        const registrationError:string = "Failed to register user";
+        const registrationError:string = error.response.data.error.message;
         dispatch(registerUserFailed(registrationError));
       }
       // yield put(registerUserSuccessful(response));
