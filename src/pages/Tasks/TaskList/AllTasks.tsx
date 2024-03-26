@@ -387,6 +387,52 @@ const AllTasks = () => {
     [handleCustomerClick, checkedAll]
   );
 console.log(TaskList);
+const [startDate, setStartDate] = useState<string | null>(null);
+  const [endDate, setEndDate] = useState<string | null>(null);
+  const [status, setStatus] = useState<string>('');
+
+  // Handler for date change
+  const handleDateChange = (selectedDates: Date[]) => {
+    if (selectedDates.length === 2) {
+      setStartDate(selectedDates[0].toISOString()); // Convert Date to ISO string
+      setEndDate(selectedDates[1].toISOString());
+      console.log(selectedDates[0].toISOString());
+    }
+  };
+
+  // Handler for status change
+  const handleStatusChange = (value:any) => {
+    setStatus(value);
+  };
+  const handleFilterClick = () => {
+ setTaskList(filteredData)
+  };
+  const filteredData = useMemo(() => {
+    let filtered= taskList;
+console.log(taskList)
+    // Filter by date range
+    if (startDate && endDate) {
+      console.log(startDate)
+      console.log(endDate)
+      filtered = filtered.filter((item:any) => {
+        const itemDate = new Date(item.due_date);
+        console.log(itemDate >= new Date(startDate))
+        return itemDate >= new Date(startDate) && itemDate <= new Date(endDate);
+      });
+    }
+
+    // Filter by status
+    if (status!="") {
+      
+      console.log("2")
+
+      filtered = filtered.filter((item: any) => item.status == status);
+      console.log(filtered)
+
+    }
+
+    return filtered;
+  }, [taskList, startDate, endDate, status]);
   return (
     <React.Fragment>
       <DeleteModal
@@ -433,7 +479,9 @@ console.log(TaskList);
                   handleTaskClick={handleTaskClicks}
                   isTaskListFilter={true}
                   SearchPlaceholder="Search for tasks or something..."
-                  // isAddCustList={true}
+                  handleStatusChange={handleStatusChange}
+                  handleDateChange={handleDateChange}
+                  handleFilterClick={handleFilterClick}
                 />
               ) : (<Loader error={error} />)
               }

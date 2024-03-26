@@ -43,11 +43,11 @@ interface GlobalFilterProps {
   isTaskListFilter?: any;
   isLeadsFilter?: any;
 }
-const [filters, setFilters] = useState({});
+// const [filters, setFilters] = useState({});
 
-const handleFilterChange = (newFilters:any) => {
-  setFilters(newFilters);
-};
+// const handleFilterChange = (newFilters:any) => {
+//   setFilters(newFilters);
+// };
 // Define a default UI for filtering
 function GlobalFilter({
   globalFilter,
@@ -121,9 +121,9 @@ function GlobalFilter({
             {isNFTRankingFilter && (
               <NFTRankingGlobalFilter />
             )}
-            {isTaskListFilter && (
-              <TaskListGlobalFilter onFilterChange={handleFilterChange} />
-            )}
+            {/* {isTaskListFilter && (
+              // <TaskListGlobalFilter onFilterChange={handleFilterChange} />
+            )} */}
           </Row>
         </form>
       </CardBody>

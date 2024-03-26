@@ -43,6 +43,9 @@ interface GlobaFilerPropes {
     isProductsFilter ?: any;
     isLeadsFilter ?: any;
     SearchPlaceholder ?: any;
+    handleDateChange ?: any;
+    handleFilterClick ?: any;
+    handleStatusChange ?: any;
 }
 
 // Define a default UI for filtering
@@ -61,17 +64,17 @@ function GlobalFilter({
   isTaskListFilter,
   isProductsFilter,
   isLeadsFilter,
-  SearchPlaceholder
+  SearchPlaceholder,
+  handleDateChange,
+  handleFilterClick,
+  handleStatusChange,
 } : GlobaFilerPropes) {
   const [value, setValue] = React.useState(globalFilter);
   const onChange = useAsyncDebounce((value  :any) => {
     setGlobalFilter(value || undefined);
     console.log(globalFilter)
   }, 200);
-  const [filters, setFilters] = useState({});
-  const handleFilterChange = (newFilters:any) => {
-    setFilters(newFilters);
-};
+
   return (
     <React.Fragment>
       <CardBody className="border border-dashed border-end-0 border-start-0">
@@ -124,7 +127,10 @@ function GlobalFilter({
               <NFTRankingGlobalFilter />
             )}
             {isTaskListFilter && (
-              <TaskListGlobalFilter onFilterChange={onChange} />
+              <TaskListGlobalFilter
+               handleFilterClick={handleFilterClick}
+               handleDateChange={handleDateChange}
+                handleStatusChange={handleStatusChange}/>
             )}
           </Row>
         </form>
@@ -170,6 +176,9 @@ interface TableContainerProps {
     handleContactClick ?:any;
     handleTicketClick ?:any;
     onFilter?:any;
+    handleStatusChange?:any;
+    handleDateChange?:any;
+    handleFilterClick?:any;
     // Remove the duplicate declaration of 'onFilter'
 }
 
@@ -203,6 +212,7 @@ const TableContainer = ({
   trClass,
   thClass,
   divClass,
+  handleFilterClick,handleDateChange,handleStatusChange,
   SearchPlaceholder} : TableContainerProps) => {
   const {
     getTableProps,
@@ -291,6 +301,9 @@ const TableContainer = ({
             isNFTRankingFilter={isNFTRankingFilter}
             isTaskListFilter={isTaskListFilter}
             SearchPlaceholder={SearchPlaceholder}
+            handleStatusChange={handleStatusChange}
+            handleDateChange={handleDateChange}
+            handleFilterClick={handleFilterClick}
           />
         )}
         {isAddOptions && (

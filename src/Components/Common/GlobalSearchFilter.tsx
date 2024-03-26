@@ -413,23 +413,21 @@ const NFTRankingGlobalFilter = () => {
     );
 };
 
-const TaskListGlobalFilter = ({ onFilterChange }: { onFilterChange: any }) => {
+const TaskListGlobalFilter = ({ handleFilterClick ,handleDateChange,handleStatusChange}: { handleFilterClick: any,handleDateChange:any,handleStatusChange:any }) => {
     const [dateRange, setDateRange] = useState(null);
     const [status, setStatus] = useState('');
 
-    const handleDateChange = (selectedDates:any, dateStr:any, instance:any) => {
-        setDateRange(selectedDates);
+    const handleDateClick = (selectedDates:any, dateStr:any, instance:any) => {
+        handleDateChange(selectedDates);
     };
 
-    const handleStatusChange = (event:any) => {
-        setStatus(event.target.value);
+    const handleStatusClick = (event:any) => {
+        handleStatusChange(event.target.value);
+        console.log(event.target.value);
     };
 
-    const handleFilterClick = () => {
-        // Gọi hàm callback để thông báo về việc thay đổi bộ lọc
-        if (onFilterChange) {
-            onFilterChange({ dateRange, status });
-        }
+    const handleFilterBtn = () => {
+            handleFilterClick({ dateRange, status });
     };
 
     return (
@@ -442,7 +440,7 @@ const TaskListGlobalFilter = ({ onFilterChange }: { onFilterChange: any }) => {
                         mode: "range",
                         dateFormat: "d M, Y"
                     }}
-                    onChange={handleDateChange}
+                    onChange={handleDateClick}
                 />
             </div>
 
@@ -454,19 +452,19 @@ const TaskListGlobalFilter = ({ onFilterChange }: { onFilterChange: any }) => {
                         data-choices-search-false
                         name="status"
                         id="idStatus"
-                        onChange={handleStatusChange}
+                        onChange={handleStatusClick}
                     >
                         <option value="">Status</option>
-                        <option value="all">All</option>
-                        <option value="Pending">Pending</option>
-                        <option value="In-progress">Inprogress</option>
-                        <option value="Completed">Completed</option>
+                        <option value="">All</option>
+                        <option value="1">Pending</option>
+                        <option value="2">Inprogress</option>
+                        <option value="3">Completed</option>
                     </select>
                 </div>
             </div>
 
             <div className="col-xxl-2 col-sm-4">
-                <button type="button" className="btn btn-primary w-100" onClick={handleFilterClick}>
+                <button type="button" className="btn btn-primary w-100" onClick={handleFilterBtn}>
                     <i className="ri-equalizer-fill me-1 align-bottom"></i> Filters
                 </button>
             </div>
