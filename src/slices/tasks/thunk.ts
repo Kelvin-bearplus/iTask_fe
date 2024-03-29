@@ -33,11 +33,15 @@ export const addNewTask = createAsyncThunk("tasks/addNewTask", async (task: any)
         return error;
     }
 });
-export const updateTask = createAsyncThunk("tasks/updateTask", async (task: any) => {
+export const updateTask = createAsyncThunk("tasks/updateTask", async (data: any) => {
     try {
-        const response = updateTaskApi(task);
+        const url =getTaskListAPI+"/"+data.id;
+        console.log(url);
+        console.log(data.task)
+        const response = await api.create(url,data.task)
         toast.success("Task Updated Successfully", { autoClose: 3000 });
-        return response;
+        console.log(response.data)
+        return response.data;
     } catch (error) {
         toast.error("Task Updated Failed", { autoClose: 3000 });
         return error;

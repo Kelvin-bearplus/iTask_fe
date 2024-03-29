@@ -11,6 +11,7 @@ export const  dateFormatFrontend =(dob: string): string=> {
   return formattedDob.replace(/(\d{4})-(\d{2})-(\d{2})/, "$3-$2-$1");
 }
 export const formatDateCreateProject = (date: Date): string => {
+  console.log(date)
   // Trích xuất thông tin về năm, tháng và ngày từ đối tượng Date
   const year = date.getFullYear();
   const month = (date.getMonth() + 1).toString().padStart(2, '0');

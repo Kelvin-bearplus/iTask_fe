@@ -36,6 +36,8 @@ const TasksSlice = createSlice({
                     ? { ...task, ...action.payload }
                     : task
             );
+            console.log("khánh")
+            window.location.reload();
             state.isTaskUpdate = true;
             state.isTaskUpdateFail = false;
         });
