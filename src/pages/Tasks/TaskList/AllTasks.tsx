@@ -64,7 +64,7 @@ const Assigned = [
 
 const AllTasks = () => {
   const dispatch: any = useDispatch();
-
+  const [modalCreateTask, setModalCreateTask] = useState<boolean>(false);
   const selectLayoutState = (state: any) => state.Tasks;
   const selectLayoutProperties = createSelector(
     selectLayoutState,
@@ -95,7 +95,6 @@ const AllTasks = () => {
   const [deleteModal, setDeleteModal] = useState<boolean>(false);
   const [deleteModalMulti, setDeleteModalMulti] = useState<boolean>(false);
   const [modal, setModal] = useState<boolean>(false);
-  const [modalCreateTask, setModalCreateTask] = useState<boolean>(false);
 
   const toggle = useCallback(() => {
     if (modal) {
@@ -104,9 +103,7 @@ const AllTasks = () => {
     } else {
       setModal(true);
     }
-    
   }, [modal]);
-  
   const toggleCreate = useCallback(() => {
 
     if (modalCreateTask) {
@@ -116,7 +113,6 @@ const AllTasks = () => {
       setModalCreateTask(true);
     }
   }, [modalCreateTask]);
-
   // Delete Data
   const onClickDelete = (task: any) => {
     setTask(task);
@@ -139,68 +135,19 @@ const AllTasks = () => {
   const validation: any = useFormik({
     // enableReinitialize : use this flag when initial values needs to be changed
     enableReinitialize: true,
-    initialValues: {
 
+    initialValues: {
       taskId: (task && task.id) || '',
       name: (task && task.name) || '',
       description: (task && task.description) || '',
-      dueDate: (task && task.due_date) || '',
+      dueDate: (task && task.due_date) ? moment(task.due_date).format("YYYY-MM-DD") : '',
       status: (task && task.status) || '',
       priority: (task && task.priority) || '',
       assignees: (task && task.assignees) || [],
     },
     validationSchema: Yup.object({
-      // taskId: Yup.string().required("Please Enter Task Id"),
-      // project: Yup.string().required("Please Enter Project Name"),
-      // task: Yup.string().required("Please Enter Your Task"),
-      // // creater: Yup.string().required("Please Enter Creater Name"),
-      // dueDate: Yup.string().required("Please Enter Due Date"),
-      // status: Yup.string().required("Please Enter Status"),
-      // priority: Yup.string().required("Please Enter Priority"),
-      // subItem: Yup.array().required("Please Enter an Image")
-    }),
-    onSubmit: (values) => {
-      var dataDate = formatDateCreateProject(new Date(values.dueDate))
-      console.log(values.dueDate)
-      const updatedTask = {
-        // id: task ? task.id : 0,
-        // taskId: values.taskId,
-        // project: values.project,
-        name: values.name,
-        description: editorData,
-        due_date: dataDate,
-        status: parseInt(values.status),
-        priority: parseInt(values.priority),
-        // assignees: values.assignees,
-      };
-      // update customer
-      var data = {
-        id: task.id,
-        task: updatedTask
-      }
-      dispatch(updateTask(data));
-      validation.resetForm();
-      toggle();
-
-    },
-  });
-  const validation_create: any = useFormik({
-    // enableReinitialize : use this flag when initial values needs to be changed
-    enableReinitialize: true,
-    initialValues: {
-      name:  '',
-      description: '',
-      dueDate: new Date(),
-      status: '',
-      priority: '',
-      assignees:  [],
-      startDate: new Date(),
-      deadlineDate:new Date(),
-      projectId:""
-    },
-    validationSchema: Yup.object({
       name: Yup.string().required("Please Enter Task Name"),
-
+     
     }),
     onSubmit: (values) => {
       var dataDate = formatDateCreateProject(new Date(values.dueDate))
@@ -221,9 +168,12 @@ const AllTasks = () => {
         id: task.id,
         task: updatedTask
       }
+      console.log("khanh")
+
       dispatch(updateTask(data));
-      validation.resetForm();
+      // validation.resetForm();
       toggle();
+      validation.resetForm();
 
     },
   });
@@ -236,8 +186,8 @@ const AllTasks = () => {
   const handleEditorCreateChange = (event: any, editor: any) => {
     const data = editor.getData();
     setEditorDataCreate(data);
-  };
-  // Update Data
+  };  // Update Data
+  
   const handleCustomerClick = useCallback((arg: any) => {
     const task = arg;
     console.log(task)
@@ -251,12 +201,14 @@ const AllTasks = () => {
       assignees: task.assignees
     });
     setEditorData(task.description)
+    console.log(task)
     toggle();
   }, [toggle]);
 
   // Add Data
   const handleTaskClicks = () => {
     setTask("");
+    setIsEdit(false);
     toggle();
   };
 
@@ -264,25 +216,25 @@ const AllTasks = () => {
 
   useEffect(() => {
     if (!isEmpty(taskList)) setTaskList(taskList);
-  }, [taskList]);
+  }, []);
 
   useEffect(() => {
     if (taskList && !taskList.length) {
       dispatch(getTaskList());
     }
-  }, [dispatch, taskList]);
+  }, [dispatch]);
 
 
   useEffect(() => {
     setTaskList(taskList);
-  }, [taskList]);
+  }, []);
 
   useEffect(() => {
     if (!isEmpty(taskList)) {
       setTaskList(taskList);
       setIsEdit(false);
     }
-  }, [taskList]);
+  }, []);
 
 
   // Checked All
@@ -324,9 +276,9 @@ const AllTasks = () => {
 
   const [filters, setFilters] = useState({});
 
-  const handleFilterChange = (newFilters: any) => {
-    setFilters(newFilters);
-  };
+    const handleFilterChange = (newFilters:any) => {
+        setFilters(newFilters);
+    };
   const columns = useMemo(
     () => [
       {
@@ -337,7 +289,7 @@ const AllTasks = () => {
         id: '#',
       },
       {
-        Header: "Task ID",
+        Header: "Order ID",
         accessor: "id",
         filterable: false,
         Cell: (cellProps: any) => {
@@ -346,7 +298,7 @@ const AllTasks = () => {
       },
       {
         Header: "Project",
-        accessor: "project_info.name",
+        accessor: "project_id",
         filterable: false,
         Cell: (cellProps: any) => {
           return <Project {...cellProps} />;
@@ -368,7 +320,7 @@ const AllTasks = () => {
                     </Link>
                   </li>
                   <li className="list-inline-item">
-                    <Link to="#" onClick={() => { const taskData = cellProps.row.original; console.log(cellProps.row.original); handleCustomerClick(taskData); }}>
+                    <Link to="#" onClick={() => { const taskData = cellProps.row.original; handleCustomerClick(taskData); }}>
                       <i className="ri-pencil-fill align-bottom me-2 text-muted"></i>
                     </Link>
                   </li>
@@ -391,26 +343,25 @@ const AllTasks = () => {
           return <CreateBy {...cellProps} />;
         },
       },
-      {
-        Header: "Assigned To",
-        accessor: "assignees",
-        filterable: false,
-        Cell: (cell: any) => {
-          const assigned = cell.value;
-          // console.log(assigned[1]);
-          return (<React.Fragment>
-            <div className="avatar-group">
-              {assigned.map((item: any, index: any) => (
-                <Link key={index} to="#" className="avatar-group-item">
-                  <img src={item.user_info.profile_ava_url} alt="" className="rounded-circle avatar-xxs" />
-                  {/* process.env.REACT_APP_API_URL + "/images/users/" + */}
-                </Link>
-              ))}
+      // {
+      //   Header: "Assigned To",
+      //   accessor: "subItem",
+      //   filterable: false,
+      //   Cell: (cell: any) => {
+      //     const assigned = cell.value.map((item: any) => item.img ? item.img : item);
+      //     return (<React.Fragment>
+      //       <div className="avatar-group">
+      //         {assigned.map((item: any, index: any) => (
+      //           <Link key={index} to="#" className="avatar-group-item">
+      //             <img src={item} alt="" className="rounded-circle avatar-xxs" />
+      //             {/* process.env.REACT_APP_API_URL + "/images/users/" + */}
+      //           </Link>
+      //         ))}
 
-            </div>
-          </React.Fragment>);
-        },
-      },
+      //       </div>
+      //     </React.Fragment>);
+      //   },
+      // },
       {
         Header: "Due Date",
         accessor: "due_date",
@@ -438,7 +389,8 @@ const AllTasks = () => {
     ],
     [handleCustomerClick, checkedAll]
   );
-  const [startDate, setStartDate] = useState<string | null>(null);
+console.log(TaskList);
+const [startDate, setStartDate] = useState<string | null>(null);
   const [endDate, setEndDate] = useState<string | null>(null);
   const [status, setStatus] = useState<string>('');
 
@@ -452,30 +404,20 @@ const AllTasks = () => {
   };
 
   // Handler for status change
-  const handleStatusChange = (value: any) => {
+  const handleStatusChange = (value:any) => {
     setStatus(value);
   };
-  const [isSearch, setIsSearch] = useState(true);
   const handleFilterClick = () => {
-    // if (filteredData.length !== 0) {
-      setTaskList(filteredData);
-    // }
-    // else {
-    //   setIsSearch(false);
-    //   setTimeout(() => {
-    //     setIsSearch(true)
-    //   })
-    //   setTaskList(taskList)
-    // }
+ setTaskList(filteredData)
   };
   const filteredData = useMemo(() => {
-    let filtered = taskList;
-    console.log(taskList)
+    let filtered= taskList;
+console.log(taskList)
     // Filter by date range
     if (startDate && endDate) {
       console.log(startDate)
       console.log(endDate)
-      filtered = filtered.filter((item: any) => {
+      filtered = filtered.filter((item:any) => {
         const itemDate = new Date(item.due_date);
         console.log(itemDate >= new Date(startDate))
         return itemDate >= new Date(startDate) && itemDate <= new Date(endDate);
@@ -483,8 +425,9 @@ const AllTasks = () => {
     }
 
     // Filter by status
-    if (status != "") {
-
+    if (status!="") {
+      
+      console.log("2")
 
       filtered = filtered.filter((item: any) => item.status == status);
       console.log(filtered)
@@ -493,10 +436,8 @@ const AllTasks = () => {
 
     return filtered;
   }, [taskList, startDate, endDate, status]);
-// console.log(taskList)
   return (
     <React.Fragment>
-      {!isSearch && toast.error("There were no results for your search ", { position: "top-right", hideProgressBar: false, progress: undefined, toastId: "" })}
       <DeleteModal
         show={deleteModal}
         onDeleteClick={handleDeleteTask}
@@ -518,7 +459,7 @@ const AllTasks = () => {
                 <h5 className="card-title mb-0 flex-grow-1">All Tasks</h5>
                 <div className="flex-shrink-0">
                   <div className="d-flex flex-wrap gap-2">
-                    <button className="btn btn-primary add-btn me-1" onClick={() => { setIsEdit(false); toggleCreate(); }}><i className="ri-add-line align-bottom me-1"></i> Create Task</button>
+                    <button className="btn btn-primary add-btn me-1" onClick={() => { setIsEdit(false); toggle(); }}><i className="ri-add-line align-bottom me-1"></i> Create Task</button>
                     {isMultiDeleteButton && <button className="btn btn-soft-danger" onClick={() => setDeleteModalMulti(true)} ><i className="ri-delete-bin-2-line"></i></button>}
                   </div>
                 </div>
@@ -547,7 +488,7 @@ const AllTasks = () => {
                 />
               ) : (<Loader error={error} />)
               }
-              {/* <ToastContainer closeButton={false} limit={1} /> */}
+              <ToastContainer closeButton={false} limit={1} />
             </div>
           </div>
         </Col>
@@ -614,7 +555,7 @@ const AllTasks = () => {
 
               <Col lg={12}>
                 <Label className="form-label">Assigned To</Label>
-                <SimpleBar style={{ maxHeight: "95px" }}>
+                {/* <SimpleBar style={{ maxHeight: "95px" }}>
                   <ul className="list-unstyled vstack gap-2 mb-0">
                     {Assigned.map((item, key) => (<li key={key}>
                       <div className="form-check d-flex align-items-center">
@@ -639,7 +580,7 @@ const AllTasks = () => {
                       </div>
                     </li>))}
                   </ul>
-                </SimpleBar>
+                </SimpleBar> */}
               </Col>
 
               <Col lg={6}>
@@ -717,196 +658,6 @@ const AllTasks = () => {
                 className="btn-light"
               >Close</Button>
               <button type="submit" className="btn btn-success" id="add-btn">Update Task</button>
-            </div>
-          </div>
-        </Form>
-      </Modal>
-
-      {/* Create task */}
-      <Modal
-        isOpen={modalCreateTask}
-        toggle={toggleCreate}
-        centered
-        size="lg"
-        className="border-0"
-        modalClassName='modal fade zoomIn'
-      >
-        <ModalHeader className="p-3 bg-info-subtle" toggle={toggle}>
-          Create Task
-        </ModalHeader>
-        <Form className="tablelist-form" onSubmit={(e: any) => {
-          e.preventDefault();
-          validation_create.handleSubmit();
-          return false;
-        }}>
-          <ModalBody className="modal-body">
-            <Row className="g-3">
-
-
-
-              <Col lg={12}>
-                <div>
-                  <Label for="tasksTitle-field" className="form-label">Task name</Label>
-                  <Input
-                    name="name"
-                    id="tasksTitle-field"
-                    className="form-control"
-                    placeholder="Task name"
-                    type="text"
-                    validate={{
-                      required: { value: true },
-                    }}
-                    onChange={validation_create.handleChange}
-                    onBlur={validation_create.handleBlur}
-                    value={validation_create.values.name || ""}
-                    invalid={
-                      validation_create.touched.name && validation_create.errors.name ? true : false
-                    }
-                  />
-                  {validation_create.touched.name && validation_create.errors.name ? (
-                    <FormFeedback type="invalid">{validation_create.errors.name}</FormFeedback>
-                  ) : null}
-                </div>
-              </Col>
-              <Col lg={12}>
-                <div className="mb-3">
-                  <Label className="form-label">Project Description</Label>
-                  <CKEditor
-                    editor={ClassicEditor}
-                    data={editorDataCreate}
-                    onChange={handleEditorCreateChange}
-                    onReady={(editor) => {
-                    }}
-                  />
-                </div>
-              </Col>
-
-              <Col lg={12}>
-                <Label className="form-label">Assigned To</Label>
-                <SimpleBar style={{ maxHeight: "95px" }}>
-                  <ul className="list-unstyled vstack gap-2 mb-0">
-                    {Assigned.map((item, key) => (<li key={key}>
-                      <div className="form-check d-flex align-items-center">
-                        <Input name="assignees" className="form-check-input me-3" type="checkbox"
-                          onChange={validation_create.handleChange}
-                          onBlur={validation_create.handleBlur}
-                          value={item.img}
-                          invalid={validation_create.touched.subItem && validation_create.errors.subItem ? true : false}
-                          id={item.imgId} />
-
-                        <Label className="form-check-label d-flex align-items-center" htmlFor={item.imgId}>
-                          <span className="flex-shrink-0">
-                            <img src={item.img} alt="" className="avatar-xxs rounded-circle" />
-                          </span>
-                          <span className="flex-grow-1 ms-2">
-                            {item.name}
-                          </span>
-                        </Label>
-                      </div>
-                    </li>))}
-                  </ul>
-                </SimpleBar>
-              </Col>
-
-              <Col lg={6}>
-                <Label for="duedate-field" className="form-label">Due Date</Label>
-                <Flatpickr
-                  name="dueDate"
-                  id="duedate-field"
-                  className="form-control"
-                  placeholder="Select a date"
-                  options={{
-                    altInput: true,
-                    altFormat: "d M, Y",
-                    dateFormat: "d M, Y",
-                  }}
-                  onChange={(dueDate: any) => validation_create.setFieldValue("dueDate", moment(dueDate[0]).format("DD MMMM ,YYYY"))}
-                  value={validation_create.values.dueDate || ''}
-                />
-              </Col>
-              <Col lg={6}>
-                <Label for="ticket-status" className="form-label">Status</Label>
-                <Input
-                  name="status"
-                  type="select"
-                  className="form-select"
-                  id="ticket-field"
-                  onChange={validation_create.handleChange}
-                  onBlur={validation_create.handleBlur}
-                  value={validation_create.values.status || ""}
-                  invalid={
-                    validation_create.touched.status && validation_create.errors.status ? true : false
-                  }
-                >
-                  <option value="1">Pending</option>
-                  <option value="2">In-progress</option>
-                  <option value="3">Completed</option>
-                </Input>
-              </Col>
-              <Col lg={6}>
-                <Label for="duedate-field" className="form-label">Start Date</Label>
-                <Flatpickr
-                  name="startDate"
-                  id="duedate-field"
-                  className="form-control"
-                  placeholder="Select a date"
-                  options={{
-                    altInput: true,
-                    altFormat: "d M, Y",
-                    dateFormat: "d M, Y",
-                  }}
-                  onChange={(startDate: any) => validation_create.setFieldValue("startDate", moment(startDate[0]).format("DD MMMM ,YYYY"))}
-                  value={validation_create.values.startDate || ''}
-                />
-              </Col>
-              <Col lg={6}>
-                <Label for="duedate-field" className="form-label">Deadline Date</Label>
-                <Flatpickr
-                  name="deadlineDate"
-                  id="duedate-field"
-                  className="form-control"
-                  placeholder="Select a date"
-                  options={{
-                    altInput: true,
-                    altFormat: "d M, Y",
-                    dateFormat: "d M, Y",
-                  }}
-                  onChange={(deadlineDate: any) => validation_create.setFieldValue("deadlineDate", moment(deadlineDate[0]).format("DD MMMM ,YYYY"))}
-                  value={validation_create.values.deadlineDate || ''}
-                />
-
-              </Col>
-              <Col lg={12}>
-                <Label for="priority-field" className="form-label">Priority</Label>
-                <Input
-                  name="priority"
-                  type="select"
-                  className="form-select"
-                  id="priority-field"
-                  onChange={validation_create.handleChange}
-                  onBlur={validation_create.handleBlur}
-                  value={validation_create.values.priority || ""}
-                  invalid={
-                    validation_create.touched.priority && validation_create.errors.priority ? true : false
-                  }
-                >
-                  <option value="1">High</option>
-                  <option value="2">Medium</option>
-                  <option value="3">Low</option>
-                </Input>
-              </Col>
-            </Row>
-          </ModalBody>
-          <div className="modal-footer">
-            <div className="hstack gap-2 justify-content-end">
-              <Button
-                type="button"
-                onClick={() => {
-                  setModal(false);
-                }}
-                className="btn-light"
-              >Close</Button>
-              <button type="submit" className="btn btn-success" id="add-btn">Add Task</button>
             </div>
           </div>
         </Form>
