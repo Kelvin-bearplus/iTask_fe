@@ -25,12 +25,13 @@ export const getTaskList = createAsyncThunk("tasks/getTaskList", async () => {
 });
 export const addNewTask = createAsyncThunk("tasks/addNewTask", async (task: any) => {
     try {
-        const response = addNewTaskApi(task);
+        console.log(task)
+        const response =await api.create(getTaskListAPI,task);
         toast.success("Task Added Successfully", { autoClose: 3000 });
         return response;
-    } catch (error) {
-        toast.error("Task Added Failed", { autoClose: 3000 });
-        return error;
+    } catch (error:any) {
+        toast.error(error.response.data.error, { autoClose: 3000 });
+        throw error.response.data.error;
     }
 });
 export const updateTask = createAsyncThunk("tasks/updateTask", async (data: any) => {
@@ -40,9 +41,9 @@ export const updateTask = createAsyncThunk("tasks/updateTask", async (data: any)
         toast.success("Task Updated Successfully", { autoClose: 3000 });
         console.log(response.data)
         return response.data;
-    } catch (error) {
-        toast.error("Task Updated Failed", { autoClose: 3000 });
-        return error;
+    } catch (error:any) {
+        toast.error(error.response.data.error, { autoClose: 3000 });
+        throw error.response.data.error;
     }
 });
 export const deleteTask = createAsyncThunk("tasks/deleteTask", async (taskId: any) => {
@@ -50,7 +51,7 @@ export const deleteTask = createAsyncThunk("tasks/deleteTask", async (taskId: an
         const url=deleteTaskAPI+"/"+taskId;
         console.log(url)
         const response =await api.deleteRequest(url);
-        toast.success("Task Updated Successfully", { autoClose: 3000 });
+        toast.success("Task Deleted Successfully", { autoClose: 3000 });
         return { taskId, ...response };
     } catch (error:any) {
         console.log(error.response.data.error)

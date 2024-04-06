@@ -1,16 +1,9 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { getListProjects, uploadFile } from '../../helpers/url_api'
+import { getListProjects, uploadFile,simpleProjectAPI } from '../../helpers/url_api'
 import { APIClient } from "../../helpers/api_helper";
-import {
-    getProjectList as getProjectListApi,
-    addProjectList as addProjectListApi,
-    updateProjectList as updateProjectListApi,
-    deleteProjectList as deleteProjectListApi
-} from "../../helpers/fakebackend_helper";
 import { resetProjectFlagChange } from "./reducer"
-import { date } from "yup";
+
 const api = new APIClient();
 export const getProjectList = createAsyncThunk("getListProjects", async ({ inPage, limit, keyword, created_day_range  }: { inPage:number, limit:number, keyword: any , created_day_range:string}) => {
     try {
@@ -90,7 +83,18 @@ export const addProjectList = createAsyncThunk("addProject", async (project: any
     }
 });
 
+export const getSimpleProject = createAsyncThunk("getSimpleProject", async () => {
+    try {
+        const response = await api.get(simpleProjectAPI);
+        
+        // toast.success("project-list Added Successfully", { autoClose: 3000 });
+        return response.data;
 
+    } catch (error) {
+        // toast.error("project-list Added Failed", { autoClose: 3000 });
+        return error;
+    }
+});
 
 export const resetProjectFlag = () => {
     try {

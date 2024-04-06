@@ -20,6 +20,7 @@ import {
   addNewTask,
   updateTask,
   deleteTask,
+  getSimpleProject
 } from "../../../slices/thunks";
 
 import {
@@ -42,25 +43,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import Loader from "../../../Components/Common/Loader";
 import { createSelector } from 'reselect';
 
-import avatar1 from "../../../assets/images/users/avatar-1.jpg";
-import avatar2 from "../../../assets/images/users/avatar-2.jpg";
-import avatar3 from "../../../assets/images/users/avatar-3.jpg";
-import avatar5 from "../../../assets/images/users/avatar-5.jpg";
-import avatar6 from "../../../assets/images/users/avatar-6.jpg";
-import avatar7 from "../../../assets/images/users/avatar-7.jpg";
-import avatar8 from "../../../assets/images/users/avatar-8.jpg";
-import avatar10 from "../../../assets/images/users/avatar-10.jpg";
 
-const Assigned = [
-  { id: 1, imgId: "anna-adame", img: avatar1, name: "Anna Adame" },
-  { id: 2, imgId: "frank-hook", img: avatar3, name: "Frank Hook" },
-  { id: 3, imgId: "alexis-clarke", img: avatar6, name: "Alexis Clarke" },
-  { id: 4, imgId: "herbert-stokes", img: avatar2, name: "Herbert Stokes" },
-  { id: 5, imgId: "michael-morris", img: avatar7, name: "Michael Morris" },
-  { id: 6, imgId: "nancy-martino", img: avatar5, name: "Nancy Martino" },
-  { id: 7, imgId: "thomas-taylor", img: avatar8, name: "Thomas Taylor" },
-  { id: 8, imgId: "tonya-noble", img: avatar10, name: "Tonya Noble" },
-];
 
 const AllTasks = () => {
   const dispatch: any = useDispatch();
@@ -89,7 +72,7 @@ const AllTasks = () => {
 
   const [task, setTask] = useState<any>([]);
   const [TaskList, setTaskList] = useState<any>([]);
-
+  const [projectList, setProjectList] = useState<any>([]);
 
   // Delete Task
   const [deleteModal, setDeleteModal] = useState<boolean>(false);
@@ -104,13 +87,14 @@ const AllTasks = () => {
       setModal(true);
     }
   }, [modal]);
-  const toggleCreate = useCallback(() => {
-
+  const toggleCreate = useCallback(async() => {
+     const projectListResponse= await dispatch(getSimpleProject());
+     setProjectList(projectListResponse.payload);
     if (modalCreateTask) {
       setModalCreateTask(false);
-      setTask(null);
     } else {
       setModalCreateTask(true);
+     
     }
   }, [modalCreateTask]);
   // Delete Data
@@ -118,6 +102,7 @@ const AllTasks = () => {
     setTask(task);
     setDeleteModal(true);
   };
+  console.log(projectList);
 
   useEffect(() => {
     setTaskList(taskList);
@@ -130,7 +115,6 @@ const AllTasks = () => {
       setDeleteModal(false);
     }
   };
-
   // validation
   const validation: any = useFormik({
     // enableReinitialize : use this flag when initial values needs to be changed
@@ -140,7 +124,7 @@ const AllTasks = () => {
       taskId: (task && task.id) || '',
       name: (task && task.name) || '',
       description: (task && task.description) || '',
-      dueDate: (task && task.due_date) ? moment(task.due_date).format("YYYY-MM-DD") : '',
+      dueDate: (task && task.due_date) ? moment(task.due_date).format("DD MMM, YYYY"): '',
       status: (task && task.status) || '',
       priority: (task && task.priority) || '',
       assignees: (task && task.assignees) || [],
@@ -168,11 +152,62 @@ const AllTasks = () => {
         id: task.id,
         task: updatedTask
       }
-      console.log("khanh")
 
       dispatch(updateTask(data));
       // validation.resetForm();
       toggle();
+      validation.resetForm();
+
+    },
+  });
+  const userIdString:string|null = localStorage.getItem('userId'); 
+  var userId:number=0;
+  if (userIdString!=null){
+       userId = parseInt(userIdString);
+  }
+  const validationCreate: any = useFormik({
+    // enableReinitialize : use this flag when initial values needs to be changed
+    enableReinitialize: true,
+
+    initialValues: {
+      taskId:  '',
+      name:  '',
+      description:  '',
+      dueDate:  '',
+      status:  '1',
+      priority: '1',
+      assignees: [],
+      project:'',
+      deadlineDate:'',
+      startDate: '',
+    },
+    validationSchema: Yup.object({
+      name: Yup.string().required("Please Enter Task Name"),
+      dueDate: Yup.string().required("Please Select Due Date"),
+      deadlineDate: Yup.string().required("Please Select Deadline Date"),
+      startDate: Yup.string().required("Please Select Start Date"),
+    }),
+    onSubmit: (values) => {
+      var startDate = formatDateCreateProject(new Date(values.startDate))
+      var deadlineDate = formatDateCreateProject(new Date(values.deadlineDate))
+      var dueDate = formatDateCreateProject(new Date(values.dueDate))
+      const dataTask = {
+        name: values.name,
+        description: editorData?editorData:'',
+        due_date: dueDate,
+        started_at: startDate,
+        deadline: deadlineDate,
+        status: parseInt(values.status),
+        priority: parseInt(values.priority),
+        position:1,
+        created_by:userId,
+        project_id:values.project!=""?parseInt(values.project.toString()):projectList[0].id
+        // assignees: values.assignees,
+      };
+
+      dispatch(addNewTask(dataTask));
+      // validation.resetForm();
+      toggleCreate();
       validation.resetForm();
 
     },
@@ -182,12 +217,6 @@ const AllTasks = () => {
     const data = editor.getData();
     setEditorData(data);
   };
-  const [editorDataCreate, setEditorDataCreate] = useState("");
-  const handleEditorCreateChange = (event: any, editor: any) => {
-    const data = editor.getData();
-    setEditorDataCreate(data);
-  };  // Update Data
-  
   const handleCustomerClick = useCallback((arg: any) => {
     const task = arg;
     console.log(task)
@@ -200,7 +229,7 @@ const AllTasks = () => {
       due_date: task.due_date,
       assignees: task.assignees
     });
-    setEditorData(task.description)
+    setEditorData(task.description);
     console.log(task)
     toggle();
   }, [toggle]);
@@ -298,7 +327,7 @@ const AllTasks = () => {
       },
       {
         Header: "Project",
-        accessor: "project_id",
+        accessor: "project_info.name",
         filterable: false,
         Cell: (cellProps: any) => {
           return <Project {...cellProps} />;
@@ -459,7 +488,7 @@ console.log(taskList)
                 <h5 className="card-title mb-0 flex-grow-1">All Tasks</h5>
                 <div className="flex-shrink-0">
                   <div className="d-flex flex-wrap gap-2">
-                    <button className="btn btn-primary add-btn me-1" onClick={() => { setIsEdit(false); toggle(); }}><i className="ri-add-line align-bottom me-1"></i> Create Task</button>
+                    <button className="btn btn-primary add-btn me-1" onClick={() => {  toggleCreate(); }}><i className="ri-add-line align-bottom me-1"></i> Create Task</button>
                     {isMultiDeleteButton && <button className="btn btn-soft-danger" onClick={() => setDeleteModalMulti(true)} ><i className="ri-delete-bin-2-line"></i></button>}
                   </div>
                 </div>
@@ -596,7 +625,7 @@ console.log(taskList)
                     dateFormat: "d M, Y",
                   }}
                   onChange={(dueDate: any) => validation.setFieldValue("dueDate", moment(dueDate[0]).format("DD MMMM ,YYYY"))}
-                  value={validation.values.dueDate || ''}
+                  value={validation.values.dueDate|| ''}
                 />
                 {validation.errors.dueDate && validation.touched.dueDate ? (
                   <FormFeedback type="invalid" className='d-block'>{validation.errors.dueDate}</FormFeedback>
@@ -658,6 +687,232 @@ console.log(taskList)
                 className="btn-light"
               >Close</Button>
               <button type="submit" className="btn btn-success" id="add-btn">Update Task</button>
+            </div>
+          </div>
+        </Form>
+      </Modal>
+      <Modal
+        isOpen={modalCreateTask}
+        toggle={toggleCreate}
+        centered
+        size="lg"
+        className="border-0"
+        modalClassName='modal fade zoomIn'
+      >
+        <ModalHeader className="p-3 bg-info-subtle" toggle={toggleCreate}>
+          Create Task
+        </ModalHeader>
+        <Form className="tablelist-form" onSubmit={(e: any) => {
+          e.preventDefault();
+          validationCreate.handleSubmit();
+          return false;
+        }}>
+          <ModalBody className="modal-body">
+            <Row className="g-3">
+
+
+
+              <Col lg={12}>
+                <div>
+                  <Label for="tasksTitle-field" className="form-label">Task name</Label>
+                  <Input
+                    name="name"
+                    id="tasksTitle-field"
+                    className="form-control"
+                    placeholder="Task name"
+                    type="text"
+                    validate={{
+                      required: { value: true },
+                    }}
+                    onChange={validationCreate.handleChange}
+                    onBlur={validationCreate.handleBlur}
+                    value={validationCreate.values.name || ""}
+                    invalid={
+                      validationCreate.touched.name && validationCreate.errors.name ? true : false
+                    }
+                  />
+                  {validationCreate.touched.name && validationCreate.errors.name ? (
+                    <FormFeedback type="invalid">{validationCreate.errors.name}</FormFeedback>
+                  ) : null}
+                </div>
+              </Col>
+              <Col lg={12}>
+                <div className="mb-3">
+                  <Label className="form-label">Project Description</Label>
+                  <CKEditor
+                    editor={ClassicEditor}
+                    data={editorData}
+                    onChange={handleEditorChange}
+                    onReady={(editor) => {
+                    }}
+                  />
+                </div>
+              </Col>
+
+              <Col lg={12}>
+                <Label className="form-label">Assigned To</Label>
+                {/* <SimpleBar style={{ maxHeight: "95px" }}>
+                  <ul className="list-unstyled vstack gap-2 mb-0">
+                    {Assigned.map((item, key) => (<li key={key}>
+                      <div className="form-check d-flex align-items-center">
+                        <Input name="subItem" className="form-check-input me-3" type="checkbox"
+                          onChange={validationCreate.handleChange}
+                          onBlur={validationCreate.handleBlur}
+                          value={item.img}
+                          invalid={validationCreate.touched.subItem && validationCreate.errors.subItem ? true : false}
+                          id={item.imgId} />
+
+                        <Label className="form-check-label d-flex align-items-center" htmlFor={item.imgId}>
+                          <span className="flex-shrink-0">
+                            <img src={item.img} alt="" className="avatar-xxs rounded-circle" />
+                          </span>
+                          <span className="flex-grow-1 ms-2">
+                            {item.name}
+                          </span>
+                        </Label>
+                        {validationCreate.touched.subItem && validationCreate.errors.subItem ? (
+                          <FormFeedback type="invalid">{validationCreate.errors.subItem}</FormFeedback>
+                        ) : null}
+                      </div>
+                    </li>))}
+                  </ul>
+                </SimpleBar> */}
+              </Col>
+              <Col lg={6}>
+                <Label for="start-field" className="form-label">Start Date</Label>
+                <Flatpickr
+                  name="startDate"
+                  id="start-field"
+                  className="form-control"
+                  placeholder="Select a date"
+                  options={{
+                    altInput: true,
+                    altFormat: "d M, Y",
+                    dateFormat: "d M, Y",
+                  }}
+                  onChange={(startDate: any) => validationCreate.setFieldValue("startDate", moment(startDate[0]).format("DD MMMM ,YYYY"))}
+                  value={validationCreate.values.startDate|| ''}
+                />
+                {validationCreate.errors.startDate && validationCreate.touched.startDate ? (
+                  <FormFeedback type="invalid" className='d-block'>{validationCreate.errors.startDate}</FormFeedback>
+                ) : null}
+              </Col>
+              <Col lg={6}>
+                <Label for="deadline-field" className="form-label">Deadline Date</Label>
+                <Flatpickr
+                  name="deadlineDate"
+                  id="deadline-field"
+                  className="form-control"
+                  placeholder="Select a date"
+                  options={{
+                    altInput: true,
+                    altFormat: "d M, Y",
+                    dateFormat: "d M, Y",
+                  }}
+                  onChange={(deadlineDate: any) => validationCreate.setFieldValue("deadlineDate", moment(deadlineDate[0]).format("DD MMMM ,YYYY"))}
+                  value={validationCreate.values.deadlineDate|| ''}
+                />
+                {validationCreate.errors.deadlineDate && validationCreate.touched.deadlineDate ? (
+                  <FormFeedback type="invalid" className='d-block'>{validationCreate.errors.deadlineDate}</FormFeedback>
+                ) : null}
+              </Col>
+              <Col lg={6}>
+                <Label for="duedate-field" className="form-label">Due Date</Label>
+                <Flatpickr
+                  name="dueDate"
+                  id="duedate-field"
+                  className="form-control"
+                  placeholder="Select a date"
+                  options={{
+                    altInput: true,
+                    altFormat: "d M, Y",
+                    dateFormat: "d M, Y",
+                  }}
+                  onChange={(dueDate: any) => validationCreate.setFieldValue("dueDate", moment(dueDate[0]).format("DD MMMM ,YYYY"))}
+                  value={validationCreate.values.dueDate|| ''}
+                />
+                {validationCreate.errors.dueDate && validationCreate.touched.dueDate ? (
+                  <FormFeedback type="invalid" className='d-block'>{validationCreate.errors.dueDate}</FormFeedback>
+                ) : null}
+              </Col>
+              <Col lg={6}>
+                <Label for="ticket-status" className="form-label">Status</Label>
+                <Input
+                  name="status"
+                  type="select"
+                  className="form-select"
+                  id="ticket-field"
+                  onChange={validationCreate.handleChange}
+                  onBlur={validationCreate.handleBlur}
+                  value={validationCreate.values.status || ""}
+                  invalid={
+                    validationCreate.touched.status && validationCreate.errors.status ? true : false
+                  }
+                >
+                  <option value="1">Pending</option>
+                  <option value="2">In-progress</option>
+                  <option value="3">Completed</option>
+                </Input>
+                {validationCreate.touched.status && validationCreate.errors.status ? (
+                  <FormFeedback type="invalid">{validationCreate.errors.status}</FormFeedback>
+                ) : null}
+              </Col>
+              <Col lg={6}>
+                <Label for="priority-field" className="form-label">Project</Label>
+                <Input
+                  name="project"
+                  type="select"
+                  className="form-select"
+                  id="priority-field"
+                  onChange={validationCreate.handleChange}
+                  onBlur={validationCreate.handleBlur}
+                  value={validationCreate.values.project || ""}
+                  invalid={
+                    validationCreate.touched.project && validationCreate.errors.project ? true : false
+                  }
+                >
+                    {projectList.length>0&&projectList.map((item:any, key:any) =>(
+                  <option key={key} value={item.id}>{item.name}</option>
+                  ))}
+                </Input>
+                {validationCreate.touched.priority && validationCreate.errors.priority ? (
+                  <FormFeedback type="invalid">{validationCreate.errors.priority}</FormFeedback>
+                ) : null}
+              </Col>
+              <Col lg={6}>
+                <Label for="priority-field" className="form-label">Priority</Label>
+                <Input
+                  name="priority"
+                  type="select"
+                  className="form-select"
+                  id="priority-field"
+                  onChange={validationCreate.handleChange}
+                  onBlur={validationCreate.handleBlur}
+                  value={validationCreate.values.priority || ""}
+                  invalid={
+                    validationCreate.touched.priority && validationCreate.errors.priority ? true : false
+                  }
+                >
+                  <option value="1">High</option>
+                  <option value="2">Medium</option>
+                  <option value="3">Low</option>
+                </Input>
+                {validationCreate.touched.priority && validationCreate.errors.priority ? (
+                  <FormFeedback type="invalid">{validationCreate.errors.priority}</FormFeedback>
+                ) : null}
+              </Col>
+            </Row>
+          </ModalBody>
+          <div className="modal-footer">
+            <div className="hstack gap-2 justify-content-end">
+              <Button
+                type="button"
+                onClick={() => {
+                  setModal(false);
+                }}
+                className="btn-light"
+              >Close</Button>
+              <button type="submit" className="btn btn-success" id="add-btn">Create Task</button>
             </div>
           </div>
         </Form>
