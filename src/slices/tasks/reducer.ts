@@ -47,12 +47,14 @@ const TasksSlice = createSlice({
             state.isTaskUpdateFail = true;
         });
         builder.addCase(deleteTask.fulfilled, (state: any, action: any) => {
-            state.taskList = state.taskList.filter((task: any) => task.id.toString() !== action.payload.task.toString());
+            console.log("khanh")
+            state.taskList = state.taskList.filter((task: any) => task.toString() !== action.payload.taskId.toString());
             state.isTaskDelete = true;
             state.isTaskDeleteFail = false;
         });
         builder.addCase(deleteTask.rejected, (state: any, action: any) => {
-            state.error = action.payload.error || null;
+            console.log("Fail")
+            state.error = action.payload || null;
             state.isTaskDelete = false;
             state.isTaskDeleteFail = true;
         });

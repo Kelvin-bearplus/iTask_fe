@@ -11,7 +11,7 @@ import {
     updateTasks as updateTasksApi,
     deleteTasks as deleteTasksApi
 } from "../../helpers/fakebackend_helper";
-import { getTaskListAPI } from '../../helpers/url_api'
+import { getTaskListAPI,deleteTaskAPI } from '../../helpers/url_api'
 import { APIClient } from "../../helpers/api_helper";
 const api = new APIClient();
 export const getTaskList = createAsyncThunk("tasks/getTaskList", async () => {
@@ -36,8 +36,6 @@ export const addNewTask = createAsyncThunk("tasks/addNewTask", async (task: any)
 export const updateTask = createAsyncThunk("tasks/updateTask", async (data: any) => {
     try {
         const url =getTaskListAPI+"/"+data.id;
-        console.log(url);
-        console.log(data.task)
         const response = await api.create(url,data.task)
         toast.success("Task Updated Successfully", { autoClose: 3000 });
         console.log(response.data)
@@ -47,14 +45,17 @@ export const updateTask = createAsyncThunk("tasks/updateTask", async (data: any)
         return error;
     }
 });
-export const deleteTask = createAsyncThunk("tasks/deleteTask", async (task: any) => {
+export const deleteTask = createAsyncThunk("tasks/deleteTask", async (taskId: any) => {
     try {
-        const response = deleteTaskApi(task);
+        const url=deleteTaskAPI+"/"+taskId;
+        console.log(url)
+        const response =await api.deleteRequest(url);
         toast.success("Task Updated Successfully", { autoClose: 3000 });
-        return { task, ...response };
-    } catch (error) {
-        toast.error("Task Updated Failed", { autoClose: 3000 });
-        return error;
+        return { taskId, ...response };
+    } catch (error:any) {
+        console.log(error.response.data.error)
+        toast.error(error.response.data.error, { autoClose: 3000 });
+        throw error.response.data.error;
     }
 });
 // Kanban Board

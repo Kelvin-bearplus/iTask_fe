@@ -124,7 +124,7 @@ class APIClient {
   /**
    * Deletes data
    */
-  delete = (url: string, config?: AxiosRequestConfig): Promise<AxiosResponse> => {
+  deleteRequest = (url: string, config?: AxiosRequestConfig): Promise<AxiosResponse> => {
     return axios.delete(url, { ...config });
   };
 }

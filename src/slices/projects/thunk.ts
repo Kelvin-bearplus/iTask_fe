@@ -60,7 +60,7 @@ export const updateProjectById = createAsyncThunk("updateProjectById", async({ i
 export const deleteProjectList = createAsyncThunk("deleteProjectList", async(id:number) => {
     try {
             var url=getListProjects+'/'+id;
-            const response = await api.delete(url);
+            const response = await api.deleteRequest(url);
             console.log(response);
             return response;
         

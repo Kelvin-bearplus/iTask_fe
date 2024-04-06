@@ -81,7 +81,7 @@ export const addNewEvent = (event : any) => api.create(url.ADD_NEW_EVENT, event)
 export const updateEvent = (event : any) => api.put(url.UPDATE_EVENT, event);
 
 // delete Event
-export const deleteEvent = (event : any) => api.delete(url.DELETE_EVENT, { headers: { event } });
+export const deleteEvent = (event : any) => api.deleteRequest(url.DELETE_EVENT, { headers: { event } });
 
 // Chat
 // get Contact
@@ -94,7 +94,7 @@ export const getMessages = (roomId : any) => api.get(`${url.GET_MESSAGES}/${room
 export const addMessage = (message : any) => api.create(url.ADD_MESSAGE, message);
 
 // add Message
-export const deleteMessage = (message : any) => api.delete(url.DELETE_MESSAGE, { headers: { message } });
+export const deleteMessage = (message : any) => api.deleteRequest(url.DELETE_MESSAGE, { headers: { message } });
 
 // get Channels
 export const getChannels = () => api.get(url.GET_CHANNELS);
@@ -104,26 +104,26 @@ export const getChannels = () => api.get(url.GET_CHANNELS);
 export const getMailDetails = () => api.get(url.GET_MAIL_DETAILS);
 
 // delete Mail
-export const deleteMail = (forId: any) => api.delete(url.DELETE_MAIL, { headers: { forId } });
+export const deleteMail = (forId: any) => api.deleteRequest(url.DELETE_MAIL, { headers: { forId } });
 
 // unread Mail
-export const unreadMail = (forId: any) => api.delete(url.UNREAD_MAIL, { headers: { forId } });
+export const unreadMail = (forId: any) => api.deleteRequest(url.UNREAD_MAIL, { headers: { forId } });
 
 // star Mail
-export const staredMail = (forId: any) => api.delete(url.STARED_MAIL, { headers: { forId } });
+export const staredMail = (forId: any) => api.deleteRequest(url.STARED_MAIL, { headers: { forId } });
 
 // label Mail
-export const labelMail = (forId: any) => api.delete(url.LABEL_MAIL, { headers: { forId } });
+export const labelMail = (forId: any) => api.deleteRequest(url.LABEL_MAIL, { headers: { forId } });
 
 // trash Mail
-export const trashMail = (forId: any) => api.delete(url.TRASH_MAIL, { headers: { forId } });
+export const trashMail = (forId: any) => api.deleteRequest(url.TRASH_MAIL, { headers: { forId } });
 
 // Ecommerce
 // get Products
 export const getProducts = () => api.get(url.GET_PRODUCTS);
 
 // delete Product
-export const deleteProducts = (product : any) => api.delete(url.DELETE_PRODUCT, { headers: { product } } );  
+export const deleteProducts = (product : any) => api.deleteRequest(url.DELETE_PRODUCT, { headers: { product } } );  
 
 // add Products
 export const addNewProduct = (product : any) => api.create(url.ADD_NEW_PRODUCT, product);
@@ -140,7 +140,7 @@ export const addNewOrder = (order : any) => api.create(url.ADD_NEW_ORDER, order)
 export const updateOrder = (order : any) => api.get(url.UPDATE_ORDER, order);
 
 // delete Order
-export const deleteOrder = (order : any) => api.delete(url.DELETE_ORDER , { headers: { order } });
+export const deleteOrder = (order : any) => api.deleteRequest(url.DELETE_ORDER , { headers: { order } });
 
 // get Customers
 export const getCustomers = () => api.get(url.GET_CUSTOMERS);
@@ -152,7 +152,7 @@ export const addNewCustomer = (customer : any) => api.create(url.ADD_NEW_CUSTOME
 export const updateCustomer = (customer : any) => api.get(url.UPDATE_CUSTOMER, customer);
 
 // delete Customers
-export const deleteCustomer = (customer : any) => api.delete(url.DELETE_CUSTOMER, { headers: { customer } });
+export const deleteCustomer = (customer : any) => api.deleteRequest(url.DELETE_CUSTOMER, { headers: { customer } });
 
 // get Sellers
 export const getSellers = () => api.get(url.GET_SELLERS);
@@ -172,13 +172,13 @@ export const addNewTask = (task : any) => api.create(url.ADD_NEW_TASK, task);
 export const updateTask = (task : any) => api.get(url.UPDATE_TASK, task);
 
 // delete Task
-export const deleteTask = (task : any) => api.delete(url.DELETE_TASK, { headers: { task }});
+export const deleteTask = (task : any) => api.deleteRequest(url.DELETE_TASK, { headers: { task }});
 
 // Kanban Board
 export const getTasks = () => api.get(url.GET_TASKS);
 export const addNewTasks = (card: any) => api.create(url.ADD_TASKS, card)
 export const updateTasks = (card: any) => api.put(url.UPDATE_TASKS, card)
-export const deleteTasks = (card: any) => api.delete(url.DELETE_TASKS, { headers: {card} })
+export const deleteTasks = (card: any) => api.deleteRequest(url.DELETE_TASKS, { headers: {card} })
 
 // CRM
 // get Contacts
@@ -191,7 +191,7 @@ export const addNewContact = (contact : any) => api.create(url.ADD_NEW_CONTACT, 
 export const updateContact = (contact : any) => api.get(url.UPDATE_CONTACT, contact);
 
 // delete Contact
-export const deleteContact = (contact : any) => api.delete(url.DELETE_CONTACT, { headers: { contact }});
+export const deleteContact = (contact : any) => api.deleteRequest(url.DELETE_CONTACT, { headers: { contact }});
 
 // get Companies
 export const getCompanies = () => api.get(url.GET_COMPANIES);
@@ -203,7 +203,7 @@ export const addNewCompanies = (company : any) => api.create(url.ADD_NEW_COMPANI
 export const updateCompanies = (company : any) => api.get(url.UPDATE_COMPANIES, company);
 
 // delete Companies
-export const deleteCompanies = (company : any) => api.delete(url.DELETE_COMPANIES, { headers: {company}});
+export const deleteCompanies = (company : any) => api.deleteRequest(url.DELETE_COMPANIES, { headers: {company}});
 
 // get Deals
 export const getDeals = () => api.get(url.GET_DEALS);
@@ -218,7 +218,7 @@ export const addNewLead = (lead : any) => api.create(url.ADD_NEW_LEAD, lead);
 export const updateLead = (lead : any) => api.get(url.UPDATE_LEAD, lead);
 
 // delete Lead
-export const deleteLead = (lead : any) => api.delete(url.DELETE_LEAD, { headers: {lead}});
+export const deleteLead = (lead : any) => api.deleteRequest(url.DELETE_LEAD, { headers: {lead}});
 
 // Crypto
 // Transation
@@ -238,7 +238,7 @@ export const addNewInvoice = (invoice : any) => api.create(url.ADD_NEW_INVOICE, 
 export const updateInvoice = (invoice : any) => api.get(url.UPDATE_INVOICE + '/' + invoice._id, invoice);
 
 // delete Invoice
-export const deleteInvoice = (invoice : any) => api.delete(url.DELETE_INVOICE + '/' + invoice);
+export const deleteInvoice = (invoice : any) => api.deleteRequest(url.DELETE_INVOICE + '/' + invoice);
 
 // Support Tickets 
 // Tickets
@@ -251,7 +251,7 @@ export const addNewTicket = (ticket : any) => api.create(url.ADD_NEW_TICKET, tic
 export const updateTicket = (ticket : any) => api.get(url.UPDATE_TICKET, ticket);
 
 // delete Tickets 
-export const deleteTicket = (ticket : any) => api.delete(url.DELETE_TICKET, { headers: {ticket}});
+export const deleteTicket = (ticket : any) => api.deleteRequest(url.DELETE_TICKET, { headers: {ticket}});
 
 // Dashboard Analytics
 
@@ -345,11 +345,11 @@ export const getYearMarketplaceData = () => api.get(url.GET_YEARMARKETPLACE_DATA
 // Project
 export const addProjectList = (project : any) => api.create(url.ADD_NEW_PROJECT, project);
 export const updateProjectList = (project : any) => api.put(url.UPDATE_PROJECT, project);
-export const deleteProjectList = (project : any) => api.delete(url.DELETE_PROJECT, { headers: { project } });
+export const deleteProjectList = (project : any) => api.deleteRequest(url.DELETE_PROJECT, { headers: { project } });
 
 // Pages > Team
 export const getTeamData = () => api.get(url.GET_TEAMDATA);
-export const deleteTeamData = (team : any) => api.delete(url.DELETE_TEAMDATA, { headers: { team } });
+export const deleteTeamData = (team : any) => api.deleteRequest(url.DELETE_TEAMDATA, { headers: { team } });
 export const addTeamData = (team : any) => api.create(url.ADD_NEW_TEAMDATA, team);
 export const updateTeamData = (team : any) => api.put(url.UPDATE_TEAMDATA, team);
 
@@ -357,19 +357,19 @@ export const updateTeamData = (team : any) => api.put(url.UPDATE_TEAMDATA, team)
 
 // Folder
 export const getFolders = () => api.get(url.GET_FOLDERS);
-export const deleteFolder = (folder : any) => api.delete(url.DELETE_FOLDER, { headers: { folder } });
+export const deleteFolder = (folder : any) => api.deleteRequest(url.DELETE_FOLDER, { headers: { folder } });
 export const addNewFolder = (folder : any) => api.create(url.ADD_NEW_FOLDER, folder);
 export const updateFolder = (folder : any) => api.put(url.UPDATE_FOLDER, folder);
 
 // File
 export const getFiles = () => api.get(url.GET_FILES);
-export const deleteFile = (file : any) => api.delete(url.DELETE_FILE, { headers: { file } });
+export const deleteFile = (file : any) => api.deleteRequest(url.DELETE_FILE, { headers: { file } });
 export const addNewFile = (file : any) => api.create(url.ADD_NEW_FILE, file);
 export const updateFile = (file : any) => api.put(url.UPDATE_FILE, file);
 
 // To Do
 export const getTodos = () => api.get(url.GET_TODOS);
-export const deleteTodo = (todo : any) => api.delete(url.DELETE_TODO, { headers: { todo } });
+export const deleteTodo = (todo : any) => api.deleteRequest(url.DELETE_TODO, { headers: { todo } });
 export const addNewTodo = (todo : any) => api.create(url.ADD_NEW_TODO, todo);
 export const updateTodo = (todo : any) => api.put(url.UPDATE_TODO, todo);
 
@@ -384,13 +384,13 @@ export const getAPIKey = () => api.get(url.GET_API_KEY);
 export const getJobApplicationList = () => api.get(url.GET_APPLICATION_LIST);
 export const addNewJobApplicationList = (job: any) => api.create(url.ADD_NEW_APPLICATION_LIST, job);
 export const updateJobApplicationList = (job: any) => api.put(url.UPDATE_APPLICATION_LIST, job);
-export const deleteJobApplicationList = (job: any) => api.delete(url.DELETE_APPLICATION_LIST, { headers: { job } });
+export const deleteJobApplicationList = (job: any) => api.deleteRequest(url.DELETE_APPLICATION_LIST, { headers: { job } });
 
 // candidate list
 export const getJobCandidateList = () => api.get(url.GET_CANDIDATE, '');
 export const addJobCandidate = (candidate : any) => api.create(url.ADD_NEW_CANDIDATE, candidate);
 export const updateJobCandidate = (candidate : any) => api.get(url.UPDATE_CANDIDATE, candidate);
-export const deleteJobCandidate = (candidate : any) => api.delete(url.DELETE_CANDIDATE, { headers: {candidate} });
+export const deleteJobCandidate = (candidate : any) => api.deleteRequest(url.DELETE_CANDIDATE, { headers: {candidate} });
 
 // category list
 export const getcategoryList = () => api.get(url.GET_CATEGORY_LIST);
