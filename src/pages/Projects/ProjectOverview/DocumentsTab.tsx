@@ -1,8 +1,17 @@
-import React from 'react';
 import { Link } from 'react-router-dom';
-import { Card, CardBody, Col, DropdownItem, DropdownMenu, DropdownToggle, Row, Table, UncontrolledDropdown } from 'reactstrap';
+import SimpleBar from "simplebar-react";
+import { Input,Card, CardBody, Col, DropdownItem, DropdownMenu, DropdownToggle, Row, Table, UncontrolledDropdown,Modal,ModalHeader,ModalBody } from 'reactstrap';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 
 const DocumentsTab = () => {
+  const [modal, setModal] = useState<boolean>(false);
+    const toggleModal = useCallback(() => {
+        if (modal) {
+          setModal(false);
+        } else {
+          setModal(true);
+        }
+      }, [modal]);
     return (
         <React.Fragment>
             <Card>
@@ -214,6 +223,127 @@ const DocumentsTab = () => {
                     </Row>
                 </CardBody>
             </Card>
+            <Modal isOpen={modal} toggle={toggleModal} centered className="border-0">
+                <ModalHeader toggle={toggleModal} className="p-3 ps-4 bg-success-subtle">
+                    Members
+                </ModalHeader>
+                <ModalBody className="p-4">
+                    <div className="search-box mb-3">
+                        <Input type="text" className="form-control bg-light border-light" placeholder="Search here..." />
+                        <i className="ri-search-line search-icon"></i>
+                    </div>
+
+                    <div className="mb-4 d-flex align-items-center">
+                        <div className="me-2">
+                            <h5 className="mb-0 fs-13">Members :</h5>
+                        </div>
+                        <div className="avatar-group justify-content-center">
+                            <Link to="#" className="avatar-group-item" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="" data-bs-original-title="Brent Gonzalez">
+                                <div className="avatar-xs">
+                                    <img  alt="" className="rounded-circle img-fluid" />
+                                </div>
+                            </Link>
+                            <Link to="#" className="avatar-group-item" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="" data-bs-original-title="Sylvia Wright">
+                                <div className="avatar-xs">
+                                    <div className="avatar-title rounded-circle bg-secondary">
+                                        S
+                                    </div>
+                                </div>
+                            </Link>
+                            <Link to="#" className="avatar-group-item" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="" data-bs-original-title="Ellen Smith">
+                                <div className="avatar-xs">
+                                    <img  alt="" className="rounded-circle img-fluid" />
+                                </div>
+                            </Link>
+                        </div>
+                    </div>
+                    <SimpleBar className="mx-n4 px-4" data-simplebar="init" style={{ maxHeight: "225px" }}>
+                        <div className="vstack gap-3">
+                            <div className="d-flex align-items-center">
+                                <div className="avatar-xs flex-shrink-0 me-3">
+                                    <img  alt="" className="img-fluid rounded-circle" />
+                                </div>
+                                <div className="flex-grow-1">
+                                    <h5 className="fs-13 mb-0"><Link to="#" className="text-body d-block">Nancy Martino</Link></h5>
+                                </div>
+                                <div className="flex-shrink-0">
+                                    <button type="button" className="btn btn-light btn-sm">Add</button>
+                                </div>
+                            </div>
+
+                            <div className="d-flex align-items-center">
+                                <div className="avatar-xs flex-shrink-0 me-3">
+                                    <div className="avatar-title bg-danger-subtle text-danger rounded-circle">
+                                        HB
+                                    </div>
+                                </div>
+                                <div className="flex-grow-1">
+                                    <h5 className="fs-13 mb-0"><Link to="#" className="text-body d-block">Henry Baird</Link></h5>
+                                </div>
+                                <div className="flex-shrink-0">
+                                    <button type="button" className="btn btn-light btn-sm">Add</button>
+                                </div>
+                            </div>
+
+                            <div className="d-flex align-items-center">
+                                <div className="avatar-xs flex-shrink-0 me-3">
+                                    <img  alt="" className="img-fluid rounded-circle" />
+                                </div>
+                                <div className="flex-grow-1">
+                                    <h5 className="fs-13 mb-0"><Link to="#" className="text-body d-block">Frank Hook</Link></h5>
+                                </div>
+                                <div className="flex-shrink-0">
+                                    <button type="button" className="btn btn-light btn-sm">Add</button>
+                                </div>
+                            </div>
+
+                            <div className="d-flex align-items-center">
+                                <div className="avatar-xs flex-shrink-0 me-3">
+                                    <img  alt="" className="img-fluid rounded-circle" />
+                                </div>
+                                <div className="flex-grow-1">
+                                    <h5 className="fs-13 mb-0"><Link to="#" className="text-body d-block">Jennifer Carter</Link></h5>
+                                </div>
+                                <div className="flex-shrink-0">
+                                    <button type="button" className="btn btn-light btn-sm">Add</button>
+                                </div>
+                            </div>
+
+                            <div className="d-flex align-items-center">
+                                <div className="avatar-xs flex-shrink-0 me-3">
+                                    <div className="avatar-title bg-success-subtle text-success rounded-circle">
+                                        AC
+                                    </div>
+                                </div>
+                                <div className="flex-grow-1">
+                                    <h5 className="fs-13 mb-0"><Link to="#" className="text-body d-block">Alexis Clarke</Link></h5>
+                                </div>
+                                <div className="flex-shrink-0">
+                                    <button type="button" className="btn btn-light btn-sm">Add</button>
+                                </div>
+                            </div>
+
+                            <div className="d-flex align-items-center">
+                                <div className="avatar-xs flex-shrink-0 me-3">
+                                    <img  alt="" className="img-fluid rounded-circle" />
+                                </div>
+                                <div className="flex-grow-1">
+                                    <h5 className="fs-13 mb-0"><Link to="#" className="text-body d-block">Joseph Parker</Link></h5>
+                                </div>
+                                <div className="flex-shrink-0">
+                                    <button type="button" className="btn btn-light btn-sm">Add</button>
+                                </div>
+                            </div>
+                        </div>
+
+                    </SimpleBar>
+                </ModalBody>
+                <div className="modal-footer">
+                    <button type="button" className="btn btn-light w-xs" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" className="btn btn-success w-xs">Invite</button>
+                </div>
+
+            </Modal>
         </React.Fragment>
     );
 };

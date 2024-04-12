@@ -40,9 +40,11 @@ const List = () => {
             dataProject = await dispatch(onGetProjectList({ inPage: inPage, limit: limit, keyword: keyWord, created_day_range: createdDayRange }));
 
             console.log(dataProject)
+            if (dataProject.payload.paging) {
             setTotalProject(dataProject.payload.paging.total);
             setTotalPage(Math.ceil(dataProject.payload.paging.total / limit))
             setInPage(dataProject.payload.paging.page)
+            }
 
         }
         fetchData();

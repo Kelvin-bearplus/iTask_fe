@@ -2,7 +2,6 @@
 
 import { getUserByEmail,getUserProfile,changePassword } from "../../../helpers/url_api";
 import { APIClient } from "../../../helpers/api_helper";
-import { AxiosResponse } from 'axios';
 
 // action
 import { profileSuccess, profileError, resetProfileFlagChange } from "./reducer";
@@ -45,6 +44,7 @@ export const changePasswordUser=(data:any) => async (dispatch:any)=>{
     }
 
 }
+
 export const getUserProfileByEmail = (email: string) => async (dispatch: any) => {
     try {
       const params = {
@@ -52,7 +52,6 @@ export const getUserProfileByEmail = (email: string) => async (dispatch: any) =>
       };
       const response = await api.get(getUserByEmail,params );
       dispatch(profileSuccess(response.data)); // Truyền response.data vào action profileSuccess
-      console.log("Dữ liệu:", response.data);
       return response.data; // Trả về dữ liệu từ phản hồi
     } catch (error) {
       const message = "Retrieve information failed";

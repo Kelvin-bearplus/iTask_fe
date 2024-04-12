@@ -1,19 +1,9 @@
 // import React from 'react';
 import { Link } from 'react-router-dom';
-import { Card, CardBody, CardHeader, Col, DropdownItem, DropdownMenu, DropdownToggle, Row, UncontrolledDropdown } from 'reactstrap';
-import React, { useEffect, useState } from 'react';
-
-//import images
-import avatar8 from "../../../assets/images/users/avatar-8.jpg";
-import avatar10 from "../../../assets/images/users/avatar-10.jpg";
-import avatar6 from "../../../assets/images/users/avatar-6.jpg";
-import avatar2 from "../../../assets/images/users/avatar-2.jpg";
-import avatar3 from "../../../assets/images/users/avatar-3.jpg";
-import avatar4 from "../../../assets/images/users/avatar-4.jpg";
-import avatar7 from "../../../assets/images/users/avatar-7.jpg";
-import image4 from "../../../assets/images/small/img-4.jpg";
-import image5 from "../../../assets/images/small/img-5.jpg";
-
+import { Input, Card, CardBody, CardHeader, Col, DropdownItem, DropdownMenu, DropdownToggle, Row, UncontrolledDropdown, Modal, ModalHeader, ModalBody } from 'reactstrap';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import { getUserProfileByEmail,inviteMember} from "../../../slices/thunks";
+import { useDispatch } from 'react-redux';
 
 //SimpleBar
 import SimpleBar from "simplebar-react";
@@ -22,12 +12,140 @@ const OverviewTab = ({ dataProject, startDate, deadlineDate }: { dataProject: an
     var items = [];
     if (dataProject.prop.tags) {
         items = dataProject.prop.tags.split(', ');
-   console.log(items);
+        console.log(dataProject);
     }
+    function checkInvite(member: any) {
+        let isMemberFound = true;
+    
+        dataProject.prop.members.some((memberProject: any) => {
+            if (memberProject.user_id === member.id) {
+                isMemberFound = false;
+                return true;
+            }
+        });
+    
+        return isMemberFound;
+    }
+    
+    
     const parseHTML = (htmlString: string) => {
         return <div dangerouslySetInnerHTML={{ __html: htmlString }} />;
-      };
-// console.log(dataProject.prop)
+    };
+    const [modal, setModal] = useState<boolean>(false);
+    const toggleModal = useCallback(() => {
+        console.log(dataProject)
+        if (modal) {
+            setModal(false);
+        } else {
+            setModal(true);
+        }
+    }, [modal]);
+const InviteMember=(email:string)=>async()=>{
+const dataUrl = {
+    projectId: dataProject.prop.id, // Match the property name with the expected parameter name
+    email: email
+};
+console.log(dataProject)
+
+const data = await dispatch(inviteMember(dataUrl));
+
+}
+    const [keyWord, setKeyWord] = useState<string>("");
+
+    const handleKeyPress = async (event: React.KeyboardEvent<HTMLInputElement>) => {
+        if (event.key === 'Enter') {
+            const newKeyword = event.currentTarget.value; // Lấy giá trị mới của keyword
+            const dataProject = await searchMembers(newKeyword)
+
+        }
+    };
+    interface memberData {
+        id: number,
+        role: string,
+        email: string,
+        username: string,
+        full_name: string,
+        address: string,
+        title: string,
+        phone: string,
+        dob: string,
+        bio: string,
+        profile_ava_url: string,
+        profile_cover_url: string,
+        created: string,
+        updated: string
+    }
+    const memberInit: memberData = {
+        id: -1,
+        role: "",
+        email: "",
+        username: "",
+        full_name: "",
+        address: "",
+        title: "",
+        phone: "",
+        dob: "",
+        bio: "",
+        profile_ava_url: "",
+        profile_cover_url: "",
+        created: "",
+        updated: ""
+    }
+    function isObjectEmpty(obj:any) {
+        return Object.keys(obj).length === 0;
+      }
+    const [searchMember, setSearchMember] = useState(memberInit);
+    const dispatch: any = useDispatch();
+    const searchMembers = async (email: any) => {
+        const data = await dispatch(getUserProfileByEmail(email));
+        console.log(checkInvite(data))
+        if (!isObjectEmpty(data)  ) {
+            if(checkInvite(data)){
+                setSearchMember(data);
+
+            }
+            else{
+                const dataNew={
+                    id: -2,
+                    role: "",
+                    email: "",
+                    username: "",
+                    full_name: "",
+                    address: "",
+                    title: "",
+                    phone: "",
+                    dob: "",
+                    bio: "",
+                    profile_ava_url: "",
+                    profile_cover_url: "",
+                    created: "",
+                    updated: ""
+                }
+                setSearchMember(dataNew);
+            }
+        }
+      else{
+        const dataNew={
+            id: -1,
+            role: "",
+            email: "",
+            username: "",
+            full_name: "",
+            address: "",
+            title: "",
+            phone: "",
+            dob: "",
+            bio: "",
+            profile_ava_url: "",
+            profile_cover_url: "",
+            created: "",
+            updated: ""
+        }
+        setSearchMember(dataNew);
+      }
+        return data;
+    }
+    console.log(searchMember)
     return (
         <React.Fragment>
             <Row>
@@ -37,7 +155,7 @@ const OverviewTab = ({ dataProject, startDate, deadlineDate }: { dataProject: an
                             <div className="text-muted">
                                 <h6 className="mb-3 fw-semibold text-uppercase">Summary</h6>
                                 {/* <p>{dataProject.prop.description}</p> */}
-                               { parseHTML(dataProject.prop.description)}
+                                {parseHTML(dataProject.prop.description)}
 
                                 <div>
                                     <button type="button" className="btn btn-link link-success p-0">Read more</button>
@@ -261,43 +379,42 @@ const OverviewTab = ({ dataProject, startDate, deadlineDate }: { dataProject: an
                         <CardHeader className="align-items-center d-flex border-bottom-dashed">
                             <h4 className="card-title mb-0 flex-grow-1">Members</h4>
                             <div className="flex-shrink-0">
-                                <button type="button" className="btn btn-soft-danger btn-sm" data-bs-toggle="modal" data-bs-target="#inviteMembersModal"><i className="ri-share-line me-1 align-bottom"></i> Invite Member</button>
+                                <button type="button" className="btn btn-soft-danger btn-sm" onClick={() => { toggleModal(); }}><i className="ri-share-line me-1 align-bottom"></i> Invite Member</button>
                             </div>
                         </CardHeader>
 
                         <CardBody>
                             <SimpleBar data-simplebar style={{ height: "235px" }} className="mx-n3 px-3">
                                 <div className="vstack gap-3">
-                                {dataProject.prop.members && dataProject.prop.members.map((member: any, index: number) => (
-                                    
-  <div key={index} className="d-flex align-items-center">
-    <script>console.log("khanh")</script>
+                                    {dataProject.prop.members && dataProject.prop.members.map((member: any, index: number) => (
 
-    <div className="avatar-xs flex-shrink-0 me-3">
-      <img src={member.account_info.profile_ava_url} alt="" className="img-fluid rounded-circle" />
-    </div>
-    <div className="flex-grow-1">
-      <h5 className="fs-13 mb-0">
-        <Link to="#" className="text-body d-block">{member.account_info.full_name}</Link>
-      </h5>
-    </div>
-    <div className="flex-shrink-0">
-      <div className="d-flex align-items-center gap-1">
-        <button type="button" className="btn btn-light btn-sm">Message</button>
-        <UncontrolledDropdown>
-          <DropdownToggle type="button" className="btn btn-icon btn-sm fs-16 text-muted dropdown" tag="button">
-            <i className="ri-more-fill"></i>
-          </DropdownToggle>
-          <DropdownMenu>
-            <li><DropdownItem><i className="ri-eye-fill text-muted me-2 align-bottom"></i>View</DropdownItem></li>
-            <li><DropdownItem><i className="ri-star-fill text-muted me-2 align-bottom"></i>Favourite</DropdownItem></li>
-            <li><DropdownItem><i className="ri-delete-bin-5-fill text-muted me-2 align-bottom"></i>Delete</DropdownItem></li>
-          </DropdownMenu>
-        </UncontrolledDropdown>
-      </div>
-    </div>
-  </div>
-))}
+                                        <div key={index} className="d-flex align-items-center">
+
+                                            <div className="avatar-xs flex-shrink-0 me-3">
+                                                <img src={member.account_info.profile_ava_url} alt="" className="img-fluid rounded-circle" />
+                                            </div>
+                                            <div className="flex-grow-1">
+                                                <h5 className="fs-13 mb-0">
+                                                    <Link to="#" className="text-body d-block">{member.account_info.full_name}</Link>
+                                                </h5>
+                                            </div>
+                                            <div className="flex-shrink-0">
+                                                <div className="d-flex align-items-center gap-1">
+                                                    <button type="button" className="btn btn-light btn-sm">Message</button>
+                                                    <UncontrolledDropdown>
+                                                        <DropdownToggle type="button" className="btn btn-icon btn-sm fs-16 text-muted dropdown" tag="button">
+                                                            <i className="ri-more-fill"></i>
+                                                        </DropdownToggle>
+                                                        <DropdownMenu>
+                                                            <li><DropdownItem><i className="ri-eye-fill text-muted me-2 align-bottom"></i>View</DropdownItem></li>
+                                                            <li><DropdownItem><i className="ri-star-fill text-muted me-2 align-bottom"></i>Favourite</DropdownItem></li>
+                                                            <li><DropdownItem><i className="ri-delete-bin-5-fill text-muted me-2 align-bottom"></i>Delete</DropdownItem></li>
+                                                        </DropdownMenu>
+                                                    </UncontrolledDropdown>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
 
                                 </div>
                             </SimpleBar>
@@ -443,6 +560,62 @@ const OverviewTab = ({ dataProject, startDate, deadlineDate }: { dataProject: an
                     </Card>
                 </Col>
             </Row>
+            <Modal isOpen={modal} toggle={toggleModal} centered className="border-0">
+                <ModalHeader toggle={toggleModal} className="p-3 ps-4 bg-success-subtle">
+                    Members
+                </ModalHeader>
+                <ModalBody className="p-4">
+                    <div className="search-box mb-3">
+                        <Input type="text" className="form-control bg-light border-light" id="search_member" placeholder="Search here..." onKeyPress={handleKeyPress} />
+                        <i className="ri-search-line search-icon"></i>
+                    </div>
+
+                    <div className="mb-4 d-flex align-items-center">
+                        <div className="me-2">
+                            <h5 className="mb-0 fs-13">Members :</h5>
+                        </div>
+                        <div className="avatar-group justify-content-center">
+                            {dataProject && dataProject.prop.members.map((project: any, index: number) => {
+                                return (
+                                    <Link to="" className="avatar-group-item" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="" data-bs-original-title="Brent Gonzalez">
+                                        <div className="avatar-xs">
+                                            <img src={project.account_info.profile_ava_url} alt="" className="rounded-circle img-fluid" />
+                                        </div>
+                                    </Link>);
+                            })}
+                        </div>
+                    </div>
+                    <SimpleBar className="mx-n4 px-4" data-simplebar="init" style={{ maxHeight: "225px" }}>
+                        <div className="vstack gap-3">
+                          
+                           {
+                            searchMember.id>0 && <div className="d-flex align-items-center">
+                            <div className="avatar-xs flex-shrink-0 me-3">
+                                <img src={searchMember.profile_ava_url} alt="" className="img-fluid rounded-circle" />
+                            </div>
+                            <div className="flex-grow-1">
+                                <h5 className="fs-13 mb-0"><Link to="#" className="text-body d-block">{searchMember.full_name}</Link></h5>
+                            </div>
+                            <div className="flex-shrink-0">
+                                <button type="button" className="btn btn-light btn-sm" onClick={InviteMember(searchMember.email)}>Add</button>
+                            </div>
+                        </div>
+                           }
+                           {
+                          searchMember.id===-1 && <div>Không tìm thấy thành viên </div>
+                           }
+                             {
+                          searchMember.id===-2 && <div>Tài khoản này đã là thành viên trong project</div>
+                           }
+                        </div>
+
+                    </SimpleBar>
+                </ModalBody>
+                <div className="modal-footer">
+                    <button type="button" className="btn btn-success w-xs">Done</button>
+                </div>
+
+            </Modal>
         </React.Fragment>
     );
 };

@@ -100,7 +100,7 @@ class APIClient {
   /**
    * Posts the given data to the URL
    */
-  create = (url: string, data: any): Promise<AxiosResponse> => {
+  create = (url: string, data?: any): Promise<AxiosResponse> => {
     return axios.post(url, data);
   };
   createFile =  (url: string, data: FormData): Promise<AxiosResponse> => {
