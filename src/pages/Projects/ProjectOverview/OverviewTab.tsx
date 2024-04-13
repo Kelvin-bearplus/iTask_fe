@@ -2,32 +2,22 @@
 import { Link } from 'react-router-dom';
 import { Input, Card, CardBody, CardHeader, Col, DropdownItem, DropdownMenu, DropdownToggle, Row, UncontrolledDropdown, Modal, ModalHeader, ModalBody } from 'reactstrap';
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { getUserProfileByEmail,inviteMember} from "../../../slices/thunks";
+import { getUninvited, inviteMember } from "../../../slices/thunks";
 import { useDispatch } from 'react-redux';
 
 //SimpleBar
 import SimpleBar from "simplebar-react";
-
+const userId = localStorage.getItem('userId');
 const OverviewTab = ({ dataProject, startDate, deadlineDate }: { dataProject: any, startDate: Date, deadlineDate: Date }) => {
-    var items = [];
-    if (dataProject.prop.tags) {
-        items = dataProject.prop.tags.split(', ');
-        console.log(dataProject);
-    }
-    function checkInvite(member: any) {
-        let isMemberFound = true;
-    
-        dataProject.prop.members.some((memberProject: any) => {
-            if (memberProject.user_id === member.id) {
-                isMemberFound = false;
-                return true;
-            }
-        });
-    
-        return isMemberFound;
-    }
-    
-    
+    // const [items,setItems]=useState([]);
+    // if (dataProject.prop.tags) {
+    //     const dataItem = dataProject.prop.tags.split(', ');
+    //     setItems( dataItem.length);
+    //     console.log(items);
+    // }
+
+
+
     const parseHTML = (htmlString: string) => {
         return <div dangerouslySetInnerHTML={{ __html: htmlString }} />;
     };
@@ -40,22 +30,21 @@ const OverviewTab = ({ dataProject, startDate, deadlineDate }: { dataProject: an
             setModal(true);
         }
     }, [modal]);
-const InviteMember=(email:string)=>async()=>{
-const dataUrl = {
-    projectId: dataProject.prop.id, // Match the property name with the expected parameter name
-    email: email
-};
-console.log(dataProject)
+    const InviteMember = (email: string) => async () => {
+        const dataUrl = {
+            projectId: dataProject.prop.id, // Match the property name with the expected parameter name
+            email: email
+        };
+        console.log(dataProject)
 
-const data = await dispatch(inviteMember(dataUrl));
-
-}
-    const [keyWord, setKeyWord] = useState<string>("");
+        dispatch(inviteMember(dataUrl));
+        setSearchMember(memberInit);
+    }
 
     const handleKeyPress = async (event: React.KeyboardEvent<HTMLInputElement>) => {
         if (event.key === 'Enter') {
             const newKeyword = event.currentTarget.value; // Lấy giá trị mới của keyword
-            const dataProject = await searchMembers(newKeyword)
+             searchMembers(newKeyword)
 
         }
     };
@@ -91,58 +80,33 @@ const data = await dispatch(inviteMember(dataUrl));
         created: "",
         updated: ""
     }
-    function isObjectEmpty(obj:any) {
+    function isObjectEmpty(obj: any) {
         return Object.keys(obj).length === 0;
-      }
+    }
     const [searchMember, setSearchMember] = useState(memberInit);
     const dispatch: any = useDispatch();
+    const [errorMessage,setErrorMessage]=useState("");
     const searchMembers = async (email: any) => {
-        const data = await dispatch(getUserProfileByEmail(email));
-        console.log(checkInvite(data))
-        if (!isObjectEmpty(data)  ) {
-            if(checkInvite(data)){
-                setSearchMember(data);
-
-            }
-            else{
-                const dataNew={
-                    id: -2,
-                    role: "",
-                    email: "",
-                    username: "",
-                    full_name: "",
-                    address: "",
-                    title: "",
-                    phone: "",
-                    dob: "",
-                    bio: "",
-                    profile_ava_url: "",
-                    profile_cover_url: "",
-                    created: "",
-                    updated: ""
-                }
-                setSearchMember(dataNew);
-            }
+        const  dataAPI={
+            email:email,
+            projectId:dataProject.prop.id
         }
-      else{
-        const dataNew={
-            id: -1,
-            role: "",
-            email: "",
-            username: "",
-            full_name: "",
-            address: "",
-            title: "",
-            phone: "",
-            dob: "",
-            bio: "",
-            profile_ava_url: "",
-            profile_cover_url: "",
-            created: "",
-            updated: ""
+        const data = await dispatch(getUninvited(dataAPI));
+        console.log(data)
+        if (data.payload&&!isObjectEmpty(data.payload)) {
+            if (!data.payload.is_invited) {
+                setSearchMember(data.payload);
+               setErrorMessage("");
+            }
+           else{
+            setErrorMessage("Member is invited!")
+            setSearchMember(memberInit);
+           }
         }
-        setSearchMember(dataNew);
-      }
+        else {
+            setErrorMessage(data.error.message)
+            setSearchMember(memberInit);
+        }
         return data;
     }
     console.log(searchMember)
@@ -365,7 +329,7 @@ const data = await dispatch(inviteMember(dataUrl));
                         <CardBody>
                             <h5 className="card-title mb-4">Skills</h5>
                             <div className="d-flex flex-wrap gap-2 fs-16">
-                                {items.map((item: string, index: number) => (
+                                {dataProject.prop.tags.split(', ').length>0 && dataProject.prop.tags.split(', ').map((item: string, index: number) => (
                                     <div key={index} className="badge fw-medium bg-secondary-subtle text-secondary">
                                         {item}
                                     </div>
@@ -375,53 +339,55 @@ const data = await dispatch(inviteMember(dataUrl));
                     </Card>
 
 
-                    <Card>
-                        <CardHeader className="align-items-center d-flex border-bottom-dashed">
-                            <h4 className="card-title mb-0 flex-grow-1">Members</h4>
-                            <div className="flex-shrink-0">
-                                <button type="button" className="btn btn-soft-danger btn-sm" onClick={() => { toggleModal(); }}><i className="ri-share-line me-1 align-bottom"></i> Invite Member</button>
-                            </div>
-                        </CardHeader>
+                    {userId == dataProject.prop.owner.id &&
+                        <Card>
+                            <CardHeader className="align-items-center d-flex border-bottom-dashed">
+                                <h4 className="card-title mb-0 flex-grow-1">Members</h4>
+                                <div className="flex-shrink-0">
+                                    <button type="button" className="btn btn-soft-danger btn-sm" onClick={() => { toggleModal(); }}><i className="ri-share-line me-1 align-bottom"></i> Invite Member</button>
+                                </div>
+                            </CardHeader>
 
-                        <CardBody>
-                            <SimpleBar data-simplebar style={{ height: "235px" }} className="mx-n3 px-3">
-                                <div className="vstack gap-3">
-                                    {dataProject.prop.members && dataProject.prop.members.map((member: any, index: number) => (
+                            <CardBody>
+                                <SimpleBar data-simplebar style={{ height: "235px" }} className="mx-n3 px-3">
+                                    <div className="vstack gap-3">
+                                        {dataProject.prop.members && dataProject.prop.members.map((member: any, index: number) => (
 
-                                        <div key={index} className="d-flex align-items-center">
+                                            <div key={index} className="d-flex align-items-center">
 
-                                            <div className="avatar-xs flex-shrink-0 me-3">
-                                                <img src={member.account_info.profile_ava_url} alt="" className="img-fluid rounded-circle" />
-                                            </div>
-                                            <div className="flex-grow-1">
-                                                <h5 className="fs-13 mb-0">
-                                                    <Link to="#" className="text-body d-block">{member.account_info.full_name}</Link>
-                                                </h5>
-                                            </div>
-                                            <div className="flex-shrink-0">
-                                                <div className="d-flex align-items-center gap-1">
-                                                    <button type="button" className="btn btn-light btn-sm">Message</button>
-                                                    <UncontrolledDropdown>
-                                                        <DropdownToggle type="button" className="btn btn-icon btn-sm fs-16 text-muted dropdown" tag="button">
-                                                            <i className="ri-more-fill"></i>
-                                                        </DropdownToggle>
-                                                        <DropdownMenu>
-                                                            <li><DropdownItem><i className="ri-eye-fill text-muted me-2 align-bottom"></i>View</DropdownItem></li>
-                                                            <li><DropdownItem><i className="ri-star-fill text-muted me-2 align-bottom"></i>Favourite</DropdownItem></li>
-                                                            <li><DropdownItem><i className="ri-delete-bin-5-fill text-muted me-2 align-bottom"></i>Delete</DropdownItem></li>
-                                                        </DropdownMenu>
-                                                    </UncontrolledDropdown>
+                                                <div className="avatar-xs flex-shrink-0 me-3">
+                                                    <img src={member.account_info.profile_ava_url} alt="" className="img-fluid rounded-circle" />
+                                                </div>
+                                                <div className="flex-grow-1">
+                                                    <h5 className="fs-13 mb-0">
+                                                        <Link to="#" className="text-body d-block">{member.account_info.full_name}</Link>
+                                                    </h5>
+                                                </div>
+                                                <div className="flex-shrink-0">
+                                                    <div className="d-flex align-items-center gap-1">
+                                                        <button type="button" className="btn btn-light btn-sm">Message</button>
+                                                        <UncontrolledDropdown>
+                                                            <DropdownToggle type="button" className="btn btn-icon btn-sm fs-16 text-muted dropdown" tag="button">
+                                                                <i className="ri-more-fill"></i>
+                                                            </DropdownToggle>
+                                                            <DropdownMenu>
+                                                                <li><DropdownItem><i className="ri-eye-fill text-muted me-2 align-bottom"></i>View</DropdownItem></li>
+                                                                <li><DropdownItem><i className="ri-star-fill text-muted me-2 align-bottom"></i>Favourite</DropdownItem></li>
+                                                                <li><DropdownItem><i className="ri-delete-bin-5-fill text-muted me-2 align-bottom"></i>Delete</DropdownItem></li>
+                                                            </DropdownMenu>
+                                                        </UncontrolledDropdown>
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                    ))}
+                                        ))}
 
-                                </div>
-                            </SimpleBar>
+                                    </div>
+                                </SimpleBar>
 
-                        </CardBody>
+                            </CardBody>
 
-                    </Card>
+                        </Card>
+                    }
                     <Card>
                         {/* <CardHeader className="align-items-center d-flex border-bottom-dashed">
                             <h4 className="card-title mb-0 flex-grow-1">Attachments</h4>
@@ -575,7 +541,7 @@ const data = await dispatch(inviteMember(dataUrl));
                             <h5 className="mb-0 fs-13">Members :</h5>
                         </div>
                         <div className="avatar-group justify-content-center">
-                            {dataProject && dataProject.prop.members.map((project: any, index: number) => {
+                            {dataProject.prop.members && dataProject.prop.members.map((project: any, index: number) => {
                                 return (
                                     <Link to="" className="avatar-group-item" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="" data-bs-original-title="Brent Gonzalez">
                                         <div className="avatar-xs">
@@ -587,32 +553,31 @@ const data = await dispatch(inviteMember(dataUrl));
                     </div>
                     <SimpleBar className="mx-n4 px-4" data-simplebar="init" style={{ maxHeight: "225px" }}>
                         <div className="vstack gap-3">
+
+                            {
+                                searchMember.id > 0 && <div className="d-flex align-items-center">
+                                    <div className="avatar-xs flex-shrink-0 me-3">
+                                        <img src={searchMember.profile_ava_url} alt="" className="img-fluid rounded-circle" />
+                                    </div>
+                                    <div className="flex-grow-1">
+                                        <h5 className="fs-13 mb-0"><Link to="#" className="text-body d-block">{searchMember.full_name}</Link></h5>
+                                    </div>
+                                    <div className="flex-shrink-0">
+                                        <button type="button" className="btn btn-light btn-sm" onClick={InviteMember(searchMember.email)}>Add</button>
+                                    </div>
+                                </div>
+                            }
+                            {
+                                errorMessage!="" && <div>{errorMessage} </div>
+                            }
                           
-                           {
-                            searchMember.id>0 && <div className="d-flex align-items-center">
-                            <div className="avatar-xs flex-shrink-0 me-3">
-                                <img src={searchMember.profile_ava_url} alt="" className="img-fluid rounded-circle" />
-                            </div>
-                            <div className="flex-grow-1">
-                                <h5 className="fs-13 mb-0"><Link to="#" className="text-body d-block">{searchMember.full_name}</Link></h5>
-                            </div>
-                            <div className="flex-shrink-0">
-                                <button type="button" className="btn btn-light btn-sm" onClick={InviteMember(searchMember.email)}>Add</button>
-                            </div>
-                        </div>
-                           }
-                           {
-                          searchMember.id===-1 && <div>Không tìm thấy thành viên </div>
-                           }
-                             {
-                          searchMember.id===-2 && <div>Tài khoản này đã là thành viên trong project</div>
-                           }
                         </div>
 
                     </SimpleBar>
                 </ModalBody>
                 <div className="modal-footer">
-                    <button type="button" className="btn btn-success w-xs">Done</button>
+                <button type="button" className="btn btn-success w-xs" onClick={toggleModal}>Done</button>
+
                 </div>
 
             </Modal>

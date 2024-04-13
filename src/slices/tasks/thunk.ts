@@ -3,15 +3,12 @@ import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 //Include Both Helper File with needed methods
 import {
-    addNewTask as addNewTaskApi,
-    updateTask as updateTaskApi,
-    deleteTask as deleteTaskApi,
     getTasks as getTasksApi,
     addNewTasks as addNewTasksApi,
     updateTasks as updateTasksApi,
     deleteTasks as deleteTasksApi
 } from "../../helpers/fakebackend_helper";
-import { getTaskListAPI,deleteTaskAPI } from '../../helpers/url_api'
+import { getTaskListAPI,deleteTaskAPI,getTaskByIdAPI ,assigneesAPI,getUnassignessAPI} from '../../helpers/url_api'
 import { APIClient } from "../../helpers/api_helper";
 const api = new APIClient();
 export const getTaskList = createAsyncThunk("tasks/getTaskList", async () => {
@@ -20,7 +17,44 @@ export const getTaskList = createAsyncThunk("tasks/getTaskList", async () => {
         console.log(response)
         return response.data;
     } catch (error) {
-        return error;
+        throw error;
+    }
+});
+export const getTaskById = createAsyncThunk("tasks/getTaskById", async (id:number) => {
+    try {
+        const url = `${getTaskByIdAPI}/${id}`
+        const response =await api.get(url);
+        // console.log(response)
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+});
+export const getAssigneesById = createAsyncThunk("tasks/getAssigneesById", async (id:number) => {
+    try {
+        const url = `${assigneesAPI}/${id}`
+        const response =await api.get(url);
+        // console.log(response)
+        return response.data;
+    } catch (error:any) {
+        throw error.response.data.message;
+
+    }
+});
+export const getUnassigness = createAsyncThunk("getUnassigness", async ({email,projectId}:{email:string, projectId:number}) => {
+    try {
+            const param={
+                email:email,
+                project_id:projectId
+            }
+            const response = await api.get(getUnassignessAPI,param);
+            console.log(response);
+            return response;
+        
+
+    } catch (error:any) {
+        console.log(error);
+        throw error.response.data.message;
     }
 });
 export const addNewTask = createAsyncThunk("tasks/addNewTask", async (task: any) => {

@@ -5,7 +5,7 @@ import { CKEditor } from "@ckeditor/ckeditor5-react";
 import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 import { formatDateCreateProject } from "../../../helpers/format";
 // Import Scroll Bar - SimpleBar
-import SimpleBar from 'simplebar-react';
+// import SimpleBar from 'simplebar-react';
 
 //Import Flatepicker
 import Flatpickr from "react-flatpickr";
@@ -344,7 +344,7 @@ const AllTasks = () => {
               <div className="flex-shrink-0 ms-4">
                 <ul className="list-inline tasks-list-menu mb-0">
                   <li className="list-inline-item">
-                    <Link to="/apps-tasks-details">
+                    <Link to={`/apps-tasks-details?id=${cellProps.row.original.id}`}>
                       <i className="ri-eye-fill align-bottom me-2 text-muted"></i>
                     </Link>
                   </li>

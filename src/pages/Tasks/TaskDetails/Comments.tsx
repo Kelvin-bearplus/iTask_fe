@@ -61,7 +61,7 @@ const Comments = () => {
                     <TabContent activeTab={activeTab}>
                         <TabPane tabId="1">
                             <h5 className="card-title mb-4">Comments</h5>
-                            <SimpleBar style={{ height: "508px" }} className="px-3 mx-n3 mb-2">
+                            {/* <SimpleBar style={{ height: "508px" }} className="px-3 mx-n3 mb-2">
                                 <div className="d-flex mb-4">
                                     <div className="flex-shrink-0">
                                         <img src={avatar7} alt="" className="avatar-xs rounded-circle" />
@@ -120,7 +120,7 @@ const Comments = () => {
                                         </div>
                                     </div>
                                 </div>
-                            </SimpleBar>
+                            </SimpleBar> */}
                             <form className="mt-4">
                                 <Row className="g-3">
                                     <Col lg={12}>
@@ -147,7 +147,7 @@ const Comments = () => {
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr>
+                                        {/* <tr>
                                             <td>
                                                 <div className="d-flex align-items-center">
                                                     <div className="avatar-sm">
@@ -266,7 +266,7 @@ const Comments = () => {
                                                     </DropdownMenu>
                                                 </UncontrolledDropdown>
                                             </td>
-                                        </tr>
+                                        </tr> */}
                                     </tbody>
                                 </Table>
                             </div>
@@ -285,7 +285,7 @@ const Comments = () => {
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr>
+                                        {/* <tr>
                                             <th scope="row">
                                                 <div className="d-flex align-items-center">
                                                     <img src={avatar8} alt="" className="rounded-circle avatar-xxs" />
@@ -326,7 +326,7 @@ const Comments = () => {
                                             <td>4 hrs 26 min</td>
                                             <td>03 min</td>
                                             <td>Ecommerce Dashboard</td>
-                                        </tr>
+                                        </tr> */}
                                     </tbody>
                                 </table>
                             </div>

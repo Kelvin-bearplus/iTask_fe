@@ -1,6 +1,6 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import 'react-toastify/dist/ReactToastify.css';
-import { getListProjects, uploadFile,simpleProjectAPI } from '../../helpers/url_api'
+import { getListProjects, uploadFile,simpleProjectAPI,uninvitedAPI } from '../../helpers/url_api'
 import { APIClient } from "../../helpers/api_helper";
 import { resetProjectFlagChange } from "./reducer"
 
@@ -36,6 +36,22 @@ export const getProjectById = createAsyncThunk("getProjectById", async (id:numbe
 
     } catch (error) {
         return error;
+    }
+});
+export const getUninvited = createAsyncThunk("getUninvited", async ({email,projectId}:{email:string, projectId:number}) => {
+    try {
+            const param={
+                email:email,
+                project_id:projectId
+            }
+            const response = await api.get(uninvitedAPI,param);
+            console.log(response);
+            return response;
+        
+
+    } catch (error:any) {
+        console.log(error);
+        throw error.response.data.message;
     }
 });
 export const updateProjectById = createAsyncThunk("updateProjectById", async({ id, project }:{id:string,project:any}) => {

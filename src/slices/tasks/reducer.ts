@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { getTaskList, addNewTask, updateTask, deleteTask, updateCardData, deleteKanban, getTasks, addCardData } from './thunk';
+import { getTaskList, addNewTask, updateTask, deleteTask, updateCardData, deleteKanban, getTasks, addCardData,getUnassigness,getTaskById,getAssigneesById } from './thunk';
 export const initialState = {
     taskList: [],
     tasks: [],
@@ -15,6 +15,16 @@ const TasksSlice = createSlice({
             state.isTaskSuccess = true;
         });
         builder.addCase(getTaskList.rejected, (state: any, action: any) => {
+            state.error = action.payload.error || null;
+            state.isTaskCreated = false;
+            state.isTaskSuccess = true;
+        });
+        builder.addCase(getAssigneesById.fulfilled, (state: any, action: any) => {
+            state.taskList = action.payload;
+            state.isTaskCreated = false;
+            state.isTaskSuccess = true;
+        });
+        builder.addCase(getAssigneesById.rejected, (state: any, action: any) => {
             state.error = action.payload.error || null;
             state.isTaskCreated = false;
             state.isTaskSuccess = true;
@@ -69,6 +79,18 @@ const TasksSlice = createSlice({
         });
         builder.addCase(getTasks.rejected, (state: any, action: any) => {
             state.error = action.payload ? action.payload?.error : null;
+        });
+        builder.addCase(getTaskById.fulfilled, (state: any, action: any) => {
+            state.tasks = action.payload;
+        });
+        builder.addCase(getTaskById.rejected, (state: any, action: any) => {
+            state.error = action.payload;
+        });
+        builder.addCase(getUnassigness.fulfilled, (state: any, action: any) => {
+            state.tasks = action.payload;
+        });
+        builder.addCase(getUnassigness.rejected, (state: any, action: any) => {
+            state.error = action.payload;
         });
         builder.addCase(addCardData.fulfilled, (state: any, action: any) => {
             const existingTaskList = state.tasks.find(
