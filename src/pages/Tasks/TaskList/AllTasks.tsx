@@ -63,6 +63,11 @@ const AllTasks = () => {
       isTaskUpdateFail: state.isTaskUpdateFail,
     })
   );
+  const [isLoad, setIsLoad]=useState(true);
+  setTimeout(()=>{
+    setIsLoad(false);
+  
+  },1500)
   // Inside your component
   const {
     taskList, isTaskSuccess, error
@@ -496,7 +501,8 @@ console.log(taskList)
             </div>
 
             <div className="card-body pt-0">
-              {isTaskSuccess && TaskList.length ? (
+              {isLoad && <Loader error={error} isLoading={isLoad} />}
+               {!isLoad&&isTaskSuccess  &&
                 <TableContainer
                   columns={columns}
                   data={(TaskList || [])}
@@ -515,7 +521,7 @@ console.log(taskList)
                   handleDateChange={handleDateChange}
                   handleFilterClick={handleFilterClick}
                 />
-              ) : (<Loader error={error} />)
+           
               }
               <ToastContainer closeButton={false} limit={1} />
             </div>

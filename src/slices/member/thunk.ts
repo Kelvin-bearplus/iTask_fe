@@ -1,6 +1,6 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import 'react-toastify/dist/ReactToastify.css';
-import { inviteMemberAPI } from '../../helpers/url_api'
+import { inviteMemberAPI,deleteMemberAPI,getMemberAssigneesAPI,assignMemberAPI } from '../../helpers/url_api'
 import { APIClient } from "../../helpers/api_helper";
 import { number } from "yup";
 import { emit } from "process";
@@ -13,23 +13,72 @@ export const inviteMember = createAsyncThunk(
       try {
         console.log(projectId);
         const params = `${inviteMemberAPI}?project_id=${projectId}&email=${email}`;
-        console.log(params);
-        
-        // Make API request
         const response = await api.create(params);
-  
-        console.log(response); // Log or handle the response as needed
-        
         return response; // Return the response data to be handled by the slice reducer
-      } catch (error) {
-        console.error("Error inviting member:", error); // Log or handle errors
-        throw error; // Rethrow the error to be caught by the slice reducer
-      }
+      }  catch (error:any) {
+        console.log(error);
+        throw error.response.data.message;
     }
-  );
-  
+});
 
+export const assignMember = createAsyncThunk(
+  "assignMember",
+  async ({ task_id, user_id }: { task_id: number, user_id: number }) => {
+    try {
+      const data={
+        task_id: task_id,
+        user_id: user_id
+      };
+      const response = await api.create(assignMemberAPI,data);
+      console.log(response);
+      return response; // Return the response data to be handled by the slice reducer
+    }  catch (error:any) {
+      console.log(error);
+      throw error.response.data.message;
+  }
+});
 
+  export const deleteMember = createAsyncThunk(
+    "deleteMemberAPI",
+    async ({ projectId, user_id }: { projectId: number, user_id: number }) => {
+      try {
+        console.log(projectId);
+        const params = `${deleteMemberAPI}?project_id=${projectId}&user_id=${user_id}`;
+        const response = await api.deleteRequest(params);
+        console.log(response);
+        return response; // Return the response data to be handled by the slice reducer
+      }  catch (error:any) {
+        console.log(error);
+        throw error.response.data.message;
+    }
+});
+export const deleteAssign = createAsyncThunk(
+  "deleteAssign",
+  async ({ task_id, user_id }: { task_id: number, user_id: number }) => {
+    try {
+      console.log(task_id);
+      const params = `${assignMemberAPI}?task_id=${task_id}&user_id=${user_id}`;
+      const response = await api.deleteRequest(params);
+      return response; // Return the response data to be handled by the slice reducer
+    }  catch (error:any) {
+      console.log(error);
+      throw error.response.data.message;
+  }
+});
+export const getMemberAssignees = createAsyncThunk(
+  "getMemberAssignees",
+  async ({ projectId, taskId }: { projectId: number, taskId: number }) => {
+    try {
+      console.log(projectId);
+      const params = `${getMemberAssigneesAPI}?project_id=${projectId}&task_id=${taskId}`;
+      const response = await api.get(params);
+      console.log(response);
+      return response; // Return the response data to be handled by the slice reducer
+    }  catch (error:any) {
+      console.log(error);
+      throw error.response.data.message;
+  }
+});
 // export const resetProjectFlag = () => {
 //     try {
 //         const response = resetProjectFlagChange();

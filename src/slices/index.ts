@@ -15,6 +15,7 @@ import chatReducer from "./chat/reducer";
 
 //Project
 import ProjectsReducer from "./projects/reducer";
+import Member from "./member/reducer";
 
 // Tasks
 import TasksReducer from "./tasks/reducer";
@@ -35,6 +36,7 @@ const rootReducer = combineReducers({
     Profile: ProfileReducer,
     Chat: chatReducer,
     Projects: ProjectsReducer,
+    Member: Member,
     Tasks: TasksReducer,
     DashboardProject: DashboardProjectReducer,
 

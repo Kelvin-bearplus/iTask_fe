@@ -2,21 +2,15 @@
 import { Link } from 'react-router-dom';
 import { Input, Card, CardBody, CardHeader, Col, DropdownItem, DropdownMenu, DropdownToggle, Row, UncontrolledDropdown, Modal, ModalHeader, ModalBody } from 'reactstrap';
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { getUninvited, inviteMember } from "../../../slices/thunks";
-import { useDispatch } from 'react-redux';
-
+import { getUninvited, inviteMember, deleteMember } from "../../../slices/thunks";
+import { useSelector, useDispatch } from 'react-redux';
+import { toast, ToastContainer } from 'react-toastify';
+import { createSelector } from 'reselect';
+import avt_default from "../../../assets/images/users/anh_mac_dinh.jpg";
 //SimpleBar
 import SimpleBar from "simplebar-react";
 const userId = localStorage.getItem('userId');
 const OverviewTab = ({ dataProject, startDate, deadlineDate }: { dataProject: any, startDate: Date, deadlineDate: Date }) => {
-    // const [items,setItems]=useState([]);
-    // if (dataProject.prop.tags) {
-    //     const dataItem = dataProject.prop.tags.split(', ');
-    //     setItems( dataItem.length);
-    //     console.log(items);
-    // }
-
-
 
     const parseHTML = (htmlString: string) => {
         return <div dangerouslySetInnerHTML={{ __html: htmlString }} />;
@@ -44,10 +38,15 @@ const OverviewTab = ({ dataProject, startDate, deadlineDate }: { dataProject: an
     const handleKeyPress = async (event: React.KeyboardEvent<HTMLInputElement>) => {
         if (event.key === 'Enter') {
             const newKeyword = event.currentTarget.value; // Lấy giá trị mới của keyword
-             searchMembers(newKeyword)
+            searchMembers(newKeyword)
 
         }
     };
+    const [inviteMemberData, setInviteMemberData] = useState([]);
+    useEffect(() => {
+        setInviteMemberData(dataProject.prop.members);
+    }, [])
+    console.log(inviteMemberData);
     interface memberData {
         id: number,
         role: string,
@@ -85,23 +84,23 @@ const OverviewTab = ({ dataProject, startDate, deadlineDate }: { dataProject: an
     }
     const [searchMember, setSearchMember] = useState(memberInit);
     const dispatch: any = useDispatch();
-    const [errorMessage,setErrorMessage]=useState("");
+    const [errorMessage, setErrorMessage] = useState("");
     const searchMembers = async (email: any) => {
-        const  dataAPI={
-            email:email,
-            projectId:dataProject.prop.id
+        const dataAPI = {
+            email: email,
+            projectId: dataProject.prop.id
         }
         const data = await dispatch(getUninvited(dataAPI));
         console.log(data)
-        if (data.payload&&!isObjectEmpty(data.payload)) {
+        if (data.payload && !isObjectEmpty(data.payload)) {
             if (!data.payload.is_invited) {
                 setSearchMember(data.payload);
-               setErrorMessage("");
+                setErrorMessage("");
             }
-           else{
-            setErrorMessage("Member is invited!")
-            setSearchMember(memberInit);
-           }
+            else {
+                setErrorMessage("Member is invited!")
+                setSearchMember(memberInit);
+            }
         }
         else {
             setErrorMessage(data.error.message)
@@ -109,9 +108,45 @@ const OverviewTab = ({ dataProject, startDate, deadlineDate }: { dataProject: an
         }
         return data;
     }
-    console.log(searchMember)
+    const [toastData, setToastData] = useState("");
+    const [errorData, setErrorData] = useState("");
+    async function deleteMemberHandel(userId: number, name: string) {
+        const dataDelete = {
+            projectId: dataProject.prop.id,
+            user_id: userId
+        }
+        const data = await dispatch(deleteMember(dataDelete));
+        console.log(data);
+        if (data.payload != undefined && data.payload.data) {
+            setErrorData("")
+            console.log("vào")
+            const messageSuccess = "Delete member " + name + " success!";
+            setToastData(messageSuccess);
+            setInviteMemberData(inviteMemberData.filter((member: any) => member.account_info.id !== userId));
+        }
+        else {
+            console.log("khanh")
+            setToastData("");
+            setErrorData("Delete member " + name + " fail!")
+        }
+    }
+
+    console.log(errorData)
     return (
         <React.Fragment>
+            {toastData && toastData != "" ? (
+                <>
+                    {toast(toastData, { position: "top-right", hideProgressBar: false, className: 'bg-success text-white', progress: undefined, toastId: "" })}
+                    <ToastContainer autoClose={2000} limit={1} />
+                </>
+            ) : null}
+            {errorData && errorData != "" ? (
+                <>
+                    {toast(errorData, { position: "top-right", hideProgressBar: false, className: 'bg-danger text-white', progress: undefined, toastId: "" })}
+                    <ToastContainer autoClose={2000} limit={1} />
+                </>
+            ) : null}
+
             <Row>
                 <Col xl={9} lg={8}>
                     <Card>
@@ -329,7 +364,7 @@ const OverviewTab = ({ dataProject, startDate, deadlineDate }: { dataProject: an
                         <CardBody>
                             <h5 className="card-title mb-4">Skills</h5>
                             <div className="d-flex flex-wrap gap-2 fs-16">
-                                {dataProject.prop.tags.split(', ').length>0 && dataProject.prop.tags.split(', ').map((item: string, index: number) => (
+                                {dataProject.prop.tags.split(', ').length > 0 && dataProject.prop.tags.split(', ').map((item: string, index: number) => (
                                     <div key={index} className="badge fw-medium bg-secondary-subtle text-secondary">
                                         {item}
                                     </div>
@@ -351,10 +386,9 @@ const OverviewTab = ({ dataProject, startDate, deadlineDate }: { dataProject: an
                             <CardBody>
                                 <SimpleBar data-simplebar style={{ height: "235px" }} className="mx-n3 px-3">
                                     <div className="vstack gap-3">
-                                        {dataProject.prop.members && dataProject.prop.members.map((member: any, index: number) => (
+                                        {inviteMemberData && inviteMemberData.map((member: any, index: number) => (
 
-                                            <div key={index} className="d-flex align-items-center">
-
+                                            <div key={index} className={`d-flex align-items-center ${userId == member.account_info.id ? "bg_own_main" : ""}`}>
                                                 <div className="avatar-xs flex-shrink-0 me-3">
                                                     <img src={member.account_info.profile_ava_url} alt="" className="img-fluid rounded-circle" />
                                                 </div>
@@ -373,7 +407,7 @@ const OverviewTab = ({ dataProject, startDate, deadlineDate }: { dataProject: an
                                                             <DropdownMenu>
                                                                 <li><DropdownItem><i className="ri-eye-fill text-muted me-2 align-bottom"></i>View</DropdownItem></li>
                                                                 <li><DropdownItem><i className="ri-star-fill text-muted me-2 align-bottom"></i>Favourite</DropdownItem></li>
-                                                                <li><DropdownItem><i className="ri-delete-bin-5-fill text-muted me-2 align-bottom"></i>Delete</DropdownItem></li>
+                                                                {userId != member.account_info.id && <li onClick={() => deleteMemberHandel(member.account_info.id, member.account_info.full_name)}><DropdownItem><i className="ri-delete-bin-5-fill text-muted me-2 align-bottom" ></i>Delete</DropdownItem></li>}
                                                             </DropdownMenu>
                                                         </UncontrolledDropdown>
                                                     </div>
@@ -541,11 +575,11 @@ const OverviewTab = ({ dataProject, startDate, deadlineDate }: { dataProject: an
                             <h5 className="mb-0 fs-13">Members :</h5>
                         </div>
                         <div className="avatar-group justify-content-center">
-                            {dataProject.prop.members && dataProject.prop.members.map((project: any, index: number) => {
+                            {inviteMemberData && inviteMemberData.map((member: any, index: number) => {
                                 return (
-                                    <Link to="" className="avatar-group-item" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="" data-bs-original-title="Brent Gonzalez">
+                                    <Link to="" className="avatar-group-item" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title={member.account_info.full_name ? member.account_info.full_name : ""} data-bs-original-title="Brent Gonzalez">
                                         <div className="avatar-xs">
-                                            <img src={project.account_info.profile_ava_url} alt="" className="rounded-circle img-fluid" />
+                                            <img src={member.account_info.profile_ava_url ? member.account_info.profile_ava_url : avt_default} alt="" className="rounded-circle img-fluid" />
                                         </div>
                                     </Link>);
                             })}
@@ -557,10 +591,10 @@ const OverviewTab = ({ dataProject, startDate, deadlineDate }: { dataProject: an
                             {
                                 searchMember.id > 0 && <div className="d-flex align-items-center">
                                     <div className="avatar-xs flex-shrink-0 me-3">
-                                        <img src={searchMember.profile_ava_url} alt="" className="img-fluid rounded-circle" />
+                                        <img src={searchMember.profile_ava_url ? searchMember.profile_ava_url : ""} alt="" className="img-fluid rounded-circle" />
                                     </div>
                                     <div className="flex-grow-1">
-                                        <h5 className="fs-13 mb-0"><Link to="#" className="text-body d-block">{searchMember.full_name}</Link></h5>
+                                        <h5 className="fs-13 mb-0"><Link to="#" className="text-body d-block">{searchMember.full_name ? searchMember.full_name : ""}</Link></h5>
                                     </div>
                                     <div className="flex-shrink-0">
                                         <button type="button" className="btn btn-light btn-sm" onClick={InviteMember(searchMember.email)}>Add</button>
@@ -568,15 +602,15 @@ const OverviewTab = ({ dataProject, startDate, deadlineDate }: { dataProject: an
                                 </div>
                             }
                             {
-                                errorMessage!="" && <div>{errorMessage} </div>
+                                errorMessage != "" && <div>{errorMessage} </div>
                             }
-                          
+
                         </div>
 
                     </SimpleBar>
                 </ModalBody>
                 <div className="modal-footer">
-                <button type="button" className="btn btn-success w-xs" onClick={toggleModal}>Done</button>
+                    <button type="button" className="btn btn-success w-xs" onClick={toggleModal}>Done</button>
 
                 </div>
 

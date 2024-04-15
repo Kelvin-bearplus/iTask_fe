@@ -1,34 +1,50 @@
-import React ,{useState,useCallback}from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { Input, Card, CardBody, DropdownItem, DropdownMenu, DropdownToggle, UncontrolledDropdown, Modal, ModalHeader, ModalBody } from 'reactstrap';
 import SimpleBar from "simplebar-react";
 
-import avatar10 from "../../../assets/images/users/avatar-10.jpg";
+import avt_default from "../../../assets/images/users/anh_mac_dinh.jpg";
 
 import { Link } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
-import { getUserProfileByEmail, inviteMember } from "../../../slices/thunks";
+import { inviteMember, getMemberAssignees,deleteAssign ,assignMember} from "../../../slices/thunks";
 
-const TimeTracking = (dataTask:any) => {
-    const handleKeyPress = async (event: React.KeyboardEvent<HTMLInputElement>) => {
-        if (event.key === 'Enter') {
-            const newKeyword = event.currentTarget.value; // Lấy giá trị mới của keyword
-            const memberSearch = await searchMembers(newKeyword)
-
-        }
-    };
+const TimeTracking = (dataTask: any) => {
     function checkInvite(member: any) {
         let isMemberFound = true;
-    
-        if(dataTask.prop.assignees!=null){dataTask.prop.assignees.some((memberProject: any) => {
-            if (memberProject.user_id === member.id) {
-                isMemberFound = false;
-                return true;
-            }
-        });}
-    
+
+        if (dataTask.prop.assignees != null) {
+            dataTask.prop.assignees.some((memberProject: any) => {
+                if (memberProject.user_id === member.id) {
+                    isMemberFound = false;
+                    return true;
+                }
+            });
+        }
+
         return isMemberFound;
     }
-    
+    async function deleteAssignHandle(userId:number) {
+        const dataDelete=await dispatch(deleteAssign({task_id:dataTask.prop.id,user_id:userId}));
+        console.log(dataDelete)
+    }
+    async function assignMemberHandle(userId:number) {
+        const assignData=await dispatch(assignMember({task_id:dataTask.prop.id,user_id:userId}));
+        console.log(assignData)
+    }
+    const [listMemberNoAssignees, setListMemberNoAssignees] = useState([]);
+    const [listMemberAssignees, setListMemberAssignees] = useState([]);
+    async function setListMemberAss() {
+        const data = await dispatch(getMemberAssignees({ projectId: dataTask.prop.project_info.id, taskId: dataTask.prop.id }));
+        console.log(data);
+        if (data.payload) {
+            setListMemberNoAssignees(data.payload);
+        }
+    }
+    useEffect(() => {
+        setListMemberAss();
+        setListMemberAssignees(dataTask.prop.assignees)
+    }, [])
+    // console.log(listMemberAssignees)
     const [modal, setModal] = useState<boolean>(false);
     const toggleModal = useCallback(() => {
         if (modal) {
@@ -37,137 +53,82 @@ const TimeTracking = (dataTask:any) => {
             setModal(true);
         }
     }, [modal]);
-function convertPriority(priority:number){
-    switch(priority){
-        case 1:
-            return "High";
-        case 2:
-            return "Medium";
-        case 3:
-            return "Low";
-        default:
-            return "High";
+    function convertPriority(priority: number) {
+        switch (priority) {
+            case 1:
+                return "High";
+            case 2:
+                return "Medium";
+            case 3:
+                return "Low";
+            default:
+                return "High";
+        }
     }
-}
-function convertStatus(status:number){
-    switch(status){
-        case 1:
-            return "Pending";
-        case 2:
-            return "In-progress";
-        case 3:
-            return "Done";
+    function convertStatus(status: number) {
+        switch (status) {
+            case 1:
+                return "Pending";
+            case 2:
+                return "In-progress";
+            case 3:
+                return "Done";
             case 4:
-            return "Delete";
-        default:
-            return "Pending";
+                return "Delete";
+            default:
+                return "Pending";
+        }
     }
-}
-function convertColorStatus(status:number){
-    switch(status){
-        case 1:
-            return "secondary";
-        case 2:
-            return "info";
-        case 3:
-            return "success";
-        default:
-            return "danger";
+    function convertColorStatus(status: number) {
+        switch (status) {
+            case 1:
+                return "secondary";
+            case 2:
+                return "info";
+            case 3:
+                return "success";
+            default:
+                return "danger";
+        }
     }
-}
-function convertColorPrority(status:number){
-    switch(status){
-        case 1:
-            return "danger";
-        case 2:
-            return "warning";
-        case 3:
-            return "success";
-        default:
-            return "danger";
+    function convertColorPrority(status: number) {
+        switch (status) {
+            case 1:
+                return "danger";
+            case 2:
+                return "warning";
+            case 3:
+                return "success";
+            default:
+                return "danger";
+        }
     }
-}
-function isObjectEmpty(obj: any) {
-    return Object.keys(obj).length === 0;
-}
-interface memberData {
-    id: number,
-    role: string,
-    email: string,
-    username: string,
-    full_name: string,
-    address: string,
-    title: string,
-    phone: string,
-    dob: string,
-    bio: string,
-    profile_ava_url: string,
-    profile_cover_url: string,
-    created: string,
-    updated: string
-}
-const memberInit: memberData = {
-    id: -1,
-    role: "",
-    email: "",
-    username: "",
-    full_name: "",
-    address: "",
-    title: "",
-    phone: "",
-    dob: "",
-    bio: "",
-    profile_ava_url: "",
-    profile_cover_url: "",
-    created: "",
-    updated: ""
-}
-const [searchMember, setSearchMember] = useState(memberInit);
+    function isObjectEmpty(obj: any) {
+        return Object.keys(obj).length === 0;
+    }
+
     const dispatch: any = useDispatch();
-const [errorMessage,setErrorMessage]=useState("");
-    const searchMembers = async (email: any) => {
-        const  dataAPI={
-            email:email,
-            projectId:dataTask.prop.id
-        }
-        // const data = await dispatch(getUninvited(dataAPI));
-        const data:any={};
-        console.log(data)
-        if (data.payload&&!isObjectEmpty(data.payload)) {
-            if (!data.payload.is_invited) {
-                setSearchMember(data.payload);
-               setErrorMessage("");
-            }
-           else{
-            setErrorMessage("Member is assignees!")
-            setSearchMember(memberInit);
-           }
-        }
-        else {
-            setErrorMessage(data.error.message)
-            setSearchMember(memberInit);
-        }
-        return data;
+    const [errorMessage, setErrorMessage] = useState("");
+    function convertDate(dateString: string) {
+        var dateData = new Date(dateString);
+        var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        var day = dateData.getDate();
+        var month = months[dateData.getMonth()];
+        var year = dateData.getFullYear();
+        return (day < 10 ? '0' : '') + day + ' ' + month + ', ' + year;
     }
-    console.log(searchMember)
-function convertDate(dateString:string) {
-    var dateData = new Date(dateString);
-    var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    var day = dateData.getDate();
-    var month = months[dateData.getMonth()];
-    var year = dateData.getFullYear();
-    return (day < 10 ? '0' : '') + day + ' ' + month + ', ' + year;
-}
-const InviteMember = (email: string) => async () => {
-    const dataUrl = {
-        projectId: dataTask.prop.id, // Match the property name with the expected parameter name
-        email: email
-    };
-    console.log(dataTask)
+    const InviteMember = (email: string) => async () => {
+        const dataUrl = {
+            projectId: dataTask.prop.id, // Match the property name with the expected parameter name
+            email: email
+        };
+        console.log(dataTask)
 
-    const data = await dispatch(inviteMember(dataUrl));
+        const data = await dispatch(inviteMember(dataUrl));
 
-}
+    }
+    console.log(listMemberAssignees)
+    console.log(listMemberNoAssignees)
     return (
         <React.Fragment>
             {/* <Card>
@@ -234,36 +195,49 @@ const InviteMember = (email: string) => async () => {
                         </div>
                     </div>
                     <ul className="list-unstyled vstack gap-3 mb-0">
-                    {dataTask.prop.assignees && dataTask.prop.assignees.map((member: any, index: number) => {
-                                return (
-                                    <li>
+                        {listMemberAssignees && listMemberAssignees.map((member: any, index: number) => {
+                            return (
+                                <li>
                                     <div className="d-flex align-items-center">
                                         <div className="flex-shrink-0">
-                                            <img src={member.user_info.profile_ava_url} alt="" className="avatar-xs rounded-circle" />
+                                            <img src={member.user_info.profile_ava_url ? member.user_info.profile_ava_url : avt_default} alt="" className="avatar-xs rounded-circle" />
                                         </div>
                                         <div className="flex-grow-1 ms-2">
-                                            <h6 className="mb-1"><Link to="/pages-profile">{member.user_info.full_name}</Link></h6>
-                                            <p className="text-muted mb-0">{member.user_info.title}</p>
+                                            <h6 className="mb-1"><Link to="/pages-profile">{member.user_info.full_name ? member.user_info.full_name : "New User"}</Link></h6>
+                                            <p className="text-muted mb-0">{member.user_info.title ? member.user_info.title : "Member"}</p>
                                         </div>
                                         <div className="flex-shrink-0">
-                                            <UncontrolledDropdown>
-                                                <DropdownToggle tag="button" className="btn btn-icon btn-sm fs-16 text-muted dropdown" type="button">
-                                                    <i className="ri-more-fill"></i>
-                                                </DropdownToggle>
-                                                <DropdownMenu>
-                                                    <div><DropdownItem><i className="ri-eye-fill text-muted me-2 align-bottom"></i>View</DropdownItem></div>
-                                                    <div><DropdownItem><i className="ri-star-fill text-muted me-2 align-bottom"></i>Favourite</DropdownItem></div>
-                                                    <div><DropdownItem><i className="ri-delete-bin-5-fill text-muted me-2 align-bottom"></i>Delete</DropdownItem></div>
-                                                </DropdownMenu>
-                                            </UncontrolledDropdown>
+                                            <i className="ri-delete-bin-5-fill text-muted me-2 align-bottom icon_delete" onClick={() => deleteAssignHandle(member.user_info.id)}></i>
                                         </div>
                                     </div>
-                                </li>  
-                                );
-                            })}
-                        
+                                </li>
+                            );
+                        })}
+
+                    </ul>
+                    <ul className="list-unstyled vstack gap-3 mb-0 mt-3">
+                        {listMemberNoAssignees && listMemberNoAssignees.map((member: any, index: number) => {
+                            return (
+                                <li>
+                                    <div className="d-flex align-items-center">
+                                        <div className="flex-shrink-0">
+                                            <img src={member.account_info.profile_ava_url ? member.account_info.profile_ava_url : avt_default} alt="" className="avatar-xs rounded-circle" />
+                                        </div>
+                                        <div className="flex-grow-1 ms-2">
+                                            <h6 className="mb-1"><Link to="/pages-profile">{member.account_info.full_name ? member.account_info.full_name : ""}</Link></h6>
+                                            <p className="text-muted mb-0">{member.account_info.title ? member.account_info.title : "Member"}</p>
+                                        </div>
+                                        <div className="flex-shrink-0">
+                                        <button type="button" className="btn btn-light btn-sm" onClick={()=>assignMemberHandle(member.account_info.id)}>Assign</button>
+                                    </div>
+                                    </div>
+                                </li>
+                            );
+                        })}
+
                     </ul>
                 </div>
+
             </div>
             {/* <Card>
                 <CardBody>
@@ -364,62 +338,7 @@ const InviteMember = (email: string) => async () => {
                     </div>
                 </CardBody>
             </Card> */}
-            <Modal isOpen={modal} toggle={toggleModal} centered className="border-0">
-                <ModalHeader toggle={toggleModal} className="p-3 ps-4 bg-success-subtle">
-                    Assignees
-                </ModalHeader>
-                <ModalBody className="p-4">
-                    <div className="search-box mb-3">
-                        <Input type="text" className="form-control bg-light border-light" id="search_member" placeholder="Search here..." onKeyPress={handleKeyPress} />
-                        <i className="ri-search-line search-icon"></i>
-                    </div>
 
-                    <div className="mb-4 d-flex align-items-center">
-                        <div className="me-2">
-                            <h5 className="mb-0 fs-13">Members :</h5>
-                        </div>
-                        <div className="avatar-group justify-content-center">
-                            {dataTask.prop.assigness && dataTask.prop.assignees.map((project: any, index: number) => {
-                                return (
-                                    <Link to="" className="avatar-group-item" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="" data-bs-original-title="Brent Gonzalez">
-                                        <div className="avatar-xs">
-                                            <img src={project.account_info.profile_ava_url} alt="" className="rounded-circle img-fluid" />
-                                        </div>
-                                    </Link>);
-                            })}
-                        </div>
-                    </div>
-                    <SimpleBar className="mx-n4 px-4" data-simplebar="init" style={{ maxHeight: "225px" }}>
-                        <div className="vstack gap-3">
-                          
-                           {
-                            searchMember.id>0 && <div className="d-flex align-items-center">
-                            <div className="avatar-xs flex-shrink-0 me-3">
-                                <img src={searchMember.profile_ava_url} alt="" className="img-fluid rounded-circle" />
-                            </div>
-                            <div className="flex-grow-1">
-                                <h5 className="fs-13 mb-0"><Link to="#" className="text-body d-block">{searchMember.full_name}</Link></h5>
-                            </div>
-                            <div className="flex-shrink-0">
-                                <button type="button" className="btn btn-light btn-sm" onClick={InviteMember(searchMember.email)}>Add</button>
-                            </div>
-                        </div>
-                           }
-                           {
-                          searchMember.id===-1 && <div>Không tìm thấy thành viên </div>
-                           }
-                             {
-                          searchMember.id===-2 && <div>Tài khoản này đã là thành viên trong project</div>
-                           }
-                        </div>
-
-                    </SimpleBar>
-                </ModalBody>
-                <div className="modal-footer">
-                    <button type="button" className="btn btn-success w-xs" onClick={toggleModal}>Done</button>
-                </div>
-
-            </Modal>
         </React.Fragment>
     );
 };
