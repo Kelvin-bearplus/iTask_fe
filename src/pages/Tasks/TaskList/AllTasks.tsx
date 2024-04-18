@@ -64,10 +64,20 @@ const AllTasks = () => {
     })
   );
   const [isLoad, setIsLoad]=useState(true);
-  setTimeout(()=>{
+useEffect(()=>{
+    setTimeout(()=>{
+    console.log("1");
+
     setIsLoad(false);
   
   },1500)
+},[])
+  // setTimeout(()=>{
+  //   console.log("1");
+
+  //   setIsLoad(false);
+  
+  // },1500)
   // Inside your component
   const {
     taskList, isTaskSuccess, error
@@ -85,6 +95,7 @@ const AllTasks = () => {
   const [modal, setModal] = useState<boolean>(false);
 
   const toggle = useCallback(() => {
+    
     if (modal) {
       setModal(false);
       setTask(null);
@@ -93,6 +104,7 @@ const AllTasks = () => {
     }
   }, [modal]);
   const toggleCreate = useCallback(async() => {
+    
      const projectListResponse= await dispatch(getSimpleProject());
      setProjectList(projectListResponse.payload);
     if (modalCreateTask) {
@@ -110,6 +122,7 @@ const AllTasks = () => {
   console.log(projectList);
 
   useEffect(() => {
+    
     setTaskList(taskList);
   }, [taskList]);
 
@@ -273,6 +286,7 @@ const AllTasks = () => {
 
   // Checked All
   const checkedAll = useCallback(() => {
+    
     const checkall: any = document.getElementById("checkBoxAll");
     const ele = document.querySelectorAll(".taskCheckBox");
 
@@ -589,7 +603,7 @@ console.log(taskList)
               </Col>
 
               <Col lg={12}>
-                <Label className="form-label">Assigned To</Label>
+                {/* <Label className="form-label">Assigned To</Label> */}
                 {/* <SimpleBar style={{ maxHeight: "95px" }}>
                   <ul className="list-unstyled vstack gap-2 mb-0">
                     {Assigned.map((item, key) => (<li key={key}>
@@ -756,7 +770,7 @@ console.log(taskList)
               </Col>
 
               <Col lg={12}>
-                <Label className="form-label">Assigned To</Label>
+                {/* <Label className="form-label">Assigned To</Label> */}
                 {/* <SimpleBar style={{ maxHeight: "95px" }}>
                   <ul className="list-unstyled vstack gap-2 mb-0">
                     {Assigned.map((item, key) => (<li key={key}>

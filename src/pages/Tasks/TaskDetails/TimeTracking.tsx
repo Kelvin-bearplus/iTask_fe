@@ -6,7 +6,7 @@ import avt_default from "../../../assets/images/users/anh_mac_dinh.jpg";
 
 import { Link } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
-import { inviteMember, getMemberAssignees,deleteAssign ,assignMember} from "../../../slices/thunks";
+import { inviteMember, getMemberAssignees, deleteAssign, assignMember } from "../../../slices/thunks";
 
 const TimeTracking = (dataTask: any) => {
     function checkInvite(member: any) {
@@ -23,13 +23,66 @@ const TimeTracking = (dataTask: any) => {
 
         return isMemberFound;
     }
-    async function deleteAssignHandle(userId:number) {
-        const dataDelete=await dispatch(deleteAssign({task_id:dataTask.prop.id,user_id:userId}));
-        console.log(dataDelete)
+    async function deleteAssignHandle(userId: number) {
+        const dataDelete = await dispatch(deleteAssign({ task_id: dataTask.prop.id, user_id: userId }));
+        if (dataDelete.payload && dataDelete.payload.data == true) {
+            console.log(listMemberNoAssignees);
+            setListMemberAssignees(listMemberAssignees.filter(
+                (item: any) => {
+                    // Kiểm tra nếu item.user_info không tồn tại
+                    if(item.user_info){
+                        return item.user_info.id !== userId;
+                    }
+                    else{
+                        return item.account_info.id !== userId;
+                    }
+                }
+            ))
+            const newListNoMemberAssignees = [...listMemberNoAssignees];
+            const filteredItems = listMemberAssignees.filter(
+                (item: any) => {
+                    // Kiểm tra nếu item.user_info không tồn tại
+                    if(item.user_info){
+                        return item.user_info.id == userId;
+                    }
+                    else{
+                        return item.account_info.id == userId;
+                    }
+                }
+            );
+            newListNoMemberAssignees.push(...filteredItems);
+            setListMemberNoAssignees(newListNoMemberAssignees);
+        }
     }
-    async function assignMemberHandle(userId:number) {
-        const assignData=await dispatch(assignMember({task_id:dataTask.prop.id,user_id:userId}));
+    async function assignMemberHandle(userId: number) {
+        const assignData = await dispatch(assignMember({ task_id: dataTask.prop.id, user_id: userId }));
         console.log(assignData)
+        if (assignData.payload && assignData.payload.data == 0) {
+            console.log(listMemberNoAssignees);
+            setListMemberNoAssignees(listMemberNoAssignees.filter(
+                (item: any) => {
+                    if(item.user_info){
+                        return item.user_info.id !== userId;
+                    }
+                    else{
+                        return item.account_info.id !== userId;
+                    }
+                }
+            ))
+            const newListMemberAssignees = [...listMemberAssignees];
+            const filteredItems = listMemberNoAssignees.filter(
+                (item: any) => {
+                    if(item.user_info){
+                        return item.user_info.id == userId;
+                    }
+                    else{
+                        return item.account_info.id == userId;
+                    }
+                }
+            );
+            newListMemberAssignees.push(...filteredItems);
+            setListMemberAssignees(newListMemberAssignees);
+        }
     }
     const [listMemberNoAssignees, setListMemberNoAssignees] = useState([]);
     const [listMemberAssignees, setListMemberAssignees] = useState([]);
@@ -117,16 +170,7 @@ const TimeTracking = (dataTask: any) => {
         var year = dateData.getFullYear();
         return (day < 10 ? '0' : '') + day + ' ' + month + ', ' + year;
     }
-    const InviteMember = (email: string) => async () => {
-        const dataUrl = {
-            projectId: dataTask.prop.id, // Match the property name with the expected parameter name
-            email: email
-        };
-        console.log(dataTask)
 
-        const data = await dispatch(inviteMember(dataUrl));
-
-    }
     console.log(listMemberAssignees)
     console.log(listMemberNoAssignees)
     return (
@@ -198,18 +242,35 @@ const TimeTracking = (dataTask: any) => {
                         {listMemberAssignees && listMemberAssignees.map((member: any, index: number) => {
                             return (
                                 <li>
-                                    <div className="d-flex align-items-center">
-                                        <div className="flex-shrink-0">
-                                            <img src={member.user_info.profile_ava_url ? member.user_info.profile_ava_url : avt_default} alt="" className="avatar-xs rounded-circle" />
+                                    {
+                                        member.user_info && <div className={`d-flex align-items-center ${member.user_info.id==dataTask.prop.owner.id ? "bg_own_main" : ""}`}>
+                                            <div className="flex-shrink-0">
+                                                <img src={member.user_info.profile_ava_url ? member.user_info.profile_ava_url : avt_default} alt="" className="avatar-xs rounded-circle" />
+                                            </div>
+                                            <div className="flex-grow-1 ms-2">
+                                                <h6 className="mb-1"><Link to="/pages-profile">{member.user_info.full_name ? member.user_info.full_name : "New User"}</Link></h6>
+                                                {member.user_info.id!==dataTask.prop.owner.id  &&<p className="text-muted mb-0">{member.user_info.title ? member.user_info.title : "Member"}</p>}
+                                                {member.user_info.id==dataTask.prop.owner.id  &&<p className="text-muted mb-0">Owner Project</p>}
+                                            </div>
+                                           {member.user_info.id!==dataTask.prop.owner.id  && <div className="flex-shrink-0">
+                                                <i className="ri-delete-bin-5-fill text-muted me-2 align-bottom icon_delete" onClick={() => deleteAssignHandle(member.user_info.id)}></i>
+                                            </div>}
                                         </div>
-                                        <div className="flex-grow-1 ms-2">
-                                            <h6 className="mb-1"><Link to="/pages-profile">{member.user_info.full_name ? member.user_info.full_name : "New User"}</Link></h6>
-                                            <p className="text-muted mb-0">{member.user_info.title ? member.user_info.title : "Member"}</p>
+                                    }
+                                    {
+                                        member.account_info && <div className="d-flex align-items-center">
+                                            <div className="flex-shrink-0">
+                                                <img src={member.account_info.profile_ava_url ? member.account_info.profile_ava_url : avt_default} alt="" className="avatar-xs rounded-circle" />
+                                            </div>
+                                            <div className="flex-grow-1 ms-2">
+                                                <h6 className="mb-1"><Link to="/pages-profile">{member.account_info.full_name ? member.account_info.full_name : "New User"}</Link></h6>
+                                                <p className="text-muted mb-0">{member.account_info.title ? member.account_info.title : "Member"}</p>
+                                            </div>
+                                            <div className="flex-shrink-0">
+                                                <i className="ri-delete-bin-5-fill text-muted me-2 align-bottom icon_delete" onClick={() => deleteAssignHandle(member.account_info.id)}></i>
+                                            </div>
                                         </div>
-                                        <div className="flex-shrink-0">
-                                            <i className="ri-delete-bin-5-fill text-muted me-2 align-bottom icon_delete" onClick={() => deleteAssignHandle(member.user_info.id)}></i>
-                                        </div>
-                                    </div>
+                                    }
                                 </li>
                             );
                         })}
@@ -219,18 +280,34 @@ const TimeTracking = (dataTask: any) => {
                         {listMemberNoAssignees && listMemberNoAssignees.map((member: any, index: number) => {
                             return (
                                 <li>
-                                    <div className="d-flex align-items-center">
-                                        <div className="flex-shrink-0">
-                                            <img src={member.account_info.profile_ava_url ? member.account_info.profile_ava_url : avt_default} alt="" className="avatar-xs rounded-circle" />
-                                        </div>
-                                        <div className="flex-grow-1 ms-2">
-                                            <h6 className="mb-1"><Link to="/pages-profile">{member.account_info.full_name ? member.account_info.full_name : ""}</Link></h6>
-                                            <p className="text-muted mb-0">{member.account_info.title ? member.account_info.title : "Member"}</p>
-                                        </div>
-                                        <div className="flex-shrink-0">
-                                        <button type="button" className="btn btn-light btn-sm" onClick={()=>assignMemberHandle(member.account_info.id)}>Assign</button>
+                                   {
+                                    member.user_info && <div className="d-flex align-items-center">
+                                    <div className="flex-shrink-0">
+                                        <img src={member.user_info.profile_ava_url ? member.user_info.profile_ava_url : avt_default} alt="" className="avatar-xs rounded-circle" />
                                     </div>
+                                    <div className="flex-grow-1 ms-2">
+                                        <h6 className="mb-1"><Link to="/pages-profile">{member.user_info.full_name ? member.user_info.full_name : "New User"}</Link></h6>
+                                        <p className="text-muted mb-0">{member.user_info.title ? member.user_info.title : "Member"}</p>
                                     </div>
+                                    <div className="flex-shrink-0">
+                                        <button type="button" className="btn btn-light btn-sm" onClick={() => assignMemberHandle(member.user_info.id)}>Assign</button>
+                                    </div>
+                                </div>
+                                   }
+                                         {
+                                    member.account_info && <div className="d-flex align-items-center">
+                                    <div className="flex-shrink-0">
+                                        <img src={member.account_info.profile_ava_url ? member.account_info.profile_ava_url : avt_default} alt="" className="avatar-xs rounded-circle" />
+                                    </div>
+                                    <div className="flex-grow-1 ms-2">
+                                        <h6 className="mb-1"><Link to="/pages-profile">{member.account_info.full_name ? member.account_info.full_name : "New User"}</Link></h6>
+                                        <p className="text-muted mb-0">{member.account_info.title ? member.account_info.title : "Member"}</p>
+                                    </div>
+                                    <div className="flex-shrink-0">
+                                        <button type="button" className="btn btn-light btn-sm" onClick={() => assignMemberHandle(member.account_info.id)}>Assign</button>
+                                    </div>
+                                </div>
+                                   }
                                 </li>
                             );
                         })}

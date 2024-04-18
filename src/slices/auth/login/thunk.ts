@@ -13,13 +13,17 @@ export const timeExpire=(date:Date):string=>{
 
   return `${hours}:${minutes}:${seconds} ${day}-${month}-${year}`;
 }
+interface ApiResponse {
+  accessToken: string;
+  expiresAt: number;
+  // Các trường khác nếu cần
+}
 // var data:any;
 export const loginUser = (user : any, history : any) => async (dispatch : any) => {
   try {
-    let response;
-      response = api.create (getUserLogin,user);
-    const data = await response;
-    console.log(data)
+    let response = await api.create(getUserLogin, user) as unknown as ApiResponse;
+    const data = response;
+    console.log(response);
  if (data&&data.accessToken){
   if (data.expiresAt) {
     const timeExpireFormatted: string = timeExpire(new Date(data.expiresAt * 1000));
