@@ -15,7 +15,7 @@ const TaskDetails = () => {
   const [dataTask, setDataTask] = React.useState({});
 
   const searchParams = new URLSearchParams(window.location.search);
-  const id = searchParams.get('id');
+  var id = searchParams.get('id');
   const getDataTask = async (id: number) => {
       const data = await dispatch(getTaskById(id));
       console.log(data);
@@ -37,20 +37,23 @@ const TaskDetails = () => {
     return (
         <React.Fragment>
            {
-            !isObjectEmpty(dataTask)&& <div className="page-content">
-            <Container fluid>
-                <BreadCrumb title="Tasks Details" pageTitle="Tasks" />
-                <Row>
-                    <Col xxl={3}>
-                        <TimeTracking prop={dataTask} />
-                    </Col>
-                    <Col xxl={9}>
-                        <Summary prop={dataTask}/>
-                        <Comments />
-                    </Col>
-                </Row>
-            </Container>
-        </div>
+            !isObjectEmpty(dataTask) && (
+                <div className="page-content">
+                    <Container fluid>
+                        <BreadCrumb title="Tasks Details" pageTitle="Tasks" />
+                        <Row>
+                            <Col xxl={3}>
+                                <TimeTracking prop={dataTask} />
+                            </Col>
+                            <Col xxl={9}>
+                                <Summary prop={dataTask} />
+                                {id!=undefined && <Comments taskId={parseInt(id)} />}
+
+                            </Col>
+                        </Row>
+                    </Container>
+                </div>
+            )
            }
         </React.Fragment>
     );

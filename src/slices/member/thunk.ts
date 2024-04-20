@@ -16,8 +16,9 @@ export const inviteMember = createAsyncThunk(
         const response = await api.create(params);
         return response; // Return the response data to be handled by the slice reducer
       }  catch (error:any) {
-        console.log(error);
-        throw error.response.data.message;
+        var message:any = error.response.data.error.message?error.response.data.error.message:"Lỗi";
+        throw message;
+        // throw error.response.data.message;
     }
 });
 
@@ -34,7 +35,8 @@ export const assignMember = createAsyncThunk(
       return response; // Return the response data to be handled by the slice reducer
     }  catch (error:any) {
       console.log(error);
-      throw error.response.data.message;
+      var message:any = error.response.data.error.message?error.response.data.error.message:"Lỗi";
+       throw message;
   }
 });
 
@@ -48,8 +50,8 @@ export const assignMember = createAsyncThunk(
         console.log(response);
         return response; // Return the response data to be handled by the slice reducer
       }  catch (error:any) {
-        console.log(error);
-        throw error.response.data.message;
+        var message:any = error.response.data.error.message?error.response.data.error.message:"Lỗi";
+        throw message;
     }
 });
 export const deleteAssign = createAsyncThunk(
@@ -61,8 +63,8 @@ export const deleteAssign = createAsyncThunk(
       const response = await api.deleteRequest(params);
       return response; // Return the response data to be handled by the slice reducer
     }  catch (error:any) {
-      console.log(error);
-      throw error.response.data.message;
+      var message:any = error.response.data.error.message?error.response.data.error.message:"Lỗi";
+       throw message;
   }
 });
 export const getMemberAssignees = createAsyncThunk(
@@ -75,8 +77,8 @@ export const getMemberAssignees = createAsyncThunk(
       console.log(response);
       return response; // Return the response data to be handled by the slice reducer
     }  catch (error:any) {
-      console.log(error);
-      throw error.response.data.message;
+      var message:any = error.response.data.error.message?error.response.data.error.message:"Lỗi";
+      throw message;
   }
 });
 // export const resetProjectFlag = () => {

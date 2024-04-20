@@ -46,8 +46,8 @@ export const loginUser = (user : any, history : any) => async (dispatch : any) =
     
   catch (error:any) {
     // var log =Promise.reject(error);
-    console.log(error.response)
-    var message:string = error.response.data.error.message;
+    var message:any = error.response.data.error.message?error.response.data.error.message:"Lỗi";
+    // throw message;
     dispatch(apiError(message));
   }
 };

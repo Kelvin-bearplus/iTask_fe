@@ -19,6 +19,7 @@ import Member from "./member/reducer";
 
 // Tasks
 import TasksReducer from "./tasks/reducer";
+import CommentReducer from "./comment/reducer";
 
 //Crypto
 
@@ -39,6 +40,7 @@ const rootReducer = combineReducers({
     Member: Member,
     Tasks: TasksReducer,
     DashboardProject: DashboardProjectReducer,
+    Comment:CommentReducer,
 
 });
 

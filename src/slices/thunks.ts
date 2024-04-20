@@ -17,6 +17,7 @@ export * from "./projects/thunk";
 // Tasks
 export * from "./tasks/thunk";
 export * from "./member/thunk";
+export * from "./comment/thunk";
 //Crypto
 
 

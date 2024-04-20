@@ -15,7 +15,7 @@ const Kanbanboard = () => {
         <React.Fragment>
             <div className="page-content">
                 <Container fluid>
-                    <BreadCrumb title="Kanban Board" pageTitle="Tasks" />
+                    {/* <BreadCrumb title="Kanban Board" pageTitle="Tasks" /> */}
                     <TasksKanban />
                 </Container>
             </div>

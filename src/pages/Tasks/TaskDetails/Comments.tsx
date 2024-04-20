@@ -1,26 +1,62 @@
-import React, { useState } from 'react';
-import { Card, CardBody, CardHeader, Col, DropdownItem, DropdownMenu, DropdownToggle, Nav, NavItem, NavLink, Row, TabContent, Table, TabPane, UncontrolledDropdown } from 'reactstrap';
+import React, { useEffect, useState } from 'react';
+import { Card, CardBody, CardHeader, Col,Input, DropdownItem, DropdownMenu, DropdownToggle, Nav, NavItem, NavLink, Row, TabContent, Table, TabPane, UncontrolledDropdown, Form,FormFeedback } from 'reactstrap';
 import classnames from 'classnames';
 import { Link } from 'react-router-dom';
-
+import { useDispatch } from "react-redux";
 //SimpleBar
+import { getComment,createComment } from "../../../slices/thunks";
 import SimpleBar from "simplebar-react";
+import { useFormik } from 'formik';
+import * as Yup from "yup";
 
-//import images
-import avatar7 from "../../../assets/images/users/avatar-7.jpg";
-import avatar10 from "../../../assets/images/users/avatar-10.jpg";
-import avatar8 from "../../../assets/images/users/avatar-8.jpg";
-import avatar6 from "../../../assets/images/users/avatar-6.jpg";
-import image4 from "../../../assets/images/small/img-4.jpg";
-import image5 from "../../../assets/images/small/img-5.jpg";
-
-const Comments = () => {
+const Comments = (dataTask: any) => {
+    const [limit, setLimit] = useState(10);
+    const [page, setPage] = useState(1);
+    console.log(dataTask)
+    const dispatch: any = useDispatch();
     const [activeTab, setActiveTab] = useState<any>('1');
-    const toggleTab = (tab:any) => {
+    const toggleTab = (tab: any) => {
         if (activeTab !== tab) {
             setActiveTab(tab);
         }
     };
+    interface dataGetComment {
+        limit: number,
+        page: number,
+        task_id: number
+    }
+    const [dataComment, setDataComment] = useState({})
+    async function getCommentData(dataComment: dataGetComment) {
+        //    const response = await dispatch(getComment(dataComment));
+        //  console.log(response);
+    }
+    const validation = useFormik({
+        enableReinitialize: true,
+        initialValues: {
+            contentComment: ''
+        },
+        validationSchema: Yup.object({
+            contentComment: Yup.string().required("Please Enter Your Comment"),
+        }),
+        onSubmit:async (values,{ resetForm }) => {
+            var valueSubmit = {
+                'task_id': dataTask.taskId,
+                'parent_comment_id': -1,
+                'message': values.contentComment
+            }
+        const response= await dispatch(createComment(valueSubmit));
+        console.log(response);
+        if(response.payload){
+            resetForm();
+        }
+        }
+    });
+    useEffect(() => {
+        if (dataTask != undefined) {
+            getCommentData({ limit: limit, page: page, task_id: dataTask.taskId })
+        }
+    }, []);
+    console.log(dataComment);
     return (
         <React.Fragment>
             <Card>
@@ -121,18 +157,32 @@ const Comments = () => {
                                     </div>
                                 </div>
                             </SimpleBar> */}
-                            <form className="mt-4">
+                            <Form className="mt-4"
+                                onSubmit={(e) => {
+                                    e.preventDefault();
+                                    validation.handleSubmit();
+                                    return false;
+                                }}
+                            >
                                 <Row className="g-3">
                                     <Col lg={12}>
                                         <label htmlFor="exampleFormControlTextarea1" className="form-label">Leave a Comments</label>
-                                        <textarea className="form-control bg-light border-light" id="exampleFormControlTextarea1" rows={3} placeholder="Enter comments"></textarea>
+                                        <Input type="text" className="form-control" id="project-title-input" name="contentComment"
+                                            placeholder="Your Comment"   onChange={validation.handleChange}
+                                            onBlur={validation.handleBlur}
+                                            value={validation.values.contentComment || ""}
+                                            invalid={
+                                                validation.touched.contentComment && validation.errors.contentComment ? true : false
+                                            } />
+                                             {validation.touched.contentComment && validation.errors.contentComment ? (
+                                                                <FormFeedback type="invalid">{validation.errors.contentComment}</FormFeedback>
+                                                            ) : null}
                                     </Col>
                                     <Col xs={12} className="text-end">
-                                        <button type="button" className="btn btn-ghost-secondary btn-icon waves-effect me-1"><i className="ri-attachment-line fs-16"></i></button>
-                                        <Link to="#" className="btn btn-success">Post Comments</Link>
+                                        <button className="btn btn-success" type="submit">Post Comments</button>
                                     </Col>
                                 </Row>
-                            </form>
+                            </Form>
                         </TabPane>
                         <TabPane tabId="2">
                             <div className="table-responsive table-card">

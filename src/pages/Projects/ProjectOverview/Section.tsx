@@ -5,7 +5,8 @@ import classnames from 'classnames';
 //import images
 import slack from '../../../assets/images/brands/slack.png';
 import OverviewTab from './OverviewTab';
-import DocumentsTab from './DocumentsTab';
+import AllTasks from '../../Tasks/TaskList/AllTasks';
+import KanbanTask from '../../Tasks/KanbanBoard/index';
 import ActivitiesTab from './ActivitiesTab';
 import TeamTab from './TeamTab';
 
@@ -92,38 +93,31 @@ const Section = (dataProject:any) => {
                                 </Row>
 
                                 <Nav className="nav-tabs-custom border-bottom-0" role="tablist">
-                                    {/* <NavItem>
+                                    <NavItem>
                                         <NavLink
                                             className={classnames({ active: activeTab === '1' }, "fw-semibold")}
                                             onClick={() => { toggleTab('1'); }}
                                             href="#">
                                             Overview
                                         </NavLink>
-                                    </NavItem> */}
-                                    {/* <NavItem>
+                                    </NavItem>
+                                    <NavItem>
                                         <NavLink
                                             className={classnames({ active: activeTab === '2' }, "fw-semibold")}
                                             onClick={() => { toggleTab('2'); }}
                                             href="#">
-                                            Documents
+                                            List View Task
                                         </NavLink>
-                                    </NavItem> */}
-                                    {/* <NavItem>
+                                    </NavItem>
+                                    <NavItem>
                                         <NavLink
                                             className={classnames({ active: activeTab === '3' }, "fw-semibold")}
                                             onClick={() => { toggleTab('3'); }}
                                             href="#">
-                                            Activities
+                                            Kanban Board Task
                                         </NavLink>
-                                    </NavItem> */}
-                                    {/* <NavItem>
-                                        <NavLink
-                                            className={classnames({ active: activeTab === '4' }, "fw-semibold")}
-                                            onClick={() => { toggleTab('4'); }}
-                                            href="#">
-                                            Team
-                                        </NavLink>
-                                    </NavItem> */}
+                                    </NavItem>
+                                    
                                 </Nav>
                             </CardBody>
                         </div>
@@ -133,10 +127,10 @@ const Section = (dataProject:any) => {
             <Row>
                 <Col lg={12}>
 
-                    <OverviewTab dataProject={dataProject} startDate={startDate} deadlineDate={deadlineDate}/>
-          {/* {activeTab === '2' && <DocumentsTab />}
-          {activeTab === '3' && <ActivitiesTab />}
-          {activeTab === '4' && <TeamTab />} */}
+                {activeTab === '1' &&     <OverviewTab dataProject={dataProject} startDate={startDate} deadlineDate={deadlineDate}/>}
+          {activeTab === '2' && <AllTasks />}
+          {activeTab === '3' && <KanbanTask />}
+          {/* {activeTab === '4' && <TeamTab />} */}
                 </Col>
             </Row>
         </React.Fragment>

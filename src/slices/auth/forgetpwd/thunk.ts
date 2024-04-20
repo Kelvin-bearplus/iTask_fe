@@ -35,9 +35,9 @@ export const userVerifyCode = (user: any, history: any) => async (dispatch: any)
             ))
             return "Success";
         }
-    } catch (forgetError) {
-        console.log(forgetError)
-        dispatch(userForgetPasswordError("Your Code is incorrect or expired. Please try again"))
+    } catch (error:any) {
+        var message:any = error.response.data.error.message?error.response.data.error.message:"Error";
+        dispatch(userForgetPasswordError(message))
         return "Fail";
     }
 }

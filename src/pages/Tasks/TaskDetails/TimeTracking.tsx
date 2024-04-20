@@ -241,7 +241,7 @@ const TimeTracking = (dataTask: any) => {
                     <ul className="list-unstyled vstack gap-3 mb-0">
                         {listMemberAssignees && listMemberAssignees.map((member: any, index: number) => {
                             return (
-                                <li>
+                                <li key={index}>
                                     {
                                         member.user_info && <div className={`d-flex align-items-center ${member.user_info.id==dataTask.prop.owner.id ? "bg_own_main" : ""}`}>
                                             <div className="flex-shrink-0">
@@ -279,7 +279,7 @@ const TimeTracking = (dataTask: any) => {
                     <ul className="list-unstyled vstack gap-3 mb-0 mt-3">
                         {listMemberNoAssignees && listMemberNoAssignees.map((member: any, index: number) => {
                             return (
-                                <li>
+                                <li key={index}>
                                    {
                                     member.user_info && <div className="d-flex align-items-center">
                                     <div className="flex-shrink-0">

@@ -20,3 +20,4 @@ export const getUnassignessAPI:string= baseURL+"api/v1/projectMembers/invited-me
 export const deleteMemberAPI:string= baseURL+"api/v1/projectMembers"
 export const getMemberAssigneesAPI:string= baseURL+"api/v1/projectMembers/unassigned-members"
 export const assignMemberAPI:string= baseURL+"api/v1/taskAssignees"
+export const getCommentAPI:string= baseURL+"api/v1/comments"
