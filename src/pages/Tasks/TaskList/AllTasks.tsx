@@ -44,8 +44,10 @@ import Loader from "../../../Components/Common/Loader";
 import { createSelector } from 'reselect';
 
 
-
-const AllTasks = () => {
+interface prop{
+  project_id: number;
+}
+const AllTasks : React.FC<prop>= (props) => {
   const dispatch: any = useDispatch();
   const [modalCreateTask, setModalCreateTask] = useState<boolean>(false);
   const selectLayoutState = (state: any) => state.Tasks;
@@ -127,9 +129,12 @@ useEffect(()=>{
   }, [taskList]);
 
   // Delete Data
-  const handleDeleteTask = () => {
+  const handleDeleteTask =async () => {
     if (task) {
-      dispatch(deleteTask(task.id));
+    const dataResponse=await  dispatch(deleteTask(task.id));
+      if(dataResponse.payload){
+        refreshTaskList()
+      }
       setDeleteModal(false);
     }
   };
@@ -142,7 +147,7 @@ useEffect(()=>{
       taskId: (task && task.id) || '',
       name: (task && task.name) || '',
       description: (task && task.description) || '',
-      dueDate: (task && task.due_date) ? moment(task.due_date).format("DD MMM, YYYY"): '',
+      dueDate: (task && task.due_date ? moment(task.due_date).format("DD MMM, YYYY"): '' ) || '',
       status: (task && task.status) || '',
       priority: (task && task.priority) || '',
       assignees: (task && task.assignees) || [],
@@ -151,7 +156,7 @@ useEffect(()=>{
       name: Yup.string().required("Please Enter Task Name"),
      
     }),
-    onSubmit: (values) => {
+    onSubmit:async (values) => {
       var dataDate = formatDateCreateProject(new Date(values.dueDate))
       console.log(values.dueDate)
       const updatedTask = {
@@ -171,7 +176,10 @@ useEffect(()=>{
         task: updatedTask
       }
 
-      dispatch(updateTask(data));
+     const dataResponse=await dispatch(updateTask(data));
+     if (dataResponse.payload){
+      refreshTaskList()
+     }
       // validation.resetForm();
       toggle();
       validation.resetForm();
@@ -205,7 +213,7 @@ useEffect(()=>{
       deadlineDate: Yup.string().required("Please Select Deadline Date"),
       startDate: Yup.string().required("Please Select Start Date"),
     }),
-    onSubmit: (values) => {
+    onSubmit:async (values) => {
       var startDate = formatDateCreateProject(new Date(values.startDate))
       var deadlineDate = formatDateCreateProject(new Date(values.deadlineDate))
       var dueDate = formatDateCreateProject(new Date(values.dueDate))
@@ -219,14 +227,19 @@ useEffect(()=>{
         priority: parseInt(values.priority),
         position:1,
         created_by:userId,
-        project_id:values.project!=""?parseInt(values.project.toString()):projectList[0].id
+        project_id:props.project_id,
         // assignees: values.assignees,
       };
 
-      dispatch(addNewTask(dataTask));
-      // validation.resetForm();
+      // dispatch(addNewTask(dataTask));
+      const dataResponse=await dispatch(addNewTask(dataTask));
+      console.log(dataResponse)
+     if (dataResponse.payload){
+      refreshTaskList()
+      validationCreate.resetForm();
+      setEditorData('');
+     }
       toggleCreate();
-      validation.resetForm();
 
     },
   });
@@ -267,11 +280,11 @@ useEffect(()=>{
 
   useEffect(() => {
     if (taskList && !taskList.length) {
-      dispatch(getTaskList());
+      dispatch(getTaskList(props.project_id));
     }
   }, [dispatch]);
 
-
+console.log("props: "+ props)
   useEffect(() => {
     setTaskList(taskList);
   }, []);
@@ -282,7 +295,9 @@ useEffect(()=>{
       setIsEdit(false);
     }
   }, []);
-
+function refreshTaskList(){
+  dispatch(getTaskList(props.project_id));
+}
 
   // Checked All
   const checkedAll = useCallback(() => {
@@ -877,7 +892,7 @@ console.log(taskList)
                   <FormFeedback type="invalid">{validationCreate.errors.status}</FormFeedback>
                 ) : null}
               </Col>
-              <Col lg={6}>
+              {/* <Col lg={6}>
                 <Label for="priority-field" className="form-label">Project</Label>
                 <Input
                   name="project"
@@ -898,8 +913,8 @@ console.log(taskList)
                 {validationCreate.touched.priority && validationCreate.errors.priority ? (
                   <FormFeedback type="invalid">{validationCreate.errors.priority}</FormFeedback>
                 ) : null}
-              </Col>
-              <Col lg={6}>
+              </Col> */}
+              <Col lg={12}>
                 <Label for="priority-field" className="form-label">Priority</Label>
                 <Input
                   name="priority"
@@ -928,7 +943,7 @@ console.log(taskList)
               <Button
                 type="button"
                 onClick={() => {
-                  setModal(false);
+                  toggleCreate()
                 }}
                 className="btn-light"
               >Close</Button>

@@ -17,13 +17,13 @@ const ProjectsSlice = createSlice({
     },
     extraReducers: (builder) => {
         builder.addCase(getComment.fulfilled, (state:any, action:any) => {
-            state.projectLists = action.payload;
+            state.commentList = action.payload;
         });
         builder.addCase(getComment.rejected,(state:any, action:any) => {
             state.error = action.payload || null;
         });
         builder.addCase(createComment.fulfilled, (state:any, action:any) => {
-            state.projectLists = action.payload;
+            state.commentList = action.payload;
         });
         builder.addCase(createComment.rejected,(state:any, action:any) => {
             state.error = action.payload || null;

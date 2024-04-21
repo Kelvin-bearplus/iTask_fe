@@ -6,7 +6,7 @@ import classnames from 'classnames';
 import slack from '../../../assets/images/brands/slack.png';
 import OverviewTab from './OverviewTab';
 import AllTasks from '../../Tasks/TaskList/AllTasks';
-import KanbanTask from '../../Tasks/KanbanBoard/index';
+import TasksKanban from '../../Tasks/KanbanBoard/MainPage';
 import ActivitiesTab from './ActivitiesTab';
 import TeamTab from './TeamTab';
 
@@ -128,8 +128,8 @@ const Section = (dataProject:any) => {
                 <Col lg={12}>
 
                 {activeTab === '1' &&     <OverviewTab dataProject={dataProject} startDate={startDate} deadlineDate={deadlineDate}/>}
-          {activeTab === '2' && <AllTasks />}
-          {activeTab === '3' && <KanbanTask />}
+          {activeTab === '2' && <AllTasks project_id={dataProject.prop.id}/>}
+          {activeTab === '3' && <TasksKanban project_id={dataProject.prop.id}/>}
           {/* {activeTab === '4' && <TeamTab />} */}
                 </Col>
             </Row>

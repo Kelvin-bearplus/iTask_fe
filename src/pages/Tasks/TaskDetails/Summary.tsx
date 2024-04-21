@@ -7,13 +7,16 @@ const Summary = (dataTask:any) => {
         items = dataTask.prop.tags.split(', ');
         console.log(dataTask);
     }
+    const parseHTML = (htmlString: string) => {
+        return <div dangerouslySetInnerHTML={{ __html: htmlString }} />;
+    };
     return (
         <React.Fragment>
             <Card>
                 <CardBody>
                     <div className="text-muted">
                         <h6 className="mb-3 fw-semibold text-uppercase">Summary</h6>
-                        <p>{dataTask.prop.description}</p>
+                        <p>{parseHTML(dataTask.prop.description)}</p>
 
                         {/* <h6 className="mb-3 fw-semibold text-uppercase">Sub-tasks</h6>
                         <ul className=" ps-3 list-unstyled vstack gap-2">

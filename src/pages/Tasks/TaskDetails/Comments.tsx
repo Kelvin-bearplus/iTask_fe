@@ -1,14 +1,16 @@
 import React, { useEffect, useState } from 'react';
-import { Card, CardBody, CardHeader, Col,Input, DropdownItem, DropdownMenu, DropdownToggle, Nav, NavItem, NavLink, Row, TabContent, Table, TabPane, UncontrolledDropdown, Form,FormFeedback } from 'reactstrap';
+import { Card, CardBody, CardHeader, Col, Input, DropdownItem, DropdownMenu, DropdownToggle, Nav, NavItem, NavLink, Row, TabContent, Table, TabPane, UncontrolledDropdown, Form, FormFeedback } from 'reactstrap';
 import classnames from 'classnames';
 import { Link } from 'react-router-dom';
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 //SimpleBar
-import { getComment,createComment } from "../../../slices/thunks";
+import { getComment, createComment } from "../../../slices/thunks";
 import SimpleBar from "simplebar-react";
 import { useFormik } from 'formik';
 import * as Yup from "yup";
-
+import { createSelector } from "reselect";
+import avtDefault from "../../../assets/images/users/anh_mac_dinh.jpg"
+import { formatDateFromAPI } from "../../../helpers/format"
 const Comments = (dataTask: any) => {
     const [limit, setLimit] = useState(10);
     const [page, setPage] = useState(1);
@@ -23,12 +25,16 @@ const Comments = (dataTask: any) => {
     interface dataGetComment {
         limit: number,
         page: number,
-        task_id: number
+        taskId: number
     }
-    const [dataComment, setDataComment] = useState({})
+    const [replyId, setReplyId] = useState(0)
+    const [isReply, setIsReply] = useState(false)
+    const [dataComment, setDataComment] = useState([])
     async function getCommentData(dataComment: dataGetComment) {
-        //    const response = await dispatch(getComment(dataComment));
-        //  console.log(response);
+        const response = await dispatch(getComment(dataComment));
+        if (response.payload) {
+            setDataComment(response.payload);
+        }
     }
     const validation = useFormik({
         enableReinitialize: true,
@@ -38,25 +44,33 @@ const Comments = (dataTask: any) => {
         validationSchema: Yup.object({
             contentComment: Yup.string().required("Please Enter Your Comment"),
         }),
-        onSubmit:async (values,{ resetForm }) => {
+        onSubmit: async (values, { resetForm }) => {
             var valueSubmit = {
                 'task_id': dataTask.taskId,
-                'parent_comment_id': -1,
+                'parent_comment_id': replyId,
                 'message': values.contentComment
             }
-        const response= await dispatch(createComment(valueSubmit));
-        console.log(response);
-        if(response.payload){
-            resetForm();
-        }
+            const response = await dispatch(createComment(valueSubmit));
+            console.log(response);
+            if (response.payload) {
+                resetForm();
+                getCommentData({ limit: limit, page: page, taskId: dataTask.taskId })
+            setReplyId(0)
+            }
         }
     });
     useEffect(() => {
         if (dataTask != undefined) {
-            getCommentData({ limit: limit, page: page, task_id: dataTask.taskId })
+            getCommentData({ limit: limit, page: page, taskId: dataTask.taskId })
         }
     }, []);
     console.log(dataComment);
+    const selectCommentData = createSelector(
+        (state: any) => state.Comment.commentList,
+        (commentList) => commentList
+    );
+    const commentList = useSelector(selectCommentData);
+    console.log(replyId)
     return (
         <React.Fragment>
             <Card>
@@ -69,7 +83,7 @@ const Comments = (dataTask: any) => {
                                     className={classnames({ active: activeTab === '1' })}
                                     onClick={() => { toggleTab('1'); }}
                                 >
-                                    Comments (5)
+                                    Comments ({dataComment.length})
                                 </NavLink>
                             </NavItem>
                             <NavItem>
@@ -97,67 +111,64 @@ const Comments = (dataTask: any) => {
                     <TabContent activeTab={activeTab}>
                         <TabPane tabId="1">
                             <h5 className="card-title mb-4">Comments</h5>
-                            {/* <SimpleBar style={{ height: "508px" }} className="px-3 mx-n3 mb-2">
-                                <div className="d-flex mb-4">
-                                    <div className="flex-shrink-0">
-                                        <img src={avatar7} alt="" className="avatar-xs rounded-circle" />
-                                    </div>
-                                    <div className="flex-grow-1 ms-3">
-                                        <h5 className="fs-13"><Link to="/pages-profile">Joseph Parker</Link> <small className="text-muted">20 Dec 2021 - 05:47AM</small></h5>
-                                        <p className="text-muted">I am getting message from customers that when they place order always get error message .</p>
-                                        <Link to="#" className="badge text-muted bg-light"><i className="mdi mdi-reply"></i> Reply</Link>
-                                        <div className="d-flex mt-4">
-                                            <div className="flex-shrink-0">
-                                                <img src={avatar10} alt="" className="avatar-xs rounded-circle" />
+                           {dataComment.length > 0 && <SimpleBar style={{ height: "508px" }} className="px-3 mx-n3 mb-2">
+                                    { dataComment.map((comment: any, index: number) => {
+                                        return (
+                                                <div className="d-flex mb-4" key={index}>
+                                                <div className="flex-shrink-0">
+                                                    <img src={comment.owner.profile_ava_url ? comment.owner.profile_ava_url : avtDefault} alt="" className="avatar-xs rounded-circle" />
+                                                </div>
+                                                <div className="flex-grow-1 ms-3">
+                                                    <h5 className="fs-13"><Link to="/pages-profile">{comment.owner.full_name ? comment.owner.full_name : "New member"}</Link> <span className="text-muted">{formatDateFromAPI(comment.updated_at)}</span></h5>
+                                                    <p className="text-muted">{comment.message}</p>
+                                                    <p onClick={() => setReplyId(comment.id)} className="badge text-muted bg-light __reply"><i className="mdi mdi-reply"></i> Reply</p>
+                                                    {comment.reply_comments.length > 0 && comment.reply_comments.map((commentReply: any, index: number) => {
+                                                        return (
+                                                            <div className="d-flex mt-4" key={index}>
+                                                                <div className="flex-shrink-0">
+                                                                    <img src={avtDefault} alt="" className="avatar-xs rounded-circle" />
+                                                                </div>
+                                                                <div className="flex-grow-1 ms-3">
+                                                                    <h5 className="fs-13"><Link to="/pages-profile">{commentReply.owner.full_name ? commentReply.owner.full_name : "New member"}</Link> <span className="text-muted">{formatDateFromAPI(commentReply.updated_at)}</span></h5>
+                                                                    <p className="text-muted">{commentReply.message}</p>
+                                                                    {/* <Link to="#" className="badge text-muted bg-light"><i className="mdi mdi-reply"></i> Reply</Link> */}
+                                                                </div>
+                                                            </div>
+                                                        )
+                                                    })}
+                                                    {replyId === comment.id && <Form className="mt-4"
+                                                        onSubmit={(e) => {
+                                                            e.preventDefault();
+                                                            validation.handleSubmit();
+                                                            return false;
+                                                        }}
+                                                    >
+                                                        <Row className="g-3">
+                                                            <Col lg={12}>
+                                                                <label htmlFor="exampleFormControlTextarea1" className="form-label">Leave a Comments</label>
+                                                                <Input type="text" className="form-control" id="project-title-input" name="contentComment"
+                                                                    placeholder="Your Comment" onChange={validation.handleChange}
+                                                                    onBlur={validation.handleBlur}
+                                                                    value={validation.values.contentComment || ""}
+                                                                    invalid={
+                                                                        validation.touched.contentComment && validation.errors.contentComment ? true : false
+                                                                    } />
+                                                                {validation.touched.contentComment && validation.errors.contentComment ? (
+                                                                    <FormFeedback type="invalid">{validation.errors.contentComment}</FormFeedback>
+                                                                ) : null}
+                                                            </Col>
+                                                            <Col xs={12} className="text-end">
+                                                                <button className="btn btn-success" type="submit">Post Comments</button>
+                                                            </Col>
+                                                        </Row>
+                                                    </Form>}
+                                                </div>
                                             </div>
-                                            <div className="flex-grow-1 ms-3">
-                                                <h5 className="fs-13"><Link to="/pages-profile">Tonya Noble</Link> <small className="text-muted">22 Dec 2021 - 02:32PM</small></h5>
-                                                <p className="text-muted">Please be sure to check your Spam mailbox to see if your email filters have identified the email from Dell as spam.</p>
-                                                <Link to="#" className="badge text-muted bg-light"><i className="mdi mdi-reply"></i> Reply</Link>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="d-flex mb-4">
-                                    <div className="flex-shrink-0">
-                                        <img src={avatar8} alt="" className="avatar-xs rounded-circle" />
-                                    </div>
-                                    <div className="flex-grow-1 ms-3">
-                                        <h5 className="fs-13"><Link to="/pages-profile">Thomas Taylor</Link> <small className="text-muted">24 Dec 2021 - 05:20PM</small></h5>
-                                        <p className="text-muted">If you have further questions, please contact Customer Support from the “Action Menu” on your <Link to="#" className="text-decoration-underline">Online Order Support</Link>.</p>
-                                        <Link to="#" className="badge text-muted bg-light"><i className="mdi mdi-reply"></i> Reply</Link>
-                                    </div>
-                                </div>
-                                <div className="d-flex">
-                                    <div className="flex-shrink-0">
-                                        <img src={avatar10} alt="" className="avatar-xs rounded-circle" />
-                                    </div>
-                                    <div className="flex-grow-1 ms-3">
-                                        <h5 className="fs-13"><Link to="/pages-profile">Tonya Noble</Link> <small className="text-muted">26 min ago</small></h5>
-                                        <p className="text-muted">Your <Link to="#" className="text-decoration-underline">Online Order Support</Link> provides you with the most current status of your order. To help manage your order refer to the “Action Menu” to initiate return, contact Customer Support and more.</p>
-                                        <Row className="g-2 mb-3">
-                                            <Col lg={1} sm={2} xs={6}>
-                                                <img src={image4} alt="" className="img-fluid rounded" />
-                                            </Col>
-                                            <Col lg={1} sm={2} xs={6}>
-                                                <img src={image5} alt="" className="img-fluid rounded" />
-                                            </Col>
-                                        </Row>
-                                        <Link to="#" className="badge text-muted bg-light"><i className="mdi mdi-reply"></i> Reply</Link>
-                                        <div className="d-flex mt-4">
-                                            <div className="flex-shrink-0">
-                                                <img src={avatar6} alt="" className="avatar-xs rounded-circle" />
-                                            </div>
-                                            <div className="flex-grow-1 ms-3">
-                                                <h5 className="fs-13"><Link to="/pages-profile">Nancy Martino</Link> <small className="text-muted">8 sec ago</small></h5>
-                                                <p className="text-muted">Other shipping methods are available at checkout if you want your purchase delivered faster.</p>
-                                                <Link to="#" className="badge text-muted bg-light"><i className="mdi mdi-reply"></i> Reply</Link>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </SimpleBar> */}
-                            <Form className="mt-4"
+                                        )
+                                    })}
+
+                            </SimpleBar>}
+                          {replyId ===0 && <Form className="mt-4"
                                 onSubmit={(e) => {
                                     e.preventDefault();
                                     validation.handleSubmit();
@@ -168,21 +179,22 @@ const Comments = (dataTask: any) => {
                                     <Col lg={12}>
                                         <label htmlFor="exampleFormControlTextarea1" className="form-label">Leave a Comments</label>
                                         <Input type="text" className="form-control" id="project-title-input" name="contentComment"
-                                            placeholder="Your Comment"   onChange={validation.handleChange}
+                                            placeholder="Your Comment" onChange={validation.handleChange}
                                             onBlur={validation.handleBlur}
                                             value={validation.values.contentComment || ""}
                                             invalid={
                                                 validation.touched.contentComment && validation.errors.contentComment ? true : false
                                             } />
-                                             {validation.touched.contentComment && validation.errors.contentComment ? (
-                                                                <FormFeedback type="invalid">{validation.errors.contentComment}</FormFeedback>
-                                                            ) : null}
+                                        {validation.touched.contentComment && validation.errors.contentComment ? (
+                                            <FormFeedback type="invalid">{validation.errors.contentComment}</FormFeedback>
+                                        ) : null}
                                     </Col>
                                     <Col xs={12} className="text-end">
                                         <button className="btn btn-success" type="submit">Post Comments</button>
                                     </Col>
                                 </Row>
                             </Form>
+}
                         </TabPane>
                         <TabPane tabId="2">
                             <div className="table-responsive table-card">

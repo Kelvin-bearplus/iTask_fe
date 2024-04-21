@@ -153,7 +153,6 @@ const OverviewTab = ({ dataProject, startDate, deadlineDate }: { dataProject: an
                         <CardBody>
                             <div className="text-muted">
                                 <h6 className="mb-3 fw-semibold text-uppercase">Summary</h6>
-                                {/* <p>{dataProject.prop.description}</p> */}
                                 {parseHTML(dataProject.prop.description)}
 
                                 <div>

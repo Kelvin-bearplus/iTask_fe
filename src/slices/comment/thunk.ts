@@ -5,11 +5,11 @@ import { APIClient } from "../../helpers/api_helper";
 // import { resetProjectFlagChange } from "./reducer"
 
 const api = new APIClient();
-export const getComment = createAsyncThunk("getComment", async ({ inPage, limit, taskId  }: { inPage:number, limit:number , taskId:number}) => {
+export const getComment = createAsyncThunk("getComment", async ({ page, limit, taskId  }: { page:number, limit:number , taskId:number}) => {
     try {
     
             const params = {
-                page: inPage,
+                page: page,
                 limit: limit,
                 task_id: taskId,
                 

@@ -1,4 +1,7 @@
-import React, { useState, useEffect } from "react"
+import React, { useState, useEffect, useCallback } from "react"
+import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
+import { CKEditor } from "@ckeditor/ckeditor5-react";
+
 import {
   Card,
   CardBody,
@@ -15,6 +18,7 @@ import {
   Label,
   Input,
   FormFeedback,
+  Button
 } from "reactstrap"
 import { useFormik } from "formik"
 import * as Yup from "yup"
@@ -26,6 +30,11 @@ import {
   addCardData as onAddCardData,
   updateCardData as onUpdateCardData,
   deleteKanban as OnDeleteKanban,
+  getTaskList,
+  addNewTask,
+  updateTask,
+  deleteTask,
+  getSimpleProject
 } from "../../../slices/thunks"
 
 //redux
@@ -41,6 +50,7 @@ import { AddTeamMember, headData } from "common/data"
 import DeleteModal from "Components/Common/DeleteModal";
 import Flatpickr from "react-flatpickr";
 import moment from "moment";
+import { formatDateCreateProject } from "../../../helpers/format";
 
 
 //Import Breadcrumb
@@ -58,17 +68,127 @@ interface CardData {
   que?: boolean;
   clip?: boolean;
 }
-
+interface prop {
+  project_id: number;
+}
 
 interface KanbanColumn {
-  id: string;
+  status: string;
   name: string;
   badge?: number;
   color?: string;
-  cards?: any;
+  tasks?: any;
 }
 
-const TasksKanban = () => {
+const TasksKanban: React.FC<prop> = (props) => {
+  const handleTaskClicks = () => {
+    setTask("");
+    setIsEdit(false);
+    toggle();
+  };
+  const [modal, setModal] = useState<boolean>(false)
+  const toggle = () => {
+    if (modal) {
+      setModal(false)
+      setImages([])
+      setCard(null)
+    } else {
+      setModal(true)
+      setAssignTag([]);
+    }
+  }
+  const [projectList, setProjectList] = useState<any>([]);
+
+  const [modalCreateTask, setModalCreateTask] = useState<boolean>(false);
+  const toggleCreate = useCallback(async () => {
+    const projectListResponse = await dispatch(getSimpleProject());
+    setProjectList(projectListResponse.payload);
+    if (modalCreateTask) {
+      setModalCreateTask(false);
+    } else {
+      setModalCreateTask(true);
+
+    }
+  }, [modalCreateTask]);
+  const userIdString: string | null = localStorage.getItem('userId');
+  var userId: number = 0;
+  if (userIdString != null) {
+    userId = parseInt(userIdString);
+  }
+  const [editorData, setEditorData] = useState("");
+  const handleEditorChange = (event: any, editor: any) => {
+    const data = editor.getData();
+    setEditorData(data);
+  };
+
+  const [task, setTask] = useState<any>([]);
+  const handleCustomerClick = useCallback((arg: any) => {
+    const taskData = arg;
+    console.log(taskData)
+    setTask({
+      id: taskData.id,
+      name: taskData.name,
+      description: taskData.description,
+      status: taskData.status,
+      priority: taskData.priority,
+      due_date: taskData.due_date,
+      assignees: taskData.assignees
+    });
+    setEditorData(taskData.description);
+    toggle();
+  }, [toggle]);
+  console.log(task)
+
+  const validationCreate: any = useFormik({
+    // enableReinitialize : use this flag when initial values needs to be changed
+    enableReinitialize: true,
+
+    initialValues: {
+      taskId: '',
+      name: '',
+      description: '',
+      dueDate: '',
+      status: '1',
+      priority: '1',
+      assignees: [],
+      // project:'',
+      deadlineDate: '',
+      startDate: '',
+    },
+    validationSchema: Yup.object({
+      name: Yup.string().required("Please Enter Task Name"),
+      dueDate: Yup.string().required("Please Select Due Date"),
+      deadlineDate: Yup.string().required("Please Select Deadline Date"),
+      startDate: Yup.string().required("Please Select Start Date"),
+    }),
+    onSubmit: async (values) => {
+      var startDate = formatDateCreateProject(new Date(values.startDate))
+      var deadlineDate = formatDateCreateProject(new Date(values.deadlineDate))
+      var dueDate = formatDateCreateProject(new Date(values.dueDate))
+      const dataTask = {
+        name: values.name,
+        description: editorData ? editorData : '',
+        due_date: dueDate,
+        started_at: startDate,
+        deadline: deadlineDate,
+        status: parseInt(values.status),
+        priority: parseInt(values.priority),
+        position: 1,
+        created_by: userId,
+        project_id: props.project_id
+        // assignees: values.assignees,
+      };
+
+      const dataResponse = await dispatch(addNewTask(dataTask));
+      console.log(dataResponse)
+      if (dataResponse.payload) {
+        refreshTaskList()
+        validationCreate.resetForm();
+      }
+      toggleCreate();
+
+    },
+  });
   const dispatch = useDispatch<any>();
   const [kanbanTasksCards, setKanbanTasksCards] = useState<any>()
 
@@ -94,45 +214,47 @@ const TasksKanban = () => {
     setCards(tasks)
   }, [tasks])
 
-
+  console.log(cards)
 
 
   const handleDragEnd = (result: any) => {
-    if (!result.destination) return // If dropped outside a valid drop area, do nothing
+    console.log(result)
 
+    if (!result.destination) return // If dropped outside a valid drop area, do nothing
+    const taskID = result.draggableId;
     const { source, destination } = result
     // Reorder cards within the same card line
-    if (source.droppableId === destination.droppableId) {
-      const line = cards.find((line: any) => line.id === source.droppableId)
-      const reorderedCards = Array.from(line.cards)
+    if (source.droppableId == destination.droppableId) {
+      const line = cards.find((line: any) => line.status == source.droppableId)
+      const reorderedCards = Array.from(line.tasks)
       const [movedCard] = reorderedCards.splice(source.index, 1)
       reorderedCards.splice(destination.index, 0, movedCard)
-
       const updatedLines = cards.map((line: any) => {
-        if (line.id === source.droppableId) {
+        if (line.status == source.droppableId) {
           return { ...line, cards: reorderedCards }
         }
         return line
       })
-
+      // console.log("1")
       setCards(updatedLines)
     } else {
       // Move card between different card lines
-      const sourceLine = cards.find((line: any) => line.id === source.droppableId)
+      const sourceLine = cards.find((line: any) => line.status == source.droppableId)
       const destinationLine = cards.find(
-        (line: any) => line.id === destination.droppableId
+        (line: any) => line.status == destination.droppableId
       )
-      const sourceCards = Array.from(sourceLine.cards)
-      const destinationCards = Array.from(destinationLine.cards)
+      const sourceCards = Array.from(sourceLine.tasks)
+      const destinationCards = Array.from(destinationLine.tasks)
       const [movedCard] = sourceCards.splice(source.index, 1)
       destinationCards.splice(destination.index, 0, movedCard)
 
       const updatedLines = cards.map((line: any) => {
-        if (line.id === source.droppableId) {
-          return { ...line, cards: sourceCards }
-        } else if (line.id === destination.droppableId) {
-          return { ...line, cards: destinationCards }
+        if (line.status == source.droppableId) {
+          return { ...line, tasks: sourceCards }
+        } else if (line.status == destination.droppableId) {
+          return { ...line, tasks: destinationCards }
         }
+
         return line
       })
 
@@ -156,7 +278,7 @@ const TasksKanban = () => {
     enableReinitialize: true,
 
     initialValues: {
-      id: (cardhead && cardhead.id) || "",
+      status: (cardhead && cardhead.id) || "",
       name: (cardhead && cardhead.name) || "",
     } as KanbanColumn,
     validationSchema: Yup.object({
@@ -165,9 +287,9 @@ const TasksKanban = () => {
     onSubmit: (values: KanbanColumn) => {
 
       const newCardheaderData: KanbanColumn = {
-        id: (Math.floor(Math.random() * (30 - 20)) + 20).toString(),
+        status: (Math.floor(Math.random() * (30 - 20)) + 20).toString(),
         name: values["name"],
-        cards: []
+        tasks: []
       }
 
       dispatch(onAddCardData(newCardheaderData))
@@ -205,18 +327,10 @@ const TasksKanban = () => {
   ];
 
   // Add Modal
-  const [modal, setModal] = useState<boolean>(false)
-  const toggle = () => {
-    if (modal) {
-      setModal(false)
-      setImages([])
-      setCard(null)
-    } else {
-      setModal(true)
-      setAssignTag([]);
-    }
-  }
 
+  function refreshTaskList() {
+    dispatch(getTaskList(props.project_id));
+  }
 
   const [isEdit, setIsEdit] = useState<boolean>(false)
   const [card, setCard] = useState<any>()
@@ -226,65 +340,48 @@ const TasksKanban = () => {
     enableReinitialize: true,
 
     initialValues: {
-      id: (card && card.cardId) || "",
-      title: (card && card.title) || "",
-      text: (card && card.text) || "",
-      badge1: (card && card.badge1) || [],
-      userImages: (card && card.userImages) || [],
-      botId: (card && card.botId) || "",
-      eye: (card && card.eye) || "",
-      que: (card && card.que) || "",
-      clip: (card && card.clip) || "",
-    } as CardData,
-    validationSchema: Yup.object({
-      title: Yup.string().required("Please Enter Your Job Title"),
-      text: Yup.string().required("Please Enter Your Task Description"),
-      userImages: Yup.array().min(1, 'Please select at least one team member'),
-      botId: Yup.string().required("Please Enter the Dates"),
-      eye: Yup.number().required("Please Enter the Views"),
-      que: Yup.number().required("Please Enter the Comments Number"),
-      clip: Yup.number().required("Please Enter the Pinned Views Number"),
-    }),
-    onSubmit: (values: CardData) => {
-      if (isEdit) {
-        const updatedCards: CardData = {
-          id: card ? card.id : 0,
-          kanId: kanbanTasksCards,
-          cardId: values.id,
-          title: values.title,
-          text: values.text,
-          badge1: values.badge1,
-          botId: values.botId,
-          userImages: values.userImages,
-          eye: values.eye,
-          que: values.que,
-          clip: values.clip,
-        }
-
-        // update Job
-        dispatch(onUpdateCardData(updatedCards))
-        validation.resetForm()
-      } else {
-        const newCardData: CardData = {
-          id: (Math.floor(Math.random() * (30 - 20)) + 20).toString(),
-          kanId: kanbanTasksCards,
-          cardId: values["id"],
-          title: values["title"],
-          text: values["text"],
-          badge1: assignTag,
-          botId: values["botId"],
-          userImages: values["userImages"],
-          eye: values['eye'],
-          que: values["que"],
-          clip: values["clip"],
-        }
-
-        dispatch(onAddCardData(newCardData))
-        validation.resetForm()
-      }
-      toggle()
+      taskId: (task && task.id) || '',
+      name: (task && task.name) || '',
+      description: (task && task.description) || '',
+      dueDate: (task && task.due_date ? moment(task.due_date).format("DD MMM, YYYY") : '') || '',
+      status: (task && task.status) || '',
+      priority: (task && task.priority) || '',
+      assignees: (task && task.assignees) || [],
     },
-  })
+    validationSchema: Yup.object({
+      name: Yup.string().required("Please Enter Task Name"),
+
+    }),
+    onSubmit: async (values) => {
+      var dataDate = formatDateCreateProject(new Date(values.dueDate))
+      console.log(values.dueDate)
+      const updatedTask = {
+        // id: task ? task.id : 0,
+        // taskId: values.taskId,
+        // project: values.project,
+        name: values.name,
+        description: editorData,
+        due_date: dataDate,
+        status: parseInt(values.status),
+        priority: parseInt(values.priority),
+        // assignees: values.assignees,
+      };
+      // update customer
+      var data = {
+        id: task.id,
+        task: updatedTask
+      }
+
+      const dataResponse = await dispatch(updateTask(data));
+      if (dataResponse.payload) {
+        refreshTaskList()
+      }
+      // validation.resetForm();
+      toggle();
+      validation.resetForm();
+
+    },
+  });
 
 
 
@@ -314,7 +411,7 @@ const TasksKanban = () => {
   const handleAddNewCard = (line: any) => {
     setCard("")
     setIsEdit(false)
-    toggle()
+    toggleCreate()
     setKanbanTasksCards(line.id)
   };
 
@@ -355,7 +452,7 @@ const TasksKanban = () => {
   }, [card])
 
 
-console.log(cards)
+  console.log(cards)
 
   return (
     <React.Fragment>
@@ -383,7 +480,7 @@ console.log(cards)
             <div className="col-auto ms-sm-auto">
               <div className="avatar-group" id="newMembar">
                 {(headData || []).map((item: any, key: any) => (<Link to="#" className="avatar-group-item" data-bs-toggle="tooltip" key={key} data-bs-trigger="hover" data-bs-placement="top" aria-label={item.name} data-bs-original-title={item.name}>
-                  <img src={item.picture} alt="" className="rounded-circle avatar-xs" />
+                  <img src={item.picture} alt="" title={item.name} className="rounded-circle avatar-xs" />
                 </Link>))}
                 <Link to="#addmemberModal" data-bs-toggle="modal" className="avatar-group-item" >
                   <div className="avatar-xs">
@@ -405,7 +502,7 @@ console.log(cards)
               {(cards || []).map((line: KanbanColumn) => {
                 return (
                   // header line
-                  <div className="tasks-list" key={line.id}>
+                  <div className="tasks-list" key={parseInt(line.status)}>
                     <div className="d-flex mb-3">
                       <div className="flex-grow-1">
                         <h6 className="fs-14 text-uppercase fw-semibold mb-0">{line.name} <small className={`badge bg-${line.color} align-bottom ms-1 totaltask-badge`}>{line.badge}</small></h6>
@@ -428,18 +525,18 @@ console.log(cards)
                     </div>
                     {/* data */}
                     <SimpleBar className="tasks-wrapper px-3 mx-n3">
-                      <div id="unassigned-task" className={line.cards === "object" ? "tasks" : "tasks noTask"}>
-                        <Droppable droppableId={line.id}>
+                      <div id="unassigned-task" className={line.tasks === "object" ? "tasks" : "tasks noTask"}>
+                        <Droppable droppableId={line.status}>
                           {(provided: any) => (
                             <div
                               ref={provided.innerRef}
                               {...provided.droppableProps}
                             >
-                              {line.cards.map((card: any, index: any) => {
+                              {line.tasks.length > 0 && line.tasks.map((task: any, index: any) => {
                                 return (
                                   <Draggable
-                                    key={card.id}
-                                    draggableId={card.id}
+                                    key={task.id}
+                                    draggableId={task.id.toString()}
                                     index={index}
                                   >
                                     {(provided: any) => (
@@ -453,7 +550,7 @@ console.log(cards)
                                       >
                                         <div className="card task-box" id="uptask-1">
                                           <CardBody>
-                                            <Link to="#" className="text-muted fw-medium fs-14 flex-grow-1 ">{card.cardId}</Link>
+                                            <Link to="#" className="text-muted fw-medium fs-14 flex-grow-1 ">{task.id}</Link>
                                             <UncontrolledDropdown className="float-end">
                                               <DropdownToggle
                                                 className="arrow-none"
@@ -464,14 +561,14 @@ console.log(cards)
                                               </DropdownToggle>
                                               <DropdownMenu className="dropdown-menu-end">
                                                 <DropdownItem
-                                                  className="edittask-details"
+                                                  className="edittask-details" href={`/apps-tasks-details?id=${task.id}`}
                                                 >
                                                   View
                                                 </DropdownItem>
                                                 <DropdownItem
                                                   className="edittask-details"
                                                   onClick={() =>
-                                                    handleCardEdit(card, line)
+                                                    handleCustomerClick(task)
                                                   }
                                                 >
                                                   Edit
@@ -479,7 +576,7 @@ console.log(cards)
                                                 <DropdownItem
                                                   className="deletetask"
                                                   onClick={() =>
-                                                    onClickDelete(card)
+                                                    onClickDelete(task)
                                                   }
                                                 >
                                                   Delete
@@ -494,46 +591,27 @@ console.log(cards)
                                                   className="d-block"
                                                   id="task-name"
                                                 >
-                                                  {card.title}
+                                                  {task.name}
                                                 </Link>
                                               </h6>
                                             </div>
                                             <p className="text-muted">
-                                              {card.text}
+                                              {task.description}
                                             </p>
 
-                                            {card.picture ?
-                                              <div className="tasks-img rounded mb-2" style={{ backgroundImage: `url(${card.picture})`, height: "135px" }}>
-                                              </div> : ""}
-
-                                            {/* progress */}
-                                            {card.prowidth ?
-                                              <div className="mb-3">
-                                                <div className="d-flex mb-1">
-                                                  <div className="flex-grow-1">
-                                                    <h6 className="text-muted mb-0"><span className="text-secondary">{card.prowidth}</span> of 100%</h6>
-                                                  </div>
-                                                  <div className="flex-shrink-0">
-                                                    <span className="text-muted">03 Jan, 2022</span>
-                                                  </div>
-                                                </div>
-                                                <div className="progress rounded-3 progress-sm">
-                                                  <div className={`progress-bar bg-${card.procolor}`} role="progressbar" style={{ width: `${card.prowidth}` }}></div>
-                                                </div>
-                                              </div>
-                                              : ""
-                                            }
-                                            {/* badge & image */}
+                                            {/* {task.assignees.leng>0 ?
+                                              <div className="tasks-img rounded mb-2" style={{ backgroundImage: `url(${task.picture})`, height: "135px" }}>
+                                              </div> : ""} */}
                                             {
                                               <div className="d-flex align-items-center">
-                                                <div className="flex-grow-1">
+                                                {/* <div className="flex-grow-1">
                                                   {card.badge1.map((badgeText: any, index: any) => (
                                                     <span key={index} className="badge bg-primary-subtle text-primary me-1">
                                                       {badgeText}
                                                     </span>
                                                   ))}
-                                                </div>
-                                                <div className="flex-shrink-0">
+                                                </div> */}
+                                                {/* <div className="flex-shrink-0">
                                                   <div className="avatar-group">
                                                     {card.userImages.map((picturedata: any, idx: any) => (
                                                       <Link to="#" className="avatar-group-item" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Alexis" key={idx}>
@@ -541,7 +619,7 @@ console.log(cards)
                                                       </Link>
                                                     ))}
                                                   </div>
-                                                </div>
+                                                </div> */}
                                               </div>
                                             }
 
@@ -550,30 +628,13 @@ console.log(cards)
                                           <div className="card-footer border-top-dashed">
                                             <div className="d-flex">
                                               <div className="flex-grow-1">
-                                                <span className="text-muted"><i className="ri-time-line align-bottom"></i>{card.botId}</span>
+                                                <span className="text-muted"><i className="ri-time-line align-bottom"></i>{task.created_at}</span>
                                               </div>
-                                              <div className="flex-shrink-0">
-                                                <ul className="link-inline mb-0">
-                                                  <li className="list-inline-item">
-                                                    <Link to="#" className="text-muted"><i className="ri-eye-line align-bottom"></i> {card.eye}</Link>
-                                                  </li>
-                                                  <li className="list-inline-item">
-                                                    <Link to="#" className="text-muted"><i className="ri-question-answer-line align-bottom"></i> {card.que}</Link>
-                                                  </li>
-                                                  <li className="list-inline-item">
-                                                    <Link to="#" className="text-muted"><i className="ri-attachment-2 align-bottom"></i> {card.clip}</Link>
-                                                  </li>
-                                                </ul>
-                                              </div>
+
                                             </div>
                                           </div>
 
-                                          {card.botpro ?
-                                            <div className="progress progress-sm">
-                                              <div className={`progress-bar bg-${card.botprocolor}`} role="progressbar" style={{ width: `${card.botpro}` }} ></div>
-                                            </div>
-                                            : ""
-                                          }
+
 
                                         </div>
                                       </div>
@@ -581,6 +642,29 @@ console.log(cards)
                                   </Draggable>
                                 )
                               })}
+                              {line.tasks.length === 0 &&
+                                <Draggable
+                                  key={-1}
+                                  draggableId={"-1"}
+                                  index={-1}
+                                >
+
+                                  {
+                                    (provided: any) => (
+                                      <div
+                                        ref={provided.innerRef}
+                                        {...provided.draggableProps}
+                                        {...provided.dragHandleProps}
+                                        // className="card task-list"
+                                        className="pb-1 task-list"
+                                        id={line.name + "-task"}
+                                      >
+                                      </div>
+                                    )}
+                                </Draggable>
+
+                              }
+                              {provided.placeholder}
                             </div>
                           )}
                         </Droppable>
@@ -641,266 +725,402 @@ console.log(cards)
         </div>
 
       </Modal>
-
-      <Modal id="modalForm" isOpen={modal} toggle={toggle} centered={true} size="lg">
-        <ModalHeader toggle={toggle}>
-          {!!isEdit ? "Update Task" : "Add New Task"}
+      <Modal
+        isOpen={modalCreateTask}
+        toggle={toggleCreate}
+        centered
+        size="lg"
+        className="border-0"
+        modalClassName='modal fade zoomIn'
+      >
+        <ModalHeader className="p-3 bg-info-subtle" toggle={toggleCreate}>
+          Create Task
         </ModalHeader>
-        <ModalBody>
-          <Form
-            onSubmit={e => {
-              e.preventDefault()
-              validation.handleSubmit()
-              return false
-            }}
-          >
-            <div className="form-group mb-3">
-              <Label htmlFor="taskname" className="col-form-label">
-                Task Name<span className="text-danger">*</span>
-              </Label>
+        <Form className="tablelist-form" onSubmit={(e: any) => {
+          e.preventDefault();
+          validationCreate.handleSubmit();
+          return false;
+        }}>
+          <ModalBody className="modal-body">
+            <Row className="g-3">
+
+
+
               <Col lg={12}>
-                <Input
-                  id="taskname"
-                  name="title"
-                  type="text"
-                  className="form-control validate"
-                  placeholder="Enter Task Name..."
-                  validate={{ required: { value: true } }}
-                  onChange={validation.handleChange}
-                  onBlur={validation.handleBlur}
-                  value={validation.values.title || ""}
-                  invalid={
-                    validation.touched.title && validation.errors.title
-                      ? true
-                      : false
-                  }
-                />
-                {validation.touched.title && validation.errors.title ? (
-                  <FormFeedback type="invalid">
-                    {validation.errors.title}
-                  </FormFeedback>
-                ) : null}
+                <div>
+                  <Label for="tasksTitle-field" className="form-label">Task name</Label>
+                  <Input
+                    name="name"
+                    id="tasksTitle-field"
+                    className="form-control"
+                    placeholder="Task name"
+                    type="text"
+                    validate={{
+                      required: { value: true },
+                    }}
+                    onChange={validationCreate.handleChange}
+                    onBlur={validationCreate.handleBlur}
+                    value={validationCreate.values.name || ""}
+                    invalid={
+                      validationCreate.touched.name && validationCreate.errors.name ? true : false
+                    }
+                  />
+                  {validationCreate.touched.name && validationCreate.errors.name ? (
+                    <FormFeedback type="invalid">{validationCreate.errors.name}</FormFeedback>
+                  ) : null}
+                </div>
               </Col>
-            </div>
-            <div className="form-group mb-3">
-              <label className="col-form-label">Task Description</label>
               <Col lg={12}>
-                <textarea
-                  id="text"
+                <div className="mb-3">
+                  <Label className="form-label">Project Description</Label>
+                  <CKEditor
+                    editor={ClassicEditor}
+                    data={editorData}
+                    onChange={handleEditorChange}
+                    onReady={(editor) => {
+                    }}
+                  />
+                </div>
+              </Col>
+
+              <Col lg={12}>
+                {/* <Label className="form-label">Assigned To</Label> */}
+                {/* <SimpleBar style={{ maxHeight: "95px" }}>
+                  <ul className="list-unstyled vstack gap-2 mb-0">
+                    {Assigned.map((item, key) => (<li key={key}>
+                      <div className="form-check d-flex align-items-center">
+                        <Input name="subItem" className="form-check-input me-3" type="checkbox"
+                          onChange={validationCreate.handleChange}
+                          onBlur={validationCreate.handleBlur}
+                          value={item.img}
+                          invalid={validationCreate.touched.subItem && validationCreate.errors.subItem ? true : false}
+                          id={item.imgId} />
+
+                        <Label className="form-check-label d-flex align-items-center" htmlFor={item.imgId}>
+                          <span className="flex-shrink-0">
+                            <img src={item.img} alt="" className="avatar-xxs rounded-circle" />
+                          </span>
+                          <span className="flex-grow-1 ms-2">
+                            {item.name}
+                          </span>
+                        </Label>
+                        {validationCreate.touched.subItem && validationCreate.errors.subItem ? (
+                          <FormFeedback type="invalid">{validationCreate.errors.subItem}</FormFeedback>
+                        ) : null}
+                      </div>
+                    </li>))}
+                  </ul>
+                </SimpleBar> */}
+              </Col>
+              <Col lg={6}>
+                <Label for="start-field" className="form-label">Start Date</Label>
+                <Flatpickr
+                  name="startDate"
+                  id="start-field"
                   className="form-control"
-                  placeholder="Enter Task Description"
-                  name="text"
-                  onChange={validation.handleChange}
-                  onBlur={validation.handleBlur}
-                  value={validation.values.text || ""}
-                ></textarea>
-                {validation.touched.text &&
-                  validation.errors.text ? (
-                  <FormFeedback type="invalid" className="d-block">
-                    {validation.errors.text}
-                  </FormFeedback>
+                  placeholder="Select a date"
+                  options={{
+                    altInput: true,
+                    altFormat: "d M, Y",
+                    dateFormat: "d M, Y",
+                  }}
+                  onChange={(startDate: any) => validationCreate.setFieldValue("startDate", moment(startDate[0]).format("DD MMMM ,YYYY"))}
+                  value={validationCreate.values.startDate || ''}
+                />
+                {validationCreate.errors.startDate && validationCreate.touched.startDate ? (
+                  <FormFeedback type="invalid" className='d-block'>{validationCreate.errors.startDate}</FormFeedback>
                 ) : null}
               </Col>
-            </div>
-
-            <div className="form-group mb-3">
-              <label className="col-form-label">
-                Add Team Member<span className="text-danger">*</span>
-              </label>
-              <SimpleBar style={{ height: "200px" }}>
-                <ul
-                  className="list-unstyled user-list validate"
-                  id="taskassignee"
-                >
-                  {(AddTeamMember || []).map((image: any, index: any) => {
-                    console.log("image", image.id);
-
-                    const isChecked = images.some((item: any) => {
-                      console.log("item.id === image.id", item.id === image.id, " ===>>>>>>>>>>>>>>>...", item.id, image.id);
-
-                      return item.id === image.id
-                    });
-                    return (
-                      <li key={index}>
-                        <div className="form-check form-check-primary mb-2 d-flex align-items-center">
-                          <input
-                            className="form-check-input"
-                            type="checkbox"
-                            id={"member" + image.id}
-                            name="userImages"
-                            onBlur={validation.handleBlur}
-                            value={validation.values.userImages}
-                            onChange={() => handleImage(image)}
-                            checked={isChecked}
-                          />
-                          <label className="form-check-label ms-2" htmlFor={"member" + image.id}>
-                            {image.name}
-                          </label>
-                          <img
-                            src={image.img}
-                            className="rounded-circle avatar-xs m-1"
-                            alt=""
-                          />
-                        </div>
-                      </li>
-                    )
-                  })}
-                </ul>
-              </SimpleBar>
-              {validation.touched.userImages &&
-                validation.errors.userImages ? (
-                <FormFeedback type="invalid" className="d-block">
-                  {validation.errors.userImages}
-                </FormFeedback>
-              ) : null}
-            </div>
-
-            <div className="form-group mb-4">
-              <Label htmlFor="date-field" className="form-label">
-                Date
-              </Label>
-              <Flatpickr
-                name="botId"
-                className="form-control"
-                id="datepicker-publish-input"
-                placeholder="Select a date"
-                options={{
-                  altInput: true,
-                  altFormat: "d M, Y",
-                  dateFormat: "d M, Y",
-                }}
-                onChange={(botId: any) => validation.setFieldValue("botId", moment(botId[0]).format("DD MMMM ,YYYY"))}
-                value={validation.values.botId || ''}
-              />
-              {validation.errors.botId && validation.touched.botId ? (
-                <FormFeedback type="invalid" className='d-block'>{validation.errors.botId}</FormFeedback>
-              ) : null}
-            </div>
-            {/* Bottom */}
-            <div className="form-group mb-4 d-flex">
-              <div>
-                <Label htmlFor="eyefor" className="col-form-label">
-                  View
-                </Label>
-                <Col lg={4}>
-                  <Input
-                    id="eyefor"
-                    name="eye"
-                    type="text"
-                    className="form-control validate"
-                    validate={{ required: { value: true } }}
-                    onChange={validation.handleChange}
-                    onBlur={validation.handleBlur}
-                    value={validation.values.eye || ""}
-                    invalid={
-                      validation.touched.eye && validation.errors.eye
-                        ? true
-                        : false
-                    }
-                  />
-                  {validation.touched.eye && validation.errors.eye ? (
-                    <FormFeedback type="invalid">
-                      {validation.errors.eye}
-                    </FormFeedback>
-                  ) : null}
-                </Col>
-              </div>
-              <div>
-                <Label htmlFor="quefor" className="col-form-label">
-                  Comment
-                </Label>
-                <Col lg={4}>
-                  <Input
-                    id="quefor"
-                    name="que"
-                    type="text"
-                    className="form-control validate"
-                    validate={{ required: { value: true } }}
-                    onChange={validation.handleChange}
-                    onBlur={validation.handleBlur}
-                    value={validation.values.que || ""}
-                    invalid={
-                      validation.touched.que && validation.errors.que
-                        ? true
-                        : false
-                    }
-                  />
-                  {validation.touched.que && validation.errors.que ? (
-                    <FormFeedback type="invalid">
-                      {validation.errors.que}
-                    </FormFeedback>
-                  ) : null}
-                </Col>
-              </div>
-              <div>
-                <Label htmlFor="clipfor" className="col-form-label">
-                  Pinned
-                </Label>
-                <Col lg={4}>
-                  <Input
-                    id="clipfor"
-                    name="clip"
-                    type="text"
-                    className="form-control validate"
-                    validate={{ required: { value: true } }}
-                    onChange={validation.handleChange}
-                    onBlur={validation.handleBlur}
-                    value={validation.values.clip || ""}
-                    invalid={
-                      validation.touched.clip && validation.errors.clip
-                        ? true
-                        : false
-                    }
-                  />
-                  {validation.touched.clip && validation.errors.clip ? (
-                    <FormFeedback type="invalid">
-                      {validation.errors.clip}
-                    </FormFeedback>
-                  ) : null}
-                </Col>
-              </div>
-            </div>
-
-            <div className="form-group mb-4">
-              <label className="col-form-label">
-                Status<span className="text-danger">*</span>
-              </label>
-              <div className="col-lg-12">
-                <Select
-                  isMulti
-                  value={tag}
-                  onChange={(e: any) => {
-                    handlestag(e);
+              <Col lg={6}>
+                <Label for="deadline-field" className="form-label">Deadline Date</Label>
+                <Flatpickr
+                  name="deadlineDate"
+                  id="deadline-field"
+                  className="form-control"
+                  placeholder="Select a date"
+                  options={{
+                    altInput: true,
+                    altFormat: "d M, Y",
+                    dateFormat: "d M, Y",
                   }}
-                  className="mb-0"
-                  options={tags}
-                  id="taginput-choices"
-                >
-                </Select>
-                {validation.touched.badge1 &&
-                  validation.errors.badge1 ? (
-                  <FormFeedback type="invalid" className="d-block">
-                    {validation.errors.badge1}
-                  </FormFeedback>
+                  onChange={(deadlineDate: any) => validationCreate.setFieldValue("deadlineDate", moment(deadlineDate[0]).format("DD MMMM ,YYYY"))}
+                  value={validationCreate.values.deadlineDate || ''}
+                />
+                {validationCreate.errors.deadlineDate && validationCreate.touched.deadlineDate ? (
+                  <FormFeedback type="invalid" className='d-block'>{validationCreate.errors.deadlineDate}</FormFeedback>
                 ) : null}
-              </div>
-            </div>
-
-            <Row>
-              <Col lg={10}>
-                <button
-                  type="submit"
-                  className="btn btn-primary"
-                  id="updatetaskdetail"
+              </Col>
+              <Col lg={6}>
+                <Label for="duedate-field" className="form-label">Due Date</Label>
+                <Flatpickr
+                  name="dueDate"
+                  id="duedate-field"
+                  className="form-control"
+                  placeholder="Select a date"
+                  options={{
+                    altInput: true,
+                    altFormat: "d M, Y",
+                    dateFormat: "d M, Y",
+                  }}
+                  onChange={(dueDate: any) => validationCreate.setFieldValue("dueDate", moment(dueDate[0]).format("DD MMMM ,YYYY"))}
+                  value={validationCreate.values.dueDate || ''}
+                />
+                {validationCreate.errors.dueDate && validationCreate.touched.dueDate ? (
+                  <FormFeedback type="invalid" className='d-block'>{validationCreate.errors.dueDate}</FormFeedback>
+                ) : null}
+              </Col>
+              <Col lg={6}>
+                <Label for="ticket-status" className="form-label">Status</Label>
+                <Input
+                  name="status"
+                  type="select"
+                  className="form-select"
+                  id="ticket-field"
+                  onChange={validationCreate.handleChange}
+                  onBlur={validationCreate.handleBlur}
+                  value={validationCreate.values.status || ""}
+                  invalid={
+                    validationCreate.touched.status && validationCreate.errors.status ? true : false
+                  }
                 >
-                  {!!isEdit ? "Update Task" : "Create Task"}
-                </button>
+                  <option value="1">Pending</option>
+                  <option value="2">In-progress</option>
+                  <option value="3">Completed</option>
+                </Input>
+                {validationCreate.touched.status && validationCreate.errors.status ? (
+                  <FormFeedback type="invalid">{validationCreate.errors.status}</FormFeedback>
+                ) : null}
+              </Col>
+              {/* <Col lg={6}>
+                <Label for="priority-field" className="form-label">Project</Label>
+                <Input
+                  name="project"
+                  type="select"
+                  className="form-select"
+                  id="priority-field"
+                  onChange={validationCreate.handleChange}
+                  onBlur={validationCreate.handleBlur}
+                  value={validationCreate.values.project || ""}
+                  invalid={
+                    validationCreate.touched.project && validationCreate.errors.project ? true : false
+                  }
+                >
+                    {projectList.length>0&&projectList.map((item:any, key:any) =>(
+                  <option key={key} value={item.id}>{item.name}</option>
+                  ))}
+                </Input>
+                {validationCreate.touched.priority && validationCreate.errors.priority ? (
+                  <FormFeedback type="invalid">{validationCreate.errors.priority}</FormFeedback>
+                ) : null}
+              </Col> */}
+              <Col lg={12}>
+                <Label for="priority-field" className="form-label">Priority</Label>
+                <Input
+                  name="priority"
+                  type="select"
+                  className="form-select"
+                  id="priority-field"
+                  onChange={validationCreate.handleChange}
+                  onBlur={validationCreate.handleBlur}
+                  value={validationCreate.values.priority || ""}
+                  invalid={
+                    validationCreate.touched.priority && validationCreate.errors.priority ? true : false
+                  }
+                >
+                  <option value="1">High</option>
+                  <option value="2">Medium</option>
+                  <option value="3">Low</option>
+                </Input>
+                {validationCreate.touched.priority && validationCreate.errors.priority ? (
+                  <FormFeedback type="invalid">{validationCreate.errors.priority}</FormFeedback>
+                ) : null}
               </Col>
             </Row>
-          </Form>
-        </ModalBody>
+          </ModalBody>
+          <div className="modal-footer">
+            <div className="hstack gap-2 justify-content-end">
+              <Button
+                type="button"
+                onClick={() => {
+                  toggleCreate()
+
+                }}
+                className="btn-light"
+              >Close</Button>
+              <button type="submit" className="btn btn-success" id="add-btn">Create Task</button>
+            </div>
+          </div>
+        </Form>
+      </Modal>
+      <Modal
+        isOpen={modal}
+        toggle={toggle}
+        centered
+        size="lg"
+        className="border-0"
+        modalClassName='modal fade zoomIn'
+      >
+        <ModalHeader className="p-3 bg-info-subtle" toggle={toggle}>
+          Edit Task
+        </ModalHeader>
+        <Form className="tablelist-form" onSubmit={(e: any) => {
+          e.preventDefault();
+          validation.handleSubmit();
+          return false;
+        }}>
+          <ModalBody className="modal-body">
+            <Row className="g-3">
+
+
+
+              <Col lg={12}>
+                <div>
+                  <Label for="tasksTitle-field" className="form-label">Task name</Label>
+                  <Input
+                    name="name"
+                    id="tasksTitle-field"
+                    className="form-control"
+                    placeholder="Task name"
+                    type="text"
+                    validate={{
+                      required: { value: true },
+                    }}
+                    onChange={validation.handleChange}
+                    onBlur={validation.handleBlur}
+                    value={validation.values.name || ""}
+                    invalid={
+                      validation.touched.name && validation.errors.name ? true : false
+                    }
+                  />
+                  {validation.touched.name && validation.errors.name ? (
+                    <FormFeedback type="invalid">{validation.errors.name}</FormFeedback>
+                  ) : null}
+                </div>
+              </Col>
+              <Col lg={12}>
+                <div className="mb-3">
+                  <Label className="form-label">Project Description</Label>
+                  <CKEditor
+                    editor={ClassicEditor}
+                    data={editorData}
+                    onChange={handleEditorChange}
+                    onReady={(editor) => {
+                    }}
+                  />
+                </div>
+              </Col>
+
+              <Col lg={12}>
+                {/* <Label className="form-label">Assigned To</Label> */}
+                {/* <SimpleBar style={{ maxHeight: "95px" }}>
+                  <ul className="list-unstyled vstack gap-2 mb-0">
+                    {Assigned.map((item, key) => (<li key={key}>
+                      <div className="form-check d-flex align-items-center">
+                        <Input name="subItem" className="form-check-input me-3" type="checkbox"
+                          onChange={validation.handleChange}
+                          onBlur={validation.handleBlur}
+                          value={item.img}
+                          invalid={validation.touched.subItem && validation.errors.subItem ? true : false}
+                          id={item.imgId} />
+
+                        <Label className="form-check-label d-flex align-items-center" htmlFor={item.imgId}>
+                          <span className="flex-shrink-0">
+                            <img src={item.img} alt="" className="avatar-xxs rounded-circle" />
+                          </span>
+                          <span className="flex-grow-1 ms-2">
+                            {item.name}
+                          </span>
+                        </Label>
+                        {validation.touched.subItem && validation.errors.subItem ? (
+                          <FormFeedback type="invalid">{validation.errors.subItem}</FormFeedback>
+                        ) : null}
+                      </div>
+                    </li>))}
+                  </ul>
+                </SimpleBar> */}
+              </Col>
+
+              <Col lg={6}>
+                <Label for="duedate-field" className="form-label">Due Date</Label>
+                <Flatpickr
+                  name="dueDate"
+                  id="duedate-field"
+                  className="form-control"
+                  placeholder="Select a date"
+                  options={{
+                    altInput: true,
+                    altFormat: "d M, Y",
+                    dateFormat: "d M, Y",
+                  }}
+                  onChange={(dueDate: any) => validation.setFieldValue("dueDate", moment(dueDate[0]).format("DD MMMM ,YYYY"))}
+                  value={validation.values.dueDate || ''}
+                />
+                {validation.errors.dueDate && validation.touched.dueDate ? (
+                  <FormFeedback type="invalid" className='d-block'>{validation.errors.dueDate}</FormFeedback>
+                ) : null}
+              </Col>
+              <Col lg={6}>
+                <Label for="ticket-status" className="form-label">Status</Label>
+                <Input
+                  name="status"
+                  type="select"
+                  className="form-select"
+                  id="ticket-field"
+                  onChange={validation.handleChange}
+                  onBlur={validation.handleBlur}
+                  value={validation.values.status || ""}
+                  invalid={
+                    validation.touched.status && validation.errors.status ? true : false
+                  }
+                >
+                  <option value="1">Pending</option>
+                  <option value="2">In-progress</option>
+                  <option value="3">Completed</option>
+                </Input>
+                {validation.touched.status && validation.errors.status ? (
+                  <FormFeedback type="invalid">{validation.errors.status}</FormFeedback>
+                ) : null}
+              </Col>
+              <Col lg={12}>
+                <Label for="priority-field" className="form-label">Priority</Label>
+                <Input
+                  name="priority"
+                  type="select"
+                  className="form-select"
+                  id="priority-field"
+                  onChange={validation.handleChange}
+                  onBlur={validation.handleBlur}
+                  value={validation.values.priority || ""}
+                  invalid={
+                    validation.touched.priority && validation.errors.priority ? true : false
+                  }
+                >
+                  <option value="1">High</option>
+                  <option value="2">Medium</option>
+                  <option value="3">Low</option>
+                </Input>
+                {validation.touched.priority && validation.errors.priority ? (
+                  <FormFeedback type="invalid">{validation.errors.priority}</FormFeedback>
+                ) : null}
+              </Col>
+            </Row>
+          </ModalBody>
+          <div className="modal-footer">
+            <div className="hstack gap-2 justify-content-end">
+              <Button
+                type="button"
+                onClick={() => {
+                  setModal(false);
+                }}
+                className="btn-light"
+              >Close</Button>
+              <button type="submit" className="btn btn-success" id="add-btn">Update Task</button>
+            </div>
+          </div>
+        </Form>
       </Modal>
       <ToastContainer />
+
     </React.Fragment>
   )
 }

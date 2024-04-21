@@ -36,3 +36,19 @@ export const formatDateCreateProjectFrontend = (date: Date): string => {
 
   return formattedDateTime;
 };
+export const formatDateFromAPI = (date: string): string => {
+  console.log(date)
+  const dateData=new Date(date);
+  // Trích xuất thông tin về năm, tháng và ngày từ đối tượng Date
+  const year = dateData.getFullYear();
+  const month = (dateData.getMonth() + 1).toString().padStart(2, '0');
+  const day = dateData.getDate().toString().padStart(2, '0');
+  const hours = dateData.getHours().toString().padStart(2, '0');
+  const minutes = dateData.getMinutes().toString().padStart(2, '0');
+  const seconds = dateData.getSeconds().toString().padStart(2, '0');
+  
+  // Tạo chuỗi đầu ra theo định dạng mong muốn
+  const formattedDateTime = `${hours}:${minutes}:${seconds} ${day}-${month}-${year} `;
+
+  return formattedDateTime;
+};

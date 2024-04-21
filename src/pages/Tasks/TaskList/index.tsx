@@ -7,6 +7,7 @@ import Widgets from './Widgets';
 
 const TaskList = () => {
     document.title="Tasks List ";
+    // const project_id=1;
     return (
         <React.Fragment>
             <div className="page-content">
@@ -16,7 +17,7 @@ const TaskList = () => {
                     <Row>
                         <Widgets />
                     </Row>
-                    <AllTasks />
+                    <AllTasks project_id={1} />
                 </Container>
             </div>
         </React.Fragment>

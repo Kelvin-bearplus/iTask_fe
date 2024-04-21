@@ -11,13 +11,14 @@ import {
 import { getTaskListAPI,deleteTaskAPI,getTaskByIdAPI ,assigneesAPI,getUnassignessAPI} from '../../helpers/url_api'
 import { APIClient } from "../../helpers/api_helper";
 const api = new APIClient();
-export const getTaskList = createAsyncThunk("tasks/getTaskList", async () => {
+export const getTaskList = createAsyncThunk("tasks/getTaskList", async (project_id:number) => {
     try {
-        const response =await api.get(getTaskListAPI);
+        const param={project_id:project_id}
+        const response =await api.get(getTaskListAPI,param);
         console.log(response)
         return response.data;
-    } catch (error) {
-        throw error;
+    } catch (error:any) {
+        throw error.response.data.message;
     }
 });
 export const getTaskById = createAsyncThunk("tasks/getTaskById", async (id:number) => {
@@ -71,13 +72,15 @@ export const addNewTask = createAsyncThunk("tasks/addNewTask", async (task: any)
 export const updateTask = createAsyncThunk("tasks/updateTask", async (data: any) => {
     try {
         const url =getTaskListAPI+"/"+data.id;
+        
         const response = await api.create(url,data.task)
         toast.success("Task Updated Successfully", { autoClose: 3000 });
         console.log(response.data)
         return response.data;
     } catch (error:any) {
-        toast.error(error.response.data.error, { autoClose: 3000 });
-        throw error.response.data.error;
+        console.log(error)
+        toast.error(error.response.data.message, { autoClose: 3000 });
+        throw error.response.data.message;
     }
 });
 export const deleteTask = createAsyncThunk("tasks/deleteTask", async (taskId: any) => {
