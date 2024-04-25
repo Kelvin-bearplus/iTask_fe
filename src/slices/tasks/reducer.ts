@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { getTaskList, addNewTask, updateTask, deleteTask, updateCardData, deleteKanban, getTasks, addCardData,getUnassigness,getTaskById,getAssigneesById } from './thunk';
+import { getTaskList, addNewTask, updateTask, deleteTask, updateCardData, deleteKanban, getTasksKanban, addCardData,getUnassigness,getTaskById,getAssigneesById } from './thunk';
 export const initialState = {
     taskList: [],
     tasks: [],
@@ -68,11 +68,11 @@ const TasksSlice = createSlice({
             state.isTaskDeleteFail = true;
         });
         // Kanban Board
-        builder.addCase(getTasks.fulfilled, (state: any, action: any) => {
+        builder.addCase(getTasksKanban.fulfilled, (state: any, action: any) => {
             state.tasks = action.payload;
         });
-        builder.addCase(getTasks.rejected, (state: any, action: any) => {
-            state.error = action.payload ? action.payload?.error : null;
+        builder.addCase(getTasksKanban.rejected, (state: any, action: any) => {
+            state.error = action.payload || null;
         });
         builder.addCase(getTaskById.fulfilled, (state: any, action: any) => {
             state.tasks = action.payload;

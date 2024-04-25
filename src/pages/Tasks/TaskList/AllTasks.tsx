@@ -274,29 +274,20 @@ useEffect(()=>{
 
   // Get Data
 
-  useEffect(() => {
-    if (!isEmpty(taskList)) setTaskList(taskList);
-  }, []);
 
-  useEffect(() => {
-    if (taskList && !taskList.length) {
-      dispatch(getTaskList(props.project_id));
-    }
-  }, [dispatch]);
 
 console.log("props: "+ props)
   useEffect(() => {
-    setTaskList(taskList);
+    // setTaskList(taskList);
+    refreshTaskList();
   }, []);
 
-  useEffect(() => {
-    if (!isEmpty(taskList)) {
-      setTaskList(taskList);
-      setIsEdit(false);
-    }
-  }, []);
-function refreshTaskList(){
-  dispatch(getTaskList(props.project_id));
+async function refreshTaskList(){
+  const dataResponse= await dispatch(getTaskList(props.project_id));
+  if(dataResponse.payload){
+    setTaskList(dataResponse.payload);
+  }
+  // console.log(dataResponse)
 }
 
   // Checked All

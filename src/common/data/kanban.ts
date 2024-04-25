@@ -46,7 +46,7 @@ const tasklist =[
         "id": 20,
         "created_at": "2024-04-21T11:38:25+07:00",
         "updated_at": "2024-04-21T11:38:25+07:00",
-        "name": "sửa bài tập cho sinh viên",
+        "name": "hello",
         "description": "<p>sửa bài tập về nhà</p>",
         "status": 2,
         "parent_task_id": 0,
@@ -88,7 +88,43 @@ const tasklist =[
         "id": 21,
         "created_at": "2024-04-21T11:38:25+07:00",
         "updated_at": "2024-04-21T11:38:25+07:00",
-        "name": "sửa bài tập cho sinh viên",
+        "name": "sửa homepage",
+        "description": "<p>sửa bài tập về nhà</p>",
+        "status": 2,
+        "parent_task_id": 0,
+        "position": 1,
+        "priority": 3,
+        "due_date": "2024-04-22T07:00:00+07:00",
+        "started_at": "2024-04-23T07:00:00+07:00",
+        "completed_at": null,
+        "project_info": {
+          "id": 1,
+          "name": "Project iTask",
+          "description": "This is a Task Management System web",
+          "thumbnail_url": null
+        },
+        "owner": {
+          "id": 6,
+          "full_name": "Trần Phúc Khánh",
+          "profile_ava_url": "",
+          "title": "Backend Developer"
+        },
+        "assignees": [
+          {
+            "user_info": {
+              "id": 4,
+              "full_name": "William Horror",
+              "profile_ava_url": "",
+              "title": "Team Lead"
+            }
+          }
+        ]
+      },
+      {
+        "id": 31,
+        "created_at": "2024-04-21T11:38:25+07:00",
+        "updated_at": "2024-04-21T11:38:25+07:00",
+        "name": "test",
         "description": "<p>sửa bài tập về nhà</p>",
         "status": 2,
         "parent_task_id": 0,

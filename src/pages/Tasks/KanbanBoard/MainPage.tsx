@@ -26,7 +26,7 @@ import Select from "react-select";
 
 
 import {
-  getTasks as onGetTasks,
+ getTasksKanban,
   addCardData as onAddCardData,
   updateCardData as onUpdateCardData,
   deleteKanban as OnDeleteKanban,
@@ -74,10 +74,10 @@ interface prop {
 
 interface KanbanColumn {
   status: string;
-  name: string;
+  status_name: string;
   badge?: number;
   color?: string;
-  tasks?: any;
+  task_list?: any;
 }
 
 const TasksKanban: React.FC<prop> = (props) => {
@@ -91,7 +91,7 @@ const TasksKanban: React.FC<prop> = (props) => {
     if (modal) {
       setModal(false)
       setImages([])
-      setCard(null)
+      setCardIdDelete(null)
     } else {
       setModal(true)
       setAssignTag([]);
@@ -138,6 +138,7 @@ const TasksKanban: React.FC<prop> = (props) => {
     toggle();
   }, [toggle]);
   console.log(task)
+  const [kanbanTasksCards, setKanbanTasksCards] = useState<any>()
 
   const validationCreate: any = useFormik({
     // enableReinitialize : use this flag when initial values needs to be changed
@@ -148,7 +149,7 @@ const TasksKanban: React.FC<prop> = (props) => {
       name: '',
       description: '',
       dueDate: '',
-      status: '1',
+      status: kanbanTasksCards?kanbanTasksCards:'0',
       priority: '1',
       assignees: [],
       // project:'',
@@ -184,13 +185,13 @@ const TasksKanban: React.FC<prop> = (props) => {
       if (dataResponse.payload) {
         refreshTaskList()
         validationCreate.resetForm();
+        setEditorData('');
       }
       toggleCreate();
 
     },
   });
   const dispatch = useDispatch<any>();
-  const [kanbanTasksCards, setKanbanTasksCards] = useState<any>()
 
   const selectLayoutState = (state: any) => state.Tasks;
   const TasksKanbanProperties = createSelector(
@@ -203,63 +204,79 @@ const TasksKanban: React.FC<prop> = (props) => {
   const { tasks, loading } = useSelector(TasksKanbanProperties)
 
   const [isLoading, setLoading] = useState<boolean>(loading)
-
+  const [cards, setCards] = useState<any>([])
+async function getDataTask(project_id:number){
+  const dataResponse= await dispatch(getTasksKanban(project_id));
+  console.log(dataResponse.payload)
+  if(dataResponse.payload){
+    setCards(dataResponse.payload.data)
+  }
+}
   useEffect(() => {
-    dispatch(onGetTasks())
+   getDataTask(props.project_id);
   }, [dispatch])
 
-  const [cards, setCards] = useState<any>([])
 
-  useEffect(() => {
-    setCards(tasks)
-  }, [tasks])
 
   console.log(cards)
 
 
-  const handleDragEnd = (result: any) => {
+  const handleDragEnd = async (result: any) => {
     console.log(result)
-
-    if (!result.destination) return // If dropped outside a valid drop area, do nothing
-    const taskID = result.draggableId;
-    const { source, destination } = result
-    // Reorder cards within the same card line
-    if (source.droppableId == destination.droppableId) {
-      const line = cards.find((line: any) => line.status == source.droppableId)
-      const reorderedCards = Array.from(line.tasks)
-      const [movedCard] = reorderedCards.splice(source.index, 1)
-      reorderedCards.splice(destination.index, 0, movedCard)
-      const updatedLines = cards.map((line: any) => {
-        if (line.status == source.droppableId) {
-          return { ...line, cards: reorderedCards }
-        }
-        return line
-      })
-      // console.log("1")
-      setCards(updatedLines)
-    } else {
-      // Move card between different card lines
-      const sourceLine = cards.find((line: any) => line.status == source.droppableId)
-      const destinationLine = cards.find(
-        (line: any) => line.status == destination.droppableId
-      )
-      const sourceCards = Array.from(sourceLine.tasks)
-      const destinationCards = Array.from(destinationLine.tasks)
-      const [movedCard] = sourceCards.splice(source.index, 1)
-      destinationCards.splice(destination.index, 0, movedCard)
-
-      const updatedLines = cards.map((line: any) => {
-        if (line.status == source.droppableId) {
-          return { ...line, tasks: sourceCards }
-        } else if (line.status == destination.droppableId) {
-          return { ...line, tasks: destinationCards }
-        }
-
-        return line
-      })
-
-      setCards(updatedLines)
-    }
+     if (result.destination!=null){
+      
+      if (!result.destination) return // If dropped outside a valid drop area, do nothing
+      const taskID = result.draggableId;
+      const { source, destination } = result
+      if(source.droppableId!=destination.droppableId|| source.index!=destination.index){
+        const data={
+          id:parseInt(result.draggableId),
+          task:{
+            status:parseInt(result.destination.droppableId),
+            position:result.destination.index+1
+          }
+         }
+        const dataResponse=  dispatch(updateTask(data));
+        console.log(dataResponse);
+      }
+      // Reorder cards within the same card line
+      if (source.droppableId == destination.droppableId) {
+        const line = cards.find((line: any) => line.status == source.droppableId)
+        const reorderedCards = Array.from(line.task_list)
+        const [movedCard] = reorderedCards.splice(source.index, 1)
+        reorderedCards.splice(destination.index, 0, movedCard)
+        const updatedLines = cards.map((line: any) => {
+          if (line.status == source.droppableId) {
+            return { ...line, task_list: reorderedCards }
+          }
+          return line
+        })
+        // console.log("1")
+        setCards(updatedLines)
+      } else {
+        // Move card between different card lines
+        const sourceLine = cards.find((line: any) => line.status == source.droppableId)
+        const destinationLine = cards.find(
+          (line: any) => line.status == destination.droppableId
+        )
+        const sourceCards = Array.from(sourceLine.task_list)
+        const destinationCards = Array.from(destinationLine.task_list)
+        const [movedCard] = sourceCards.splice(source.index, 1)
+        destinationCards.splice(destination.index, 0, movedCard)
+  
+        const updatedLines = cards.map((line: any) => {
+          if (line.status == source.droppableId) {
+            return { ...line, task_list: sourceCards }
+          } else if (line.status == destination.droppableId) {
+            return { ...line, task_list: destinationCards }
+          }
+  
+          return line
+        })
+  
+        setCards(updatedLines)
+      }
+     }
   }
 
   // create Modal
@@ -279,7 +296,7 @@ const TasksKanban: React.FC<prop> = (props) => {
 
     initialValues: {
       status: (cardhead && cardhead.id) || "",
-      name: (cardhead && cardhead.name) || "",
+      status_name: (cardhead && cardhead.status_name) || "",
     } as KanbanColumn,
     validationSchema: Yup.object({
       name: Yup.string().required("Please Enter Your Card Title"),
@@ -288,8 +305,8 @@ const TasksKanban: React.FC<prop> = (props) => {
 
       const newCardheaderData: KanbanColumn = {
         status: (Math.floor(Math.random() * (30 - 20)) + 20).toString(),
-        name: values["name"],
-        tasks: []
+        status_name: values["status_name"],
+        task_list: []
       }
 
       dispatch(onAddCardData(newCardheaderData))
@@ -328,12 +345,17 @@ const TasksKanban: React.FC<prop> = (props) => {
 
   // Add Modal
 
-  function refreshTaskList() {
-    dispatch(getTaskList(props.project_id));
+  async function refreshTaskList() {
+    const dataResponse =await dispatch(getTasksKanban(props.project_id));
+    console.log(dataResponse)
+    if(dataResponse.payload.data){
+    setCards(dataResponse.payload.data)
+
+    }
   }
 
   const [isEdit, setIsEdit] = useState<boolean>(false)
-  const [card, setCard] = useState<any>()
+  const [cardIdDelete, setCardIdDelete] = useState<any>()
   // validation
   const validation: any = useFormik({
     // enableReinitialize : use this flag when initial values needs to be changed
@@ -385,50 +407,54 @@ const TasksKanban: React.FC<prop> = (props) => {
 
 
 
-  const handleCardEdit = (arg: any, line: any) => {
-    setModal(true)
-    setCard(arg)
+  // const handleCardEdit = (arg: any, line: any) => {
+  //   setModal(true)
+  //   setCard(arg)
 
-    let card = arg
-    setCard({
-      id: card.id,
-      title: card.title,
-      text: card.text,
-      botId: card.botId,
-      userImages: card.userImages,
-      eye: card.eye,
-      que: card.que,
-      clip: card.clip,
-      badge1: card.badge1
-    })
+  //   let card = arg
+  //   setCard({
+  //     id: card.id,
+  //     title: card.title,
+  //     text: card.text,
+  //     botId: card.botId,
+  //     userImages: card.userImages,
+  //     eye: card.eye,
+  //     que: card.que,
+  //     clip: card.clip,
+  //     badge1: card.badge1
+  //   })
 
-    setKanbanTasksCards(line.id)
-    setIsEdit(true)
+  //   setKanbanTasksCards(line.id)
+  //   setIsEdit(true)
 
-    toggle()
-  }
+  //   toggle()
+  // }
 
   const handleAddNewCard = (line: any) => {
-    setCard("")
     setIsEdit(false)
     toggleCreate()
-    setKanbanTasksCards(line.id)
+    setKanbanTasksCards(line.status)
+    
   };
-
+// console.log(kanbanTasksCards)
   const [images, setImages] = useState<any>([])
 
   const [deleteModal, setDeleteModal] = useState<boolean>(false);
 
   const onClickDelete = (card: any) => {
-    setCard(card);
+    setCardIdDelete(card);
     setDeleteModal(true);
   };
 
-  const handleDeleteCard = () => {
-    if (card) {
-      console.log("card ===", card);
+  const handleDeleteCard =async () => {
+    if (cardIdDelete) {
+      console.log("card ===", cardIdDelete);
 
-      dispatch(OnDeleteKanban(card.id));
+    const dataResponse= await dispatch(deleteTask(cardIdDelete));
+    console.log(dataResponse)
+    if(dataResponse.payload){
+      refreshTaskList();
+    }
       setDeleteModal(false);
     }
   };
@@ -445,20 +471,12 @@ const TasksKanban: React.FC<prop> = (props) => {
     validation.setFieldValue('userImages', updatedImages)
 
   }
-  useEffect(() => {
-    if (card) {
-      setImages([...card?.userImages])
-    }
-  }, [card])
-
-
-  console.log(cards)
 
   return (
     <React.Fragment>
       <DeleteModal
         show={deleteModal}
-        onDeleteClick={handleDeleteCard}
+        onDeleteClick={()=>handleDeleteCard()}
         onCloseClick={() => setDeleteModal(false)}
       />
 
@@ -499,13 +517,13 @@ const TasksKanban: React.FC<prop> = (props) => {
         {
           isLoading ? <Spinners setLoading={setLoading} /> :
             <DragDropContext onDragEnd={handleDragEnd}>
-              {(cards || []).map((line: KanbanColumn) => {
+              {cards.length>0 &&(cards || []).map((line: KanbanColumn) => {
                 return (
                   // header line
                   <div className="tasks-list" key={parseInt(line.status)}>
                     <div className="d-flex mb-3">
                       <div className="flex-grow-1">
-                        <h6 className="fs-14 text-uppercase fw-semibold mb-0">{line.name} <small className={`badge bg-${line.color} align-bottom ms-1 totaltask-badge`}>{line.badge}</small></h6>
+                        <h6 className="fs-14 text-uppercase fw-semibold mb-0">{line.status_name} </h6>
                       </div>
                       <div className="flex-shrink-0">
                         <UncontrolledDropdown className="card-header-dropdown float-end">
@@ -525,14 +543,14 @@ const TasksKanban: React.FC<prop> = (props) => {
                     </div>
                     {/* data */}
                     <SimpleBar className="tasks-wrapper px-3 mx-n3">
-                      <div id="unassigned-task" className={line.tasks === "object" ? "tasks" : "tasks noTask"}>
-                        <Droppable droppableId={line.status}>
+                      <div id="unassigned-task" className={line.task_list === "object" ? "tasks" : "tasks noTask"}>
+                        <Droppable droppableId={line.status.toString()}>
                           {(provided: any) => (
                             <div
                               ref={provided.innerRef}
                               {...provided.droppableProps}
                             >
-                              {line.tasks.length > 0 && line.tasks.map((task: any, index: any) => {
+                              {line.task_list.length > 0 && line.task_list.map((task: any, index: any) => {
                                 return (
                                   <Draggable
                                     key={task.id}
@@ -546,11 +564,11 @@ const TasksKanban: React.FC<prop> = (props) => {
                                         {...provided.dragHandleProps}
                                         // className="card task-list"
                                         className="pb-1 task-list"
-                                        id={line.name + "-task"}
+                                        id={line.status_name + "-task"}
                                       >
                                         <div className="card task-box" id="uptask-1">
                                           <CardBody>
-                                            <Link to="#" className="text-muted fw-medium fs-14 flex-grow-1 ">{task.id}</Link>
+                                            {/* <Link to="#" className="text-muted fw-medium fs-14 flex-grow-1 ">{task.id}</Link> */}
                                             <UncontrolledDropdown className="float-end">
                                               <DropdownToggle
                                                 className="arrow-none"
@@ -576,7 +594,7 @@ const TasksKanban: React.FC<prop> = (props) => {
                                                 <DropdownItem
                                                   className="deletetask"
                                                   onClick={() =>
-                                                    onClickDelete(task)
+                                                    onClickDelete(task.id)
                                                   }
                                                 >
                                                   Delete
@@ -595,9 +613,9 @@ const TasksKanban: React.FC<prop> = (props) => {
                                                 </Link>
                                               </h6>
                                             </div>
-                                            <p className="text-muted">
-                                              {task.description}
-                                            </p>
+                                            <div className="text-muted" dangerouslySetInnerHTML= {{ __html: task.description }}>
+                                            
+                                            </div>
 
                                             {/* {task.assignees.leng>0 ?
                                               <div className="tasks-img rounded mb-2" style={{ backgroundImage: `url(${task.picture})`, height: "135px" }}>
@@ -628,7 +646,7 @@ const TasksKanban: React.FC<prop> = (props) => {
                                           <div className="card-footer border-top-dashed">
                                             <div className="d-flex">
                                               <div className="flex-grow-1">
-                                                <span className="text-muted"><i className="ri-time-line align-bottom"></i>{task.created_at}</span>
+                                                <span className="text-muted"><i className="ri-time-line align-bottom"></i>{moment(task.create_at).format("DD MMM, YYYY")}</span>
                                               </div>
 
                                             </div>
@@ -642,7 +660,7 @@ const TasksKanban: React.FC<prop> = (props) => {
                                   </Draggable>
                                 )
                               })}
-                              {line.tasks.length === 0 &&
+                              {line.task_list.length === 0 &&
                                 <Draggable
                                   key={-1}
                                   draggableId={"-1"}
@@ -657,7 +675,7 @@ const TasksKanban: React.FC<prop> = (props) => {
                                         {...provided.dragHandleProps}
                                         // className="card task-list"
                                         className="pb-1 task-list"
-                                        id={line.name + "-task"}
+                                        id={line.status_name + "-task"}
                                       >
                                       </div>
                                     )}
@@ -883,6 +901,7 @@ const TasksKanban: React.FC<prop> = (props) => {
                     validationCreate.touched.status && validationCreate.errors.status ? true : false
                   }
                 >
+                  <option value="0">UNASSIGNED</option>
                   <option value="1">Pending</option>
                   <option value="2">In-progress</option>
                   <option value="3">Completed</option>

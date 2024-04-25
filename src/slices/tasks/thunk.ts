@@ -8,7 +8,7 @@ import {
     updateTasks as updateTasksApi,
     deleteTasks as deleteTasksApi
 } from "../../helpers/fakebackend_helper";
-import { getTaskListAPI,deleteTaskAPI,getTaskByIdAPI ,assigneesAPI,getUnassignessAPI} from '../../helpers/url_api'
+import { getTaskListAPI,deleteTaskAPI,getTaskByIdAPI ,assigneesAPI,getUnassignessAPI,getTaskKanbanAPI} from '../../helpers/url_api'
 import { APIClient } from "../../helpers/api_helper";
 const api = new APIClient();
 export const getTaskList = createAsyncThunk("tasks/getTaskList", async (project_id:number) => {
@@ -71,6 +71,7 @@ export const addNewTask = createAsyncThunk("tasks/addNewTask", async (task: any)
 });
 export const updateTask = createAsyncThunk("tasks/updateTask", async (data: any) => {
     try {
+        console.log(data);
         const url =getTaskListAPI+"/"+data.id;
         
         const response = await api.create(url,data.task)
@@ -97,12 +98,15 @@ export const deleteTask = createAsyncThunk("tasks/deleteTask", async (taskId: an
     }
 });
 // Kanban Board
-export const getTasks = createAsyncThunk("tasks/getTasks", async () => {
+export const getTasksKanban = createAsyncThunk("tasks/getTasksKanban", async (project_id:number) => {
     try {
-        const response = getTasksApi();
+        const param={
+            project_id:project_id
+        }
+        const response = api.get(getTaskKanbanAPI,param);
         return response;
-    } catch (error) {
-        return error;
+    } catch (error:any) {
+        throw error.response.data.error;
     }
 });
 export const addCardData = createAsyncThunk("tasks/addCardData", async (card: any) => {
