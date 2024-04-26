@@ -162,7 +162,7 @@ useEffect(()=>{
       const updatedTask = {
         // id: task ? task.id : 0,
         // taskId: values.taskId,
-        // project: values.project,
+        project_id: props.project_id,
         name: values.name,
         description: editorData,
         due_date: dataDate,
@@ -273,9 +273,6 @@ useEffect(()=>{
   };
 
   // Get Data
-
-
-
 console.log("props: "+ props)
   useEffect(() => {
     // setTaskList(taskList);

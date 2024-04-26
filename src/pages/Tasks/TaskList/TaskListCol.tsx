@@ -86,7 +86,10 @@ const DueDate = (cell:any) => {
 const Status = (cell:any) => {
     return (
         <React.Fragment>
-            {cell.value ==1 ?
+            {cell.value ==0 ?
+                <span className="badge bg-secondary-subtle text-warning text-uppercase">Unssigned</span>
+                :
+            cell.value ==1 ?
                 <span className="badge bg-secondary-subtle text-secondary text-uppercase">Pending</span>
                 :
                 cell.value ==2 ?

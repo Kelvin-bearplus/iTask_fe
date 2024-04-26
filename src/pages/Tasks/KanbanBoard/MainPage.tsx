@@ -226,24 +226,35 @@ async function getDataTask(project_id:number){
      if (result.destination!=null){
       
       if (!result.destination) return // If dropped outside a valid drop area, do nothing
-      const taskID = result.draggableId;
+      const indexDestination = result.destination.index;
       const { source, destination } = result
+      // const positionTask=cards[destination]
+      let positionTask:number=0.000;
+    cards.map((card:any) => {
+    if(card.status==destination.droppableId){
+      const idCardTaskPrev=card.task_list[indexDestination-1]?card.task_list[indexDestination-1].position:0;
+      const idCardTaskNext=card.task_list[indexDestination]?card.task_list[indexDestination].position:1;
+     positionTask= (idCardTaskPrev+idCardTaskNext)/2;
+    }
+    })
       if(source.droppableId!=destination.droppableId|| source.index!=destination.index){
         const data={
           id:parseInt(result.draggableId),
           task:{
+            project_id:props.project_id,
             status:parseInt(result.destination.droppableId),
-            position:result.destination.index+1
+            position:positionTask
           }
          }
         const dataResponse=  dispatch(updateTask(data));
-        console.log(dataResponse);
+        console.log(positionTask);
       }
       // Reorder cards within the same card line
       if (source.droppableId == destination.droppableId) {
         const line = cards.find((line: any) => line.status == source.droppableId)
         const reorderedCards = Array.from(line.task_list)
-        const [movedCard] = reorderedCards.splice(source.index, 1)
+        let [movedCard]:any = reorderedCards.splice(source.index, 1);
+        movedCard = { ...movedCard, position: positionTask };
         reorderedCards.splice(destination.index, 0, movedCard)
         const updatedLines = cards.map((line: any) => {
           if (line.status == source.droppableId) {
@@ -261,7 +272,8 @@ async function getDataTask(project_id:number){
         )
         const sourceCards = Array.from(sourceLine.task_list)
         const destinationCards = Array.from(destinationLine.task_list)
-        const [movedCard] = sourceCards.splice(source.index, 1)
+        let [movedCard]:any = sourceCards.splice(source.index, 1)
+        movedCard = { ...movedCard, position: positionTask };
         destinationCards.splice(destination.index, 0, movedCard)
   
         const updatedLines = cards.map((line: any) => {
@@ -278,7 +290,7 @@ async function getDataTask(project_id:number){
       }
      }
   }
-
+console.log(cards);
   // create Modal
   const [modall, setModall] = useState<boolean>(false)
 
@@ -525,7 +537,7 @@ async function getDataTask(project_id:number){
                       <div className="flex-grow-1">
                         <h6 className="fs-14 text-uppercase fw-semibold mb-0">{line.status_name} </h6>
                       </div>
-                      <div className="flex-shrink-0">
+                      {/* <div className="flex-shrink-0">
                         <UncontrolledDropdown className="card-header-dropdown float-end">
                           <DropdownToggle
                             className="text-reset dropdown-btn"
@@ -539,7 +551,7 @@ async function getDataTask(project_id:number){
                             <DropdownItem>Date Added</DropdownItem>
                           </DropdownMenu>
                         </UncontrolledDropdown>
-                      </div>
+                      </div> */}
                     </div>
                     {/* data */}
                     <SimpleBar className="tasks-wrapper px-3 mx-n3">
@@ -646,7 +658,7 @@ async function getDataTask(project_id:number){
                                           <div className="card-footer border-top-dashed">
                                             <div className="d-flex">
                                               <div className="flex-grow-1">
-                                                <span className="text-muted"><i className="ri-time-line align-bottom"></i>{moment(task.create_at).format("DD MMM, YYYY")}</span>
+                                                <span className="text-muted"><i className="ri-time-line align-bottom"></i>{moment(task.due_date).format("DD MMM, YYYY")}</span>
                                               </div>
 
                                             </div>

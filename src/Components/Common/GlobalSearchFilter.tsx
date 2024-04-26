@@ -455,9 +455,10 @@ const TaskListGlobalFilter = ({ handleFilterClick ,handleDateChange,handleStatus
                         onChange={handleStatusClick}
                     >
                         <option value="">Status</option>
-                        <option value="">All</option>
+                        <option value="0">Unassigned</option>
                         <option value="1">Pending</option>
                         <option value="2">Inprogress</option>
+                        <option value="3">Complete</option>
                         {/* <option value="3">Completed</option> */}
                     </select>
                 </div>
