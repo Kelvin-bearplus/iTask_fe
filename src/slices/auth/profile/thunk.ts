@@ -15,6 +15,7 @@ export const editProfile = (user : any,id:internal) => async (dispatch : any) =>
       const url=getUserProfile+'/'+id;
     const   dataResponse=await api.update(url,user)
       if (dataResponse.data){
+        console.log("khanh de");
         const success={
        data:   "Change Profile Success"};
         dispatch(profileSuccess(success))
@@ -23,6 +24,7 @@ export const editProfile = (user : any,id:internal) => async (dispatch : any) =>
        const error='Change Profile Failed'
         dispatch(profileError(error));
       }
+      return dataResponse;
     } catch (error) {
         dispatch(profileError(error));
     }

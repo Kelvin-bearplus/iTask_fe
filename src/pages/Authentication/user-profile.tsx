@@ -7,13 +7,14 @@ import * as Yup from "yup";
 import { useFormik } from "formik";
 //import images
 import progileBg from '../../assets/images/profile-bg.jpg';
-import avatar1 from '../../assets/images/users/avatar-1.jpg';
+import avatar1 from '../../assets/images/users/anh_mac_dinh.jpg';
 import { editProfile, resetProfileFlag, getUserProfileByEmail, getPathImage,changePasswordUser } from "../../slices/thunks";
 import { useSelector, useDispatch } from "react-redux";
 import { createSelector } from "reselect";
 import internal from "stream";
 import DatePicker from "react-flatpickr";
 import{ formatDateCreateProject} from"../../helpers/format";
+import { title } from 'process';
 
 const Settings = () => {
     const [activeTab, setActiveTab] = useState("1");
@@ -24,15 +25,15 @@ const Settings = () => {
     const dispatch: any = useDispatch();
     interface UserInfo {
         id?: internal,
-        "profile_ava_url": string;
+        "profile_ava_url"?: string;
         "username": string;
         "full_name": string;
         "address": string;
         "phone": string;
         "dob": string;
-        "bio": string;
-      "profile_cover_url":string
-
+        "bio"?: string;
+      "profile_cover_url"?:string
+      "title"?:string
     }
     const initialUserInfo: UserInfo = {
         profile_cover_url:"",
@@ -43,6 +44,7 @@ const Settings = () => {
         phone: "",
         dob: "",
         bio: "",
+        title:""
     };
     const initData:Date=new Date();
  const [dataStart,setDataStart]=useState<Date>(initData);
@@ -71,7 +73,14 @@ const Settings = () => {
         var file = e.target.files[0];
         // console.log("khanh"); 
         var urlThumbnail = await getPathImage(file);
-        urlThumbnail = "https://" + urlThumbnail;
+        // urlThumbnail = "https://" + urlThumbnail;
+        if(urlThumbnail){
+            if (userInfoApi.id) {
+                dispatch(editProfile({profile_ava_url:urlThumbnail}, userInfoApi.id));
+            localStorage.setItem('user_avatar_url', urlThumbnail);
+
+            }
+        }
         console.log(urlThumbnail)
         setThumbnail(urlThumbnail);
     }
@@ -79,7 +88,14 @@ const Settings = () => {
         var file = e.target.files[0];
         // console.log("khanh"); 
         var urlThumbnail = await getPathImage(file);
-        urlThumbnail = "https://" + urlThumbnail;
+        // urlThumbnail = "https://" + urlThumbnail;
+        
+    if(urlThumbnail){
+        if (userInfoApi.id) {
+            dispatch(editProfile({profile_cover_url:urlThumbnail}, userInfoApi.id));
+
+        }
+    }
         console.log(urlThumbnail)
         setThumbnailCover(urlThumbnail);
     }
@@ -89,12 +105,16 @@ const Settings = () => {
     } = useSelector(userprofileData);
     const [dob, setDob] = useState<string>("");
     const [name, setName] = useState<string>("");
+    const [checkProfile,setCheckProfile]=useState(0);
     const fetchUserProfile = async () => {
         try {
             // console.log(userInfo.email)
             const storedUser = await dispatch(getUserProfileByEmail(userInfo));
             // return storedUser;
             if (storedUser) {
+                const count=countEmptyFields(storedUser);
+                setCheckProfile(Math.floor(count/13*100));
+
                 setUserInfoApi(storedUser);
                 const dob_avai = new Date(storedUser.dob);
                 setThumbnail(storedUser.profile_ava_url);
@@ -159,6 +179,35 @@ const Settings = () => {
             }
         }
     )
+    const validationChangeExperient=useFormik(
+        {
+            enableReinitialize: true,
+
+            initialValues: {
+              title:userInfoApi.title,
+              bio:userInfoApi.bio
+            },
+            validationSchema: Yup.object({
+                title: Yup.string().required("Please Enter Your Title Job"),
+                
+            }),
+            onSubmit: async(values) => {
+                var infoSubmit = {
+                    title:values.title,
+                    bio:values.bio,
+                }
+                if (userInfoApi.id) {
+                   const dataResponse= await dispatch(editProfile(infoSubmit, userInfoApi.id));
+                    if(dataResponse.data){
+                        setTimeout(()=>{
+                            refreshData();
+                        },1000)
+                      }
+                }
+    
+            }
+        }
+    )
     const validation = useFormik({
         // enableReinitialize : use this flag when initial values needs to be changed
         enableReinitialize: true,
@@ -168,7 +217,7 @@ const Settings = () => {
             username: userInfoApi.username,
             phone: userInfoApi.phone,
             address: userInfoApi.address,
-            bio: userInfoApi.bio,
+            // bio: userInfoApi.bio,
 
         },
         validationSchema: Yup.object({
@@ -179,29 +228,60 @@ const Settings = () => {
                 .max(15, 'Phone number must not exceed 15 characters'),
             email: Yup.string().email('Invalid email'),
         }),
-        onSubmit: (values) => {
+        onSubmit:async (values) => {
             var infoSubmit: UserInfo = {
-                profile_ava_url: thumbnail,
-                profile_cover_url: thumbnailCover,
                 full_name: values.full_name,
                 username: values.username,
                 phone: values.phone,
                 address: values.address,
-                bio: values.bio,
+                // bio: values.bio,
                 dob: selectedDate,
             }
             if (userInfoApi.id) {
                 localStorage.setItem('user_avatar_url', thumbnail);
                 localStorage.setItem('user_name', values.full_name);
-                dispatch(editProfile(infoSubmit, userInfoApi.id));
+                console.log(infoSubmit);
+              const dataResponse=await  dispatch(editProfile(infoSubmit, userInfoApi.id));
+              console.log(dataResponse);
+              if(dataResponse.data){
                 setTimeout(()=>{
-                    window.location.reload();
-                },2000)
+                    refreshData();
+                },1000)
+              }
+                // setTimeout(()=>{
+                //     window.location.reload();
+                // },2000)
             }
 
         }
     });
-
+    function countEmptyFields(obj:any) {
+        let count = 0;
+        for (const key in obj) {
+            if (Object.prototype.hasOwnProperty.call(obj, key)) {
+                if (typeof obj[key] === 'string' && obj[key].trim() !== '') {
+                    count++;
+                }
+            }
+        }
+        return count;
+    }
+   async function refreshData(){
+    const data= await dispatch(getUserProfileByEmail(userInfo));
+    console.log(data);
+    if(data){
+        const count=countEmptyFields(data);
+        setCheckProfile(Math.floor(count/13*100));
+        setUserInfoApi(data);
+        const dob_avai = new Date(data.dob);
+        setThumbnail(data.profile_ava_url);
+        setThumbnailCover(data.profile_cover_url);
+        setSelectedDate(formatDateCreateProject(dob_avai))
+        setDataStart(dob_avai)
+        setName(data.full_name)
+    
+    }
+   }
     function formatDateToApi(date: Date): string {
         const day = String(date.getDate()).padStart(2, '0');
         const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -262,8 +342,8 @@ console.log("khanh123")
                                                 </Label>
                                             </div>
                                         </div>
-                                        <h5 className="fs-16 mb-1">{name}</h5>
-                                        <p className="text-muted mb-0">Lead Designer / Developer</p>
+                                        <h5 className="fs-16 mb-1">{userInfoApi.full_name}</h5>
+                                        <p className="text-muted mb-0">{userInfoApi.title}</p>
                                     </div>
                                 </CardBody>
                             </Card>
@@ -279,11 +359,11 @@ console.log("khanh123")
                                                 className="ri-edit-box-line align-bottom me-1"></i> Edit</Link>
                                         </div>
                                     </div>
-                                    <div className="progress animated-progress custom-progress progress-label">
-                                        <div className="progress-bar bg-danger" role="progressbar" style={{ "width": "30%" }}>
-                                            <div className="label">30%</div>
+                                       <div className="progress animated-progress custom-progress progress-label">
+                                        <div className="progress-bar bg-danger" role="progressbar" style={{ width: `${checkProfile}%` }}>
+                                            <div className="label">{checkProfile}%</div>
                                         </div>
-                                    </div>
+                                        </div>
                                 </CardBody>
                             </Card>
                             <Card>
@@ -347,7 +427,7 @@ console.log("khanh123")
                                                 className={classnames({ active: activeTab === "1" })}
                                                 onClick={() => {
                                                     tabChange("1");
-                                                }}>
+                                                }} type="button">
                                                 <i className="fas fa-home"></i>
                                                 Personal Details
                                             </NavLink>
@@ -374,17 +454,7 @@ console.log("khanh123")
                                                 Experience
                                             </NavLink>
                                         </NavItem>
-                                        <NavItem>
-                                            <NavLink to="#"
-                                                className={classnames({ active: activeTab === "4" })}
-                                                onClick={() => {
-                                                    tabChange("4");
-                                                }}
-                                                type="button">
-                                                <i className="far fa-envelope"></i>
-                                                Privacy Policy
-                                            </NavLink>
-                                        </NavItem>
+                                       
                                     </Nav>
                                 </CardHeader>
                                 <CardBody className="p-4">
@@ -507,23 +577,7 @@ console.log("khanh123")
                                                             {/* <Input name="idx" value={idx} type="hidden" /> */}
                                                         </div>
                                                     </Col>
-                                                    <Col xs={12} md={6}>
-                                                        <div className="form-group">
-                                                            <Label className="form-label">BIO</Label>
-                                                            <textarea
-                                                                name="bio"
-                                                                // value={name}
-                                                                className="form-control"
-                                                                placeholder="Enter your BIO"
-                                                                onChange={validation.handleChange}
-                                                                onBlur={validation.handleBlur}
-                                                                value={validation.values.bio || ""}
-
-                                                            />
-
-                                                            {/* <Input name="idx" value={idx} type="hidden" /> */}
-                                                        </div>
-                                                    </Col>
+                                                    
                                                 </Row>
 
 
@@ -537,6 +591,7 @@ console.log("khanh123")
                                         </TabPane>
 
                                         <TabPane tabId="2">
+                                       
                                             <Form
                                                 className="form-horizontal"
                                                 onSubmit={(e) => {
@@ -612,7 +667,7 @@ console.log("khanh123")
 
                                                     <Col lg={12}>
                                                         <div className="mb-3">
-                                                            <Link to="#"
+                                                            <Link to="/forgot-password"
                                                                 className="link-primary text-decoration-underline">Forgot
                                                                 Password ?</Link>
                                                         </div>
@@ -697,7 +752,21 @@ console.log("khanh123")
                                         </TabPane>
 
                                         <TabPane tabId="3">
-                                            <form>
+                                        {error && error ? (
+                                                    <Alert color="danger"><div>
+                                                        {error} </div></Alert>
+                                                ) : null}
+                                                {success && success ? (
+                                                    <Alert color="success"><div>
+                                                        {success} </div></Alert>
+                                                ) : null}
+                                            <Form
+                                            onSubmit={(e) => {
+                                                e.preventDefault();
+                                                validationChangeExperient.handleSubmit();
+                                                return false;
+                                            }}
+                                            >
                                                 <div id="newlink">
                                                     <div id="1">
                                                         <Row>
@@ -705,9 +774,11 @@ console.log("khanh123")
                                                                 <div className="mb-3">
                                                                     <Label htmlFor="jobTitle" className="form-label">Job
                                                                         Title</Label>
-                                                                    <Input type="text" className="form-control"
-                                                                        id="jobTitle" placeholder="Job title"
-                                                                        defaultValue="Fouder" />
+                                                                    <Input type="text" className="form-control" name='title'
+                                                                        id="jobTitle" placeholder="Job title" value={validationChangeExperient.values.title || ""}
+                                                                        onChange={validationChangeExperient.handleChange}
+                                                                onBlur={validationChangeExperient.handleBlur}
+                                                                        />
                                                                 </div>
                                                             </Col>
 
@@ -794,23 +865,23 @@ console.log("khanh123")
                                                                 </div>
                                                             </Col>
 
-                                                            <Col lg={12}>
-                                                                <div className="mb-3">
-                                                                    <Label htmlFor="jobDescription" className="form-label">Job
-                                                                        Description</Label>
-                                                                    <Input type='textarea'
-                                                                        className="form-control" id="jobDescription"
-                                                                        rows="3"
-                                                                        placeholder='Enter description'
-                                                                        defaultValue="You always want to make sure that your fonts work well together and try to limit the number of fonts you use to three or less. Experiment and play around with the fonts that you already have in the software you're working with reputable font websites."
-                                                                    />
-                                                                </div>
-                                                            </Col>
+                                                            <Col xs={12} >
+                                                        <div className="form-group">
+                                                            <Label className="form-label">BIO</Label>
+                                                            <textarea
+                                                                name="bio"
+                                                                // value={name}
+                                                                className="form-control"
+                                                                placeholder="Enter your BIO"
+                                                                onChange={validationChangeExperient.handleChange}
+                                                                onBlur={validationChangeExperient.handleBlur}
+                                                                value={validationChangeExperient.values.bio || ""}
 
-                                                            <div className="hstack gap-2 justify-content-end">
-                                                                <Link className="btn btn-success"
-                                                                    to="#">Delete</Link>
-                                                            </div>
+                                                            />
+                                                        </div>
+                                                    </Col>
+
+                                                            
                                                         </Row>
                                                     </div>
                                                 </div>
@@ -818,162 +889,12 @@ console.log("khanh123")
                                                 </div>
 
                                                 <Col lg={12}>
-                                                    <div className="hstack gap-2">
+                                                    <div className="hstack gap-2 mt-4">
                                                         <button type="submit" className="btn btn-success">Update</button>
-                                                        <Link to="#" className="btn btn-primary">Add
-                                                            New</Link>
+                                                        
                                                     </div>
                                                 </Col>
-                                            </form>
-                                        </TabPane>
-
-                                        <TabPane tabId="4">
-                                            <div className="mb-4 pb-2">
-                                                <h5 className="card-title text-decoration-underline mb-3">Security:</h5>
-                                                <div className="d-flex flex-column flex-sm-row mb-4 mb-sm-0">
-                                                    <div className="flex-grow-1">
-                                                        <h6 className="fs-14 mb-1">Two-factor Authentication</h6>
-                                                        <p className="text-muted">Two-factor authentication is an enhanced
-                                                            security meansur. Once enabled, you'll be required to give
-                                                            two types of identification when you log into Google
-                                                            Authentication and SMS are Supported.</p>
-                                                    </div>
-                                                    <div className="flex-shrink-0 ms-sm-3">
-                                                        <Link to="#"
-                                                            className="btn btn-sm btn-primary">Enable Two-facor
-                                                            Authentication</Link>
-                                                    </div>
-                                                </div>
-                                                <div className="d-flex flex-column flex-sm-row mb-4 mb-sm-0 mt-2">
-                                                    <div className="flex-grow-1">
-                                                        <h6 className="fs-14 mb-1">Secondary Verification</h6>
-                                                        <p className="text-muted">The first factor is a password and the
-                                                            second commonly includes a text with a code sent to your
-                                                            smartphone, or biometrics using your fingerprint, face, or
-                                                            retina.</p>
-                                                    </div>
-                                                    <div className="flex-shrink-0 ms-sm-3">
-                                                        <Link to="#" className="btn btn-sm btn-primary">Set
-                                                            up secondary method</Link>
-                                                    </div>
-                                                </div>
-                                                <div className="d-flex flex-column flex-sm-row mb-4 mb-sm-0 mt-2">
-                                                    <div className="flex-grow-1">
-                                                        <h6 className="fs-14 mb-1">Backup Codes</h6>
-                                                        <p className="text-muted mb-sm-0">A backup code is automatically
-                                                            generated for you when you turn on two-factor authentication
-                                                            through your iOS or Android Twitter app. You can also
-                                                            generate a backup code on twitter.com.</p>
-                                                    </div>
-                                                    <div className="flex-shrink-0 ms-sm-3">
-                                                        <Link to="#"
-                                                            className="btn btn-sm btn-primary">Generate backup codes</Link>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div className="mb-3">
-                                                <h5 className="card-title text-decoration-underline mb-3">Application Notifications:</h5>
-                                                <ul className="list-unstyled mb-0">
-                                                    <li className="d-flex">
-                                                        <div className="flex-grow-1">
-                                                            <label htmlFor="directMessage"
-                                                                className="form-check-label fs-14">Direct messages</label>
-                                                            <p className="text-muted">Messages from people you follow</p>
-                                                        </div>
-                                                        <div className="flex-shrink-0">
-                                                            <div className="form-check form-switch">
-                                                                <Input className="form-check-input" type="checkbox"
-                                                                    role="switch" id="directMessage" defaultChecked />
-                                                            </div>
-                                                        </div>
-                                                    </li>
-                                                    <li className="d-flex mt-2">
-                                                        <div className="flex-grow-1">
-                                                            <Label className="form-check-label fs-14"
-                                                                htmlFor="desktopNotification">
-                                                                Show desktop notifications
-                                                            </Label>
-                                                            <p className="text-muted">Choose the option you want as your
-                                                                default setting. Block a site: Next to "Not allowed to
-                                                                send notifications," click Add.</p>
-                                                        </div>
-                                                        <div className="flex-shrink-0">
-                                                            <div className="form-check form-switch">
-                                                                <Input className="form-check-input" type="checkbox"
-                                                                    role="switch" id="desktopNotification" defaultChecked />
-                                                            </div>
-                                                        </div>
-                                                    </li>
-                                                    <li className="d-flex mt-2">
-                                                        <div className="flex-grow-1">
-                                                            <Label className="form-check-label fs-14"
-                                                                htmlFor="emailNotification">
-                                                                Show email notifications
-                                                            </Label>
-                                                            <p className="text-muted"> Under Settings, choose Notifications.
-                                                                Under Select an account, choose the account to enable
-                                                                notifications for. </p>
-                                                        </div>
-                                                        <div className="flex-shrink-0">
-                                                            <div className="form-check form-switch">
-                                                                <Input className="form-check-input" type="checkbox"
-                                                                    role="switch" id="emailNotification" />
-                                                            </div>
-                                                        </div>
-                                                    </li>
-                                                    <li className="d-flex mt-2">
-                                                        <div className="flex-grow-1">
-                                                            <Label className="form-check-label fs-14"
-                                                                htmlFor="chatNotification">
-                                                                Show chat notifications
-                                                            </Label>
-                                                            <p className="text-muted">To prevent duplicate mobile
-                                                                notifications from the Gmail and Chat apps, in settings,
-                                                                turn off Chat notifications.</p>
-                                                        </div>
-                                                        <div className="flex-shrink-0">
-                                                            <div className="form-check form-switch">
-                                                                <Input className="form-check-input" type="checkbox"
-                                                                    role="switch" id="chatNotification" />
-                                                            </div>
-                                                        </div>
-                                                    </li>
-                                                    <li className="d-flex mt-2">
-                                                        <div className="flex-grow-1">
-                                                            <Label className="form-check-label fs-14"
-                                                                htmlFor="purchaesNotification">
-                                                                Show purchase notifications
-                                                            </Label>
-                                                            <p className="text-muted">Get real-time purchase alerts to
-                                                                protect yourself from fraudulent charges.</p>
-                                                        </div>
-                                                        <div className="flex-shrink-0">
-                                                            <div className="form-check form-switch">
-                                                                <Input className="form-check-input" type="checkbox"
-                                                                    role="switch" id="purchaesNotification" />
-                                                            </div>
-                                                        </div>
-                                                    </li>
-                                                </ul>
-                                            </div>
-                                            <div>
-                                                <h5 className="card-title text-decoration-underline mb-3">Delete This
-                                                    Account:</h5>
-                                                <p className="text-muted">Go to the Data & Privacy section of your profile
-                                                    Account. Scroll to "Your data & privacy options." Delete your
-                                                    Profile Account. Follow the instructions to delete your account :
-                                                </p>
-                                                <div>
-                                                    <Input type="password" className="form-control" id="passwordInput"
-                                                        placeholder="Enter your password" defaultValue="make@321654987"
-                                                        style={{ maxWidth: "265px" }} />
-                                                </div>
-                                                <div className="hstack gap-2 mt-3">
-                                                    <Link to="#" className="btn btn-soft-danger">Close &
-                                                        Delete This Account</Link>
-                                                    <Link to="#" className="btn btn-light">Cancel</Link>
-                                                </div>
-                                            </div>
+                                            </Form>
                                         </TabPane>
                                     </TabContent>
                                 </CardBody>

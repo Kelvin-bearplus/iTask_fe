@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react"
 import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 import { CKEditor } from "@ckeditor/ckeditor5-react";
-
+import avt_default from '../../../assets/images/users/anh_mac_dinh.jpg';
 import {
   Card,
   CardBody,
@@ -26,7 +26,7 @@ import Select from "react-select";
 
 
 import {
- getTasksKanban,
+  getTasksKanban,
   addCardData as onAddCardData,
   updateCardData as onUpdateCardData,
   deleteKanban as OnDeleteKanban,
@@ -149,7 +149,7 @@ const TasksKanban: React.FC<prop> = (props) => {
       name: '',
       description: '',
       dueDate: '',
-      status: kanbanTasksCards?kanbanTasksCards:'0',
+      status: kanbanTasksCards ? kanbanTasksCards : '0',
       priority: '1',
       assignees: [],
       // project:'',
@@ -205,15 +205,15 @@ const TasksKanban: React.FC<prop> = (props) => {
 
   const [isLoading, setLoading] = useState<boolean>(loading)
   const [cards, setCards] = useState<any>([])
-async function getDataTask(project_id:number){
-  const dataResponse= await dispatch(getTasksKanban(project_id));
-  console.log(dataResponse.payload)
-  if(dataResponse.payload){
-    setCards(dataResponse.payload.data)
+  async function getDataTask(project_id: number) {
+    const dataResponse = await dispatch(getTasksKanban(project_id));
+    console.log(dataResponse.payload)
+    if (dataResponse.payload) {
+      setCards(dataResponse.payload.data)
+    }
   }
-}
   useEffect(() => {
-   getDataTask(props.project_id);
+    getDataTask(props.project_id);
   }, [dispatch])
 
 
@@ -223,37 +223,37 @@ async function getDataTask(project_id:number){
 
   const handleDragEnd = async (result: any) => {
     console.log(result)
-     if (result.destination!=null){
-      
+    if (result.destination != null) {
+
       if (!result.destination) return // If dropped outside a valid drop area, do nothing
       const indexDestination = result.destination.index;
       const { source, destination } = result
       // const positionTask=cards[destination]
-      let positionTask:number=0.000;
-    cards.map((card:any) => {
-    if(card.status==destination.droppableId){
-      const idCardTaskPrev=card.task_list[indexDestination-1]?card.task_list[indexDestination-1].position:0;
-      const idCardTaskNext=card.task_list[indexDestination]?card.task_list[indexDestination].position:1;
-     positionTask= (idCardTaskPrev+idCardTaskNext)/2;
-    }
-    })
-      if(source.droppableId!=destination.droppableId|| source.index!=destination.index){
-        const data={
-          id:parseInt(result.draggableId),
-          task:{
-            project_id:props.project_id,
-            status:parseInt(result.destination.droppableId),
-            position:positionTask
+      let positionTask: number = 0.000;
+      cards.map((card: any) => {
+        if (card.status == destination.droppableId) {
+          const idCardTaskPrev = card.task_list[indexDestination - 1] ? card.task_list[indexDestination - 1].position : 0;
+          const idCardTaskNext = card.task_list[indexDestination] ? card.task_list[indexDestination].position : 1;
+          positionTask = (idCardTaskPrev + idCardTaskNext) / 2;
+        }
+      })
+      if (source.droppableId != destination.droppableId || source.index != destination.index) {
+        const data = {
+          id: parseInt(result.draggableId),
+          task: {
+            project_id: props.project_id,
+            status: parseInt(result.destination.droppableId),
+            position: positionTask
           }
-         }
-        const dataResponse=  dispatch(updateTask(data));
+        }
+        const dataResponse = dispatch(updateTask(data));
         console.log(positionTask);
       }
       // Reorder cards within the same card line
       if (source.droppableId == destination.droppableId) {
         const line = cards.find((line: any) => line.status == source.droppableId)
         const reorderedCards = Array.from(line.task_list)
-        let [movedCard]:any = reorderedCards.splice(source.index, 1);
+        let [movedCard]: any = reorderedCards.splice(source.index, 1);
         movedCard = { ...movedCard, position: positionTask };
         reorderedCards.splice(destination.index, 0, movedCard)
         const updatedLines = cards.map((line: any) => {
@@ -272,25 +272,25 @@ async function getDataTask(project_id:number){
         )
         const sourceCards = Array.from(sourceLine.task_list)
         const destinationCards = Array.from(destinationLine.task_list)
-        let [movedCard]:any = sourceCards.splice(source.index, 1)
+        let [movedCard]: any = sourceCards.splice(source.index, 1)
         movedCard = { ...movedCard, position: positionTask };
         destinationCards.splice(destination.index, 0, movedCard)
-  
+
         const updatedLines = cards.map((line: any) => {
           if (line.status == source.droppableId) {
             return { ...line, task_list: sourceCards }
           } else if (line.status == destination.droppableId) {
             return { ...line, task_list: destinationCards }
           }
-  
+
           return line
         })
-  
+
         setCards(updatedLines)
       }
-     }
+    }
   }
-console.log(cards);
+  console.log(cards);
   // create Modal
   const [modall, setModall] = useState<boolean>(false)
 
@@ -358,10 +358,10 @@ console.log(cards);
   // Add Modal
 
   async function refreshTaskList() {
-    const dataResponse =await dispatch(getTasksKanban(props.project_id));
+    const dataResponse = await dispatch(getTasksKanban(props.project_id));
     console.log(dataResponse)
-    if(dataResponse.payload.data){
-    setCards(dataResponse.payload.data)
+    if (dataResponse.payload.data) {
+      setCards(dataResponse.payload.data)
 
     }
   }
@@ -446,9 +446,9 @@ console.log(cards);
     setIsEdit(false)
     toggleCreate()
     setKanbanTasksCards(line.status)
-    
+
   };
-// console.log(kanbanTasksCards)
+  // console.log(kanbanTasksCards)
   const [images, setImages] = useState<any>([])
 
   const [deleteModal, setDeleteModal] = useState<boolean>(false);
@@ -458,15 +458,15 @@ console.log(cards);
     setDeleteModal(true);
   };
 
-  const handleDeleteCard =async () => {
+  const handleDeleteCard = async () => {
     if (cardIdDelete) {
       console.log("card ===", cardIdDelete);
 
-    const dataResponse= await dispatch(deleteTask(cardIdDelete));
-    console.log(dataResponse)
-    if(dataResponse.payload){
-      refreshTaskList();
-    }
+      const dataResponse = await dispatch(deleteTask(cardIdDelete));
+      console.log(dataResponse)
+      if (dataResponse.payload) {
+        refreshTaskList();
+      }
       setDeleteModal(false);
     }
   };
@@ -488,7 +488,7 @@ console.log(cards);
     <React.Fragment>
       <DeleteModal
         show={deleteModal}
-        onDeleteClick={()=>handleDeleteCard()}
+        onDeleteClick={() => handleDeleteCard()}
         onCloseClick={() => setDeleteModal(false)}
       />
 
@@ -529,7 +529,7 @@ console.log(cards);
         {
           isLoading ? <Spinners setLoading={setLoading} /> :
             <DragDropContext onDragEnd={handleDragEnd}>
-              {cards.length>0 &&(cards || []).map((line: KanbanColumn) => {
+              {cards.length > 0 && (cards || []).map((line: KanbanColumn) => {
                 return (
                   // header line
                   <div className="tasks-list" key={parseInt(line.status)}>
@@ -625,13 +625,14 @@ console.log(cards);
                                                 </Link>
                                               </h6>
                                             </div>
-                                            <div className="text-muted" dangerouslySetInnerHTML= {{ __html: task.description }}>
-                                            
+                                            <div className="text-muted" dangerouslySetInnerHTML={{ __html: task.description }}>
                                             </div>
-
-                                            {/* {task.assignees.leng>0 ?
-                                              <div className="tasks-img rounded mb-2" style={{ backgroundImage: `url(${task.picture})`, height: "135px" }}>
-                                              </div> : ""} */}
+                                            <div className="d-flex justify-content-end">
+                                            {task.assignees.length > 0 && task.assignees.map((item: any, key: any) => {
+                                              return (<img className="tasks-img rounded mb-2" src={item.user_info.profile_ava_url?item.user_info.profile_ava_url:avt_default} title={item.user_info.full_name?item.user_info.full_name:"New user"} />)
+                                            })
+                                            }
+                                            </div>
                                             {
                                               <div className="d-flex align-items-center">
                                                 {/* <div className="flex-grow-1">

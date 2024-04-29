@@ -165,23 +165,23 @@ const Navdata = () => {
                         { id: 3, label: "Create Project", link: "/apps-projects-create", parentId: "apps", },
                     ]
                 },
-                {
-                    id: "tasks",
-                    label: "Tasks",
-                    link: "/#",
-                    isChildItem: true,
-                    click: function (e: any) {
-                        e.preventDefault();
-                        setIsTasks(!isTasks);
-                    },
-                    parentId: "apps",
-                    stateVariables: isTasks,
-                    childItems: [
-                        { id: 1, label: "Kanban Board", link: "/apps-tasks-kanban", parentId: "apps", },
-                        { id: 2, label: "List View", link: "/apps-tasks-list-view", parentId: "apps", },
-                        // { id: 3, label: "Task Details", link: "/apps-tasks-details", parentId: "apps", },
-                    ]
-                },
+                // {
+                //     id: "tasks",
+                //     label: "Tasks",
+                //     link: "/#",
+                //     isChildItem: true,
+                //     click: function (e: any) {
+                //         e.preventDefault();
+                //         setIsTasks(!isTasks);
+                //     },
+                //     parentId: "apps",
+                //     stateVariables: isTasks,
+                //     childItems: [
+                //         { id: 1, label: "Kanban Board", link: "/apps-tasks-kanban", parentId: "apps", },
+                //         { id: 2, label: "List View", link: "/apps-tasks-list-view", parentId: "apps", },
+                //         // { id: 3, label: "Task Details", link: "/apps-tasks-details", parentId: "apps", },
+                //     ]
+                // },
               
             ],
         },

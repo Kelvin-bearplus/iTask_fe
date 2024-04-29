@@ -126,7 +126,7 @@ const getThumbnail = async (e:any) => {
         // console.log(formData);
        
         var urlThumbnail = await getPathImage(file);
-        urlThumbnail="https://"+urlThumbnail;
+        // urlThumbnail="https://"+urlThumbnail;
         console.log(urlThumbnail)
         setThumbnail(urlThumbnail);
 }
@@ -282,6 +282,7 @@ document.title="Create Project For My Team";
                                                         handleMulti(selectedMulti);
                                                     }}
                                                     options={SingleOptions}
+                                                    // onInputChange={handleInputChange}
                                                 />
                                                 {/* <div onClick={khanh}>check</div> */}
                                             </div>

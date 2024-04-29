@@ -14,7 +14,7 @@ const ProfileSlice = createSlice({
     profileSuccess(state, action) {
       state.success = action.payload.data;
       // console.log(state.success);
-      state.user = action.payload.data
+      state.user = action.payload
       // setTimeout(() => window.location.reload(), 1000)
     },
     profileError(state, action) {

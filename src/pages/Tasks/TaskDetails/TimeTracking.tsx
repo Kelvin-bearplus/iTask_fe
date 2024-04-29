@@ -234,9 +234,9 @@ const TimeTracking = (dataTask: any) => {
                 <div className="card-body">
                     <div className="d-flex mb-3">
                         <h6 className="card-title mb-0 flex-grow-1" >Assigned To</h6>
-                        <div className="flex-shrink-0">
+                        {/* <div className="flex-shrink-0">
                             <button type="button" className="btn btn-soft-danger btn-sm" onClick={() => { toggleModal(); }}><i className="ri-share-line me-1 align-bottom"></i> Assigned Member</button>
-                        </div>
+                        </div> */}
                     </div>
                     <ul className="list-unstyled vstack gap-3 mb-0">
                         {listMemberAssignees && listMemberAssignees.map((member: any, index: number) => {

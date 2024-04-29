@@ -25,3 +25,12 @@ File: Custom Css File
 .__reply{
   cursor: pointer;
 }
+.tasks-img.rounded {
+  width: 40px;
+  height: 40px;
+  border-radius: 50% !important;
+  object-fit: cover;
+  object-position: center;
+  margin-right: 5px;
+  
+}
