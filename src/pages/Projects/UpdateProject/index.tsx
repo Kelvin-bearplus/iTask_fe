@@ -110,7 +110,7 @@ const UpdateProject = () => {
     useEffect(() => {
         if (toastData) {
             setTimeout(() => {
-                window.location.reload();
+                window.location.href='/apps-projects-overview?id='+id;
             }, 2000)
         }
         setTimeout(() => {

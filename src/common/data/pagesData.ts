@@ -863,7 +863,7 @@ const video = [
         title: "Create Responsive Admin Dashboard using Html CSS",
         siteLink: "https://themesbrand.com/velzon/index.html",
         videoLink: "https://www.youtube.com/embed/Z-fV2lGKnnU",
-        description: "Velzon admin is super flexible, powerful, clean, modern & responsive admin template based on bootstrap 5 stable with unlimited possibilities. You can simply change to any layout or mode by changing a couple of lines of code. You can start small and large projects or update design in your existing project using Velzon it is very quick and easy as it is beautiful, adroit, and delivers the ultimate user experience.",
+        description: "iTask admin is super flexible, powerful, clean, modern & responsive admin template based on bootstrap 5 stable with unlimited possibilities. You can simply change to any layout or mode by changing a couple of lines of code. You can start small and large projects or update design in your existing project using Velzon it is very quick and easy as it is beautiful, adroit, and delivers the ultimate user experience.",
         likes: 485,
         comments: 167,
         auther: "Themesbrand"

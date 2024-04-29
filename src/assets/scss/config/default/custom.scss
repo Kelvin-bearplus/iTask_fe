@@ -1,5 +1,5 @@
 /*
-Template Name: Velzon - Admin & Dashboard Template
+Template Name: iTask
 Author: Themesbrand
 Website: https://themesbrand.com/
 Contact: support@themesbrand.com
@@ -33,4 +33,13 @@ File: Custom Css File
   object-position: center;
   margin-right: 5px;
   
+}
+.active_tab{
+  background-color: rgba(37, 86, 201, 0.468);
+  color: #fff !important;
+  font-weight: 600;
+}
+.active_tab::before{
+  color: #fff !important;
+  font-weight: 600;
 }

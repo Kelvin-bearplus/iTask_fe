@@ -269,7 +269,7 @@ const todoTaskList = [
 const todoCollapse = [
   {
     id: 1,
-    title: "Velzon Admin & Dashboard",
+    title: "iTask Admin & Dashboard",
     subItem: [
       { id: 1, version: "v1.4.0", iconClass: "danger" },
       { id: 2, version: "v1.5.0", iconClass: "secondary" },

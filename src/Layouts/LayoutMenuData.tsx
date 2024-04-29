@@ -1,7 +1,29 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-
+import {  useDispatch,useSelector } from "react-redux";
+import { createSelector } from 'reselect';
+import {getSimpleProject} from "../slices/thunks"
+import { useParams } from 'react-router-dom';
 const Navdata = () => {
+    const dispatch: any = useDispatch();
+    const projectData = createSelector(
+        (state : any) => state.Projects.projectLists,
+        (project) => project
+      );
+      const [projects,setProjects]=useState([]);
+      async function getProject(){
+        let limit=100;
+        const responseData=await dispatch(getSimpleProject(limit));
+        console.log(responseData);
+        if(responseData.payload){
+            setProjects(responseData.payload);
+        }
+      }
+    var project = useSelector(projectData);
+      useEffect(()=>{
+        getProject();
+      },[project])
+    // Inside your component
     const history = useNavigate();
     //state data
     const [isDashboard, setIsDashboard] = useState<boolean>(false);
@@ -20,6 +42,7 @@ const Navdata = () => {
 
     const [isProjects, setIsProjects] = useState<boolean>(false);
     const [isTasks, setIsTasks] = useState<boolean>(false);
+    const [activeTab, setActiveTab] = useState<number>(0);
 
 
     // Authentication
@@ -129,7 +152,7 @@ const Navdata = () => {
         },
         {
             id: "apps",
-            label: "Apps",
+            label: "Projects",
             icon: "ri-apps-2-line",
             link: "/#",
             click: function (e: any) {
@@ -139,49 +162,49 @@ const Navdata = () => {
                 updateIconSidebar(e);
             },
             stateVariables: isApps,
-            subItems: [
-                
-                {
-                    id: "chat",
-                    label: "Chat",
-                    link: "/apps-chat",
-                    parentId: "apps",
-                },
-             
-                {
-                    id: "appsprojects",
-                    label: "Projects",
-                    link: "/#",
-                    isChildItem: true,
+            subItems: [ 
+                ...projects.map((project:any) => ({
+                    id: project.id,
+                    label: project.name,
+                    className:`menu-item_custom ${project.id === activeTab ? "active_tab" : ""}`,
                     click: function (e: any) {
                         e.preventDefault();
                         setIsProjects(!isProjects);
+                        setActiveTab(project.id)
+                        console.log(activeTab)
+                    },
+                    link: `/apps-projects-overview/${project.id}`,
+                    // parentId: "apps",
+                })),
+                {
+                    id: "appsprojects",
+                    label: "View All",
+                    link: "/apps-projects-list",
+                    className:`menu-item_custom ${activeTab===101 ? "active_tab" : ""}`,
+                    click: function (e: any) {
+                        e.preventDefault();
+                        setIsProjects(!isProjects);
+                        setActiveTab(101)
+
                     },
                     parentId: "apps",
                     stateVariables: isProjects,
-                    childItems: [
-                        { id: 1, label: "List", link: "/apps-projects-list", parentId: "apps", },
-                        // { id: 2, label: "Overview", link: "/apps-projects-overview", parentId: "apps", },
-                        { id: 3, label: "Create Project", link: "/apps-projects-create", parentId: "apps", },
-                    ]
+                 
                 },
-                // {
-                //     id: "tasks",
-                //     label: "Tasks",
-                //     link: "/#",
-                //     isChildItem: true,
-                //     click: function (e: any) {
-                //         e.preventDefault();
-                //         setIsTasks(!isTasks);
-                //     },
-                //     parentId: "apps",
-                //     stateVariables: isTasks,
-                //     childItems: [
-                //         { id: 1, label: "Kanban Board", link: "/apps-tasks-kanban", parentId: "apps", },
-                //         { id: 2, label: "List View", link: "/apps-tasks-list-view", parentId: "apps", },
-                //         // { id: 3, label: "Task Details", link: "/apps-tasks-details", parentId: "apps", },
-                //     ]
-                // },
+                {
+                    id: "addProject",
+                    label: "Add New Project",
+                    className:`menu-item_custom ${activeTab===102 ? "active_tab" : ""}`,
+                    link: "/apps-projects-create",
+                    click: function (e: any) {
+                        e.preventDefault();
+                        setIsProjects(!isProjects);
+                        setActiveTab(102)
+
+                    },
+                    parentId: "apps",
+                    stateVariables: isProjects,
+                },
               
             ],
         },

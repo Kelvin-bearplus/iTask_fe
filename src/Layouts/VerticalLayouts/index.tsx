@@ -116,10 +116,10 @@ const VerticalLayout = (props : any) => {
                                                 {item.subItems && ((item.subItems || []).map((subItem : any, key : number) => (
                                                     <React.Fragment key={key}>
                                                         {!subItem.isChildItem ? (
-                                                            <li className="nav-item">
+                                                            <li className="nav-item" onClick={subItem.click}>
                                                                 <Link
                                                                     to={subItem.link ? subItem.link : "/#"}
-                                                                    className="nav-link"
+                                                                    className={`nav-link  ${subItem.className?subItem.className:""}`}
                                                                 >
                                                                     {props.t(subItem.label)}
                                                                     {subItem.badgeName ?
@@ -150,7 +150,7 @@ const VerticalLayout = (props : any) => {
                                                                                         <li className="nav-item">
                                                                                             <Link
                                                                                                 to={childItem.link ? childItem.link : "/#"}
-                                                                                                className="nav-link">
+                                                                                                className={`"nav-link  ${item.className?item.className:""}`}>
                                                                                                 {props.t(childItem.label)}
                                                                                             </Link>
                                                                                         </li>

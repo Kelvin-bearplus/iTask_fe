@@ -40,9 +40,9 @@ const CreateProject = () => {
     } = useSelector(projectData);
     useEffect(()=>{
         if(toastData){
-            setTimeout(()=>{
-                window.location.reload();
-            },2000)
+            // setTimeout(()=>{
+            //     window.location.reload();
+            // },2000)
         }
         setTimeout(() => {
             dispatch(resetProjectFlag());

@@ -29,18 +29,14 @@ const ProjectsSlice = createSlice({
             state.error = action.payload || null;
         });
         builder.addCase(getSimpleProject.fulfilled, (state:any, action:any) => {
-            state.projectLists = action.payload;
+            // state.projectLists = action.payload;
         });
         builder.addCase(getSimpleProject.rejected,(state:any, action:any) => {
             state.error = action.payload.error || null;
         });
         builder.addCase(addProjectList.fulfilled, (state:any, action:any) => {
-            // state.projectLists.push(action.payload.data);
             state.toastData=action.payload.toastData;
-           if (action.payload.error){
-            state.error=action.payload.error;
-           }
-           console.log(state.error)
+            state.projectLists=action.payload;
 
         });
         builder.addCase(addProjectList.rejected, (state:any, action:any) => {
@@ -48,34 +44,27 @@ const ProjectsSlice = createSlice({
             state.error = action.payload || null;
         });
         builder.addCase(getProjectById.fulfilled, (state:any, action:any) => {
-            state.projectLists.push(action.payload);
-           if (action.payload.error){
-            state.error=action.payload.error;
-           }
+            // state.projectLists=action.payload.data;
+         
         });
         builder.addCase(getProjectById.rejected, (state:any, action:any) => {
             console.log(action.payload)
             state.error = action.payload || null;
         });
         builder.addCase(updateProjectById.fulfilled, (state:any, action:any) => {
-            // state.projectLists.push(action.payload);
-           if (action.payload.error){
-            state.error=action.payload.error;
-           }
-           else{
-            state.toastData="Update success";
-           }
+    state.projectLists=action.payload;
+    state.toastData="Update Project Success"
         });
         builder.addCase(updateProjectById.rejected, (state:any, action:any) => {
             console.log(action.payload)
-            state.error = "Update Fail";
+            state.error = action.payload;
         });
 
         builder.addCase(deleteProjectList.fulfilled, (state:any, action:any) => {
-            // state.projectLists = state.projectLists.filter((project:any) => project.id.toString() !== action.payload.id.toString());
+            state.projectLists =action.payload;
         });
         builder.addCase(deleteProjectList.rejected, (state:any, action:any) => {
-            state.error = action.payload.error || null;
+            state.error = action.payload;
         });
     }
 });

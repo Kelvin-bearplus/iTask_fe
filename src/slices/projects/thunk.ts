@@ -22,8 +22,9 @@ export const getProjectList = createAsyncThunk("getListProjects", async ({ inPag
             return response;
         
 
-    } catch (error) {
-        return error;
+    }catch (error:any) {
+        var message:any = error.response.data.error.message?error.response.data.error.message:"Lỗi";
+        throw message;
     }
 });
 export const getProjectById = createAsyncThunk("getProjectById", async (id:number) => {
@@ -34,8 +35,9 @@ export const getProjectById = createAsyncThunk("getProjectById", async (id:numbe
             return response;
         
 
-    } catch (error) {
-        return error;
+    }catch (error:any) {
+        var message:any = error.response.data.error.message?error.response.data.error.message:"Lỗi";
+        throw message;
     }
 });
 export const getUninvited = createAsyncThunk("getUninvited", async ({email,projectId}:{email:string, projectId:number}) => {
@@ -59,12 +61,11 @@ export const updateProjectById = createAsyncThunk("updateProjectById", async({ i
     try {
             var url=getListProjects+'/'+id;
             const response = await api.create(url,project);
-            console.log(response);
-            return response;
-        
-
-    } catch (error) {
-        return error;
+            // console.log(response);
+            return response.data;
+    } catch (error:any) {
+        var message:any = error.response.data.error.message?error.response.data.error.message:"Lỗi";
+        throw message;
     }
 });
 export const deleteProjectList = createAsyncThunk("deleteProjectList", async(id:number) => {
@@ -72,18 +73,19 @@ export const deleteProjectList = createAsyncThunk("deleteProjectList", async(id:
             var url=getListProjects+'/'+id;
             const response = await api.deleteRequest(url);
             console.log(response);
-            return response;
+            return response.data;
         
 
-    } catch (error) {
-        return error;
+    } catch (error:any) {
+        var message:any = error.response.data.error.message?error.response.data.error.message:"Lỗi";
+        throw message;
     }
 });
 export const addProjectList = createAsyncThunk("addProject", async (project: any) => {
     try {
         console.log(project)
         const response = await api.create(getListProjects, project);
-        const data = response;
+        const data = response.data;
         
         // toast.success("project-list Added Successfully", { autoClose: 3000 });
         const dataReturn = {
@@ -92,24 +94,33 @@ export const addProjectList = createAsyncThunk("addProject", async (project: any
         }
 
         return dataReturn;
-    } catch (error) {
-        // toast.error("project-list Added Failed", { autoClose: 3000 });
-        return {
-            error: error,
-        }
+    } catch (error:any) {
+        var message:any = error.response.data.error.message?error.response.data.error.message:"Lỗi";
+        throw message;
     }
 });
 
-export const getSimpleProject = createAsyncThunk("getSimpleProject", async () => {
+export const getSimpleProject = createAsyncThunk("getSimpleProject", async (limit?:number) => {
     try {
-        const response = await api.get(simpleProjectAPI);
-        
-        // toast.success("project-list Added Successfully", { autoClose: 3000 });
+        if(limit){
+            const param ={
+                limit:limit
+            }
+            const response = await api.get(simpleProjectAPI,param);
         return response.data;
 
-    } catch (error) {
-        // toast.error("project-list Added Failed", { autoClose: 3000 });
-        return error;
+        }
+        else{
+            const response = await api.get(simpleProjectAPI);
+        return response.data;
+        }
+     
+        
+        // toast.success("project-list Added Successfully", { autoClose: 3000 });
+
+    } catch (error:any) {
+        var message:any = error.response.data.error.message?error.response.data.error.message:"Lỗi";
+        throw message;
     }
 });
 
@@ -117,23 +128,11 @@ export const resetProjectFlag = () => {
     try {
         const response = resetProjectFlagChange();
         return response;
-    } catch (error) {
-        return error;
+    } catch (error:any) {
+        var message:any = error.response.data.error.message?error.response.data.error.message:"Lỗi";
+        throw message;
     }
 };
-//   export const getPathImage=async (file:string)=>{
-// try{
-//    var fileUrl=new FormData();
-//    fileUrl.append('file', file);
-//    console.log(fileUrl);
-// const response=await api.create(uploadFile,fileUrl)
-// const data=response.data.url;
-// return data
-// }
-// catch(error){
-//     return false;
-// }
-//   }
 export const getPathImage = async (fileUrl: File) => {
     try {
         const formData = new FormData();
@@ -142,8 +141,8 @@ export const getPathImage = async (fileUrl: File) => {
         const responseApi = await api.createFile(uploadFile, formData);
         const data = responseApi.data.url;
         return data;
-    } catch (error) {
-        console.error(error);
-        // Xử lý lỗi ở đây nếu cần
+    } catch (error:any) {
+        var message:any = error.response.data.error.message?error.response.data.error.message:"Lỗi";
+        throw message;
     }
 }

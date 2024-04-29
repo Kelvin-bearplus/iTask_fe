@@ -62,7 +62,7 @@ const authProtectedRoutes = [
 
   // //Projects
   { path: "/apps-projects-list", component: <ProjectList /> },
-  { path: "/apps-projects-overview", component: <ProjectOverview /> },
+  { path: "/apps-projects-overview/:id", component: <ProjectOverview /> },
   { path: "/apps-projects-create", component: <CreateProject /> },
   { path: "/apps-projects-update", component: <UpdateProject /> },
 

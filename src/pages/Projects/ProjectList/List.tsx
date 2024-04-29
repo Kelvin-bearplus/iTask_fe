@@ -23,7 +23,8 @@ const List = () => {
         (projectLists) => projectLists
     );
     // Inside your component
-    const projectLists = useSelector(selectDashboardData);
+    // const projectLists = useSelector(selectDashboardData);
+    const [projectLists, setProjectLists] = useState<any>();
 
     const [projectId, setProjectId] = useState(0);
     const [deleteModal, setDeleteModal] = useState<boolean>(false);
@@ -33,22 +34,23 @@ const List = () => {
     const [keyWord, setKeyWord] = useState<string>("");
     const [createdDayRange, setCreatedDaRange] = useState<string>("-1");
     const limit = 8;
-    var dataProject: any = [];
-    useEffect(() => {
-        async function fetchData() {
-            //  dataProject = await dispatch(onGetProjectList({ inPage: inPage, limit: limit }));
-            dataProject = await dispatch(onGetProjectList({ inPage: inPage, limit: limit, keyword: keyWord, created_day_range: createdDayRange }));
+    async function fetchData() {
+        //  dataProject = await dispatch(onGetProjectList({ inPage: inPage, limit: limit }));
+        const dataProject = await dispatch(onGetProjectList({ inPage: inPage, limit: limit, keyword: keyWord, created_day_range: createdDayRange }));
 
-            console.log(dataProject)
-            if (dataProject.payload.paging) {
+        console.log(dataProject)
+        if (dataProject.payload) {
+            setProjectLists(dataProject.payload)
             setTotalProject(dataProject.payload.paging.total);
             setTotalPage(Math.ceil(dataProject.payload.paging.total / limit))
             setInPage(dataProject.payload.paging.page)
-            }
-
         }
+
+    }
+    useEffect(() => {
+
         fetchData();
-    }, [dispatch]);
+    }, []);
 
 
     // delete
@@ -63,7 +65,7 @@ const List = () => {
             setDeleteModal(false);
             setTimeout(() => {
                 window.location.reload();
-            },1500)
+            }, 1500)
         }
     };
 
@@ -151,25 +153,34 @@ const List = () => {
 
         }
     }
-    const handlePaging = (numberPage: number) => {
+    const handlePaging = async (numberPage: number) => {
         setInPage(numberPage);
-        console.log(inPage)
-        dispatch(onGetProjectList({ inPage: numberPage, limit: limit, keyword: keyWord, created_day_range: createdDayRange }));
-
+        console.log(numberPage)
+        const dataProject = await dispatch(onGetProjectList({ inPage: numberPage, limit: limit, keyword: keyWord, created_day_range: createdDayRange }));
+        console.log(dataProject)
+        if (dataProject.payload) {
+            setProjectLists(dataProject.payload)
+        }
     }
     const handleKeyPress = async (event: React.KeyboardEvent<HTMLInputElement>) => {
         if (event.key === 'Enter') {
             const newKeyword = event.currentTarget.value; // Lấy giá trị mới của keyword
             setKeyWord(newKeyword);
-            dataProject = await dispatch(onGetProjectList({ inPage: inPage, limit: limit, keyword: newKeyword, created_day_range: createdDayRange }));
-            setTotalPage(Math.ceil(dataProject.payload.paging.total / limit))
+            const dataProject = await dispatch(onGetProjectList({ inPage: inPage, limit: limit, keyword: newKeyword, created_day_range: createdDayRange }));
+            if (dataProject.payload) {
+                setProjectLists(dataProject.payload)
+                setTotalPage(Math.ceil(dataProject.payload.paging.total / limit))
+            }
 
         }
     };
     const handleSelectSearch: React.ChangeEventHandler<HTMLSelectElement> = async (event) => {
         setCreatedDaRange(event.currentTarget.value);
-        dataProject = await dispatch(onGetProjectList({ inPage: inPage, limit: limit, keyword: keyWord, created_day_range: event.currentTarget.value }));
-        setTotalPage(Math.ceil(dataProject.payload.paging.total / limit))
+        const dataProject = await dispatch(onGetProjectList({ inPage: inPage, limit: limit, keyword: keyWord, created_day_range: event.currentTarget.value }));
+        if (dataProject.payload) {
+            setProjectLists(dataProject.payload)
+            setTotalPage(Math.ceil(dataProject.payload.paging.total / limit))
+        }
     };
     console.log(projectLists)
     return (
@@ -201,14 +212,14 @@ const List = () => {
                             <option value="30">Last 30 Days</option>
                             <option value="365">Last Year</option>
                             <option value="0">Today</option>
-                      
+
                         </select>
                     </div>
                 </div>
             </Row>
 
             <div className="row">
-                {(projectLists.data || []).map((item: any, index: any) => (
+                {projectLists != undefined && projectLists.data.map((item: any, index: any) => (
                     <React.Fragment key={item.id}>
                         <Col xxl={3} sm={6} className="project-card">
                             <Card className="card-height-100">
@@ -231,7 +242,7 @@ const List = () => {
                                                         </DropdownToggle>
 
                                                         <DropdownMenu className="dropdown-menu-end">
-                                                            <DropdownItem href={`apps-projects-overview?id=${item.id}`}><i className="ri-eye-fill align-bottom me-2 text-muted"></i> View</DropdownItem>
+                                                            <DropdownItem href={`apps-projects-overview/${item.id}`}><i className="ri-eye-fill align-bottom me-2 text-muted"></i> View</DropdownItem>
                                                             {
                                                                 userId != null && userId == item.owner.id && (
                                                                     <DropdownItem
@@ -241,12 +252,12 @@ const List = () => {
                                                                     </DropdownItem>
                                                                 )
                                                             }
-                                                              {
+                                                            {
                                                                 userId != null && userId == item.owner.id && (
                                                                     <DropdownItem href="#" onClick={() => onClickData(item.id)} data-bs-toggle="modal" data-bs-target="#removeProjectModal"><i className="ri-delete-bin-fill align-bottom me-2 text-muted"></i> Remove</DropdownItem>
                                                                 )
                                                             }
-                                                            
+
                                                         </DropdownMenu>
                                                     </UncontrolledDropdown>
                                                 </div>
@@ -261,7 +272,7 @@ const List = () => {
                                                 </div>
                                             </div>
                                             <div className="flex-grow-1">
-                                                <h5 className="mb-1 fs-15"><div  className="text-body">{item.name}</div></h5>
+                                                <h5 className="mb-1 fs-15"><div className="text-body">{item.name}</div></h5>
                                                 <div className="text-muted text-truncate-two-lines mb-3" dangerouslySetInnerHTML={{ __html: item.description }} />
                                             </div>
                                         </div>
@@ -326,14 +337,14 @@ const List = () => {
                 ))}
 
             </div>
-            {projectLists.data &&<Row className="g-0 text-center text-sm-start align-items-center mb-4">
+            {projectLists != undefined && <Row className="g-0 text-center text-sm-start align-items-center mb-4">
                 <Col sm={6}>
                     <div>
-                        <p className="mb-sm-0 text-muted">Showing <span className="fw-semibold">{(projectLists.paging.page-1)*limit +1}</span> to <span className="fw-semibold">{((projectLists.paging.page) * limit) < projectLists.paging.total ? 
-  (projectLists.paging.page) * limit
- : (
-projectLists.paging.total
-)}</span> of <span className="fw-semibold text-decoration-underline">{projectLists.paging.total}</span> entries</p>
+                        <p className="mb-sm-0 text-muted">Showing <span className="fw-semibold">{(projectLists.paging.page - 1) * limit + 1}</span> to <span className="fw-semibold">{((projectLists.paging.page) * limit) < projectLists.paging.total ?
+                            (projectLists.paging.page) * limit
+                            : (
+                                projectLists.paging.total
+                            )}</span> of <span className="fw-semibold text-decoration-underline">{projectLists.paging.total}</span> entries</p>
                     </div>
                 </Col>
 

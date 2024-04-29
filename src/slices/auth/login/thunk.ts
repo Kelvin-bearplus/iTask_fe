@@ -84,7 +84,7 @@ export const socialLogin = (type : any, history : any) => async (dispatch : any)
     if (socialdata) {
       localStorage.setItem("authUser", JSON.stringify(response));
       dispatch(loginSuccess(response));
-      history('/dashboard')
+      history('/dashboard-projects')
     }
 
   } catch (error) {

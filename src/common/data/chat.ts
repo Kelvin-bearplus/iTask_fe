@@ -437,7 +437,7 @@ const attachements = [
   {
     id: 2,
     foldericon: "ri-file-ppt-2-line",
-    foldername: "Velzon admin.ppt",
+    foldername: "iTask admin.ppt",
     foldersize: "2.4MB",
   },
   {
