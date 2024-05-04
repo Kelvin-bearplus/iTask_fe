@@ -277,7 +277,7 @@ console.log("props: "+ props)
   useEffect(() => {
     // setTaskList(taskList);
     refreshTaskList();
-  }, []);
+  }, [props.project_id]);
 
 async function refreshTaskList(){
   const dataResponse= await dispatch(getTaskList(props.project_id));
@@ -668,6 +668,7 @@ console.log(taskList)
                     validation.touched.status && validation.errors.status ? true : false
                   }
                 >
+                  <option value="0">Unssigned</option>
                   <option value="1">Pending</option>
                   <option value="2">In-progress</option>
                   <option value="3">Completed</option>
@@ -872,6 +873,7 @@ console.log(taskList)
                     validationCreate.touched.status && validationCreate.errors.status ? true : false
                   }
                 >
+                  <option value="0">Unssigned</option>
                   <option value="1">Pending</option>
                   <option value="2">In-progress</option>
                   <option value="3">Completed</option>

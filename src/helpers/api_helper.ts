@@ -60,8 +60,9 @@ axios.interceptors.response.use(
     return response.data;
   },
   (error) => {
+    console.log('Response received: ', error.response.data);
     // Xử lý lỗi trong quá trình nhận phản hồi
-    return Promise.reject(error);
+    return error.response.data;
   }
 );
 /**

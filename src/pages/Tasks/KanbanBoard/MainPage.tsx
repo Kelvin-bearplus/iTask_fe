@@ -214,7 +214,7 @@ const TasksKanban: React.FC<prop> = (props) => {
   }
   useEffect(() => {
     getDataTask(props.project_id);
-  }, [dispatch])
+  }, [props.project_id])
 
 
 

@@ -23,7 +23,7 @@ const ProjectsSlice = createSlice({
             state.error = action.payload.error || null;
         });
         builder.addCase(getUninvited.fulfilled, (state:any, action:any) => {
-            state.projectLists = action.payload;
+            // state.projectLists = action.payload;
         });
         builder.addCase(getUninvited.rejected,(state:any, action:any) => {
             state.error = action.payload || null;

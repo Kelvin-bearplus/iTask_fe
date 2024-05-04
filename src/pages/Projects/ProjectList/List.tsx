@@ -1,9 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect,useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { Card, CardBody, Col, DropdownItem, DropdownMenu, DropdownToggle, Input, Row, UncontrolledDropdown } from 'reactstrap';
+// import { Card, CardBody, Col, DropdownItem, DropdownMenu, DropdownToggle, Input, Row, UncontrolledDropdown } from 'reactstrap';
+import { Input, Card, CardBody, CardHeader, Col, DropdownItem, DropdownMenu, DropdownToggle, Row, UncontrolledDropdown, Modal, ModalHeader, ModalBody } from 'reactstrap';
+
 import DeleteModal from "../../../Components/Common/DeleteModal";
 import { ToastContainer } from 'react-toastify';
 import { createSelector } from "reselect";
+import SimpleBar from "simplebar-react";
+import avt_default from "../../../assets/images/users/anh_mac_dinh.jpg";
 
 //redux
 import { useSelector, useDispatch } from 'react-redux';
@@ -14,6 +18,7 @@ import FeatherIcon from "feather-icons-react";
 import {
     getProjectList as onGetProjectList,
     deleteProjectList as onDeleteProjectList,
+    getUninvited, inviteMember
 } from "../../../slices/thunks";
 const List = () => {
     const dispatch: any = useDispatch();
@@ -34,6 +39,50 @@ const List = () => {
     const [keyWord, setKeyWord] = useState<string>("");
     const [createdDayRange, setCreatedDaRange] = useState<string>("-1");
     const limit = 8;
+    const [inviteMemberData, setInviteMemberData] = useState([]);
+    interface memberData {
+        id: number,
+        role: string,
+        email: string,
+        username: string,
+        full_name: string,
+        address: string,
+        title: string,
+        phone: string,
+        dob: string,
+        bio: string,
+        profile_ava_url: string,
+        profile_cover_url: string,
+        created: string,
+        updated: string
+    }
+    const memberInit: memberData = {
+        id: -1,
+        role: "",
+        email: "",
+        username: "",
+        full_name: "",
+        address: "",
+        title: "",
+        phone: "",
+        dob: "",
+        bio: "",
+        profile_ava_url: "",
+        profile_cover_url: "",
+        created: "",
+        updated: ""
+    }
+    const [searchMember, setSearchMember] = useState(memberInit);
+    const [errorMessage, setErrorMessage] = useState("");
+    const InviteMember = (email: string,project_id:string) => async () => {
+        const dataUrl = {
+            projectId: project_id, // Match the property name with the expected parameter name
+            email: email
+        };
+
+        dispatch(inviteMember(dataUrl));
+        setSearchMember(memberInit);
+    }
     async function fetchData() {
         //  dataProject = await dispatch(onGetProjectList({ inPage: inPage, limit: limit }));
         const dataProject = await dispatch(onGetProjectList({ inPage: inPage, limit: limit, keyword: keyWord, created_day_range: createdDayRange }));
@@ -47,6 +96,14 @@ const List = () => {
         }
 
     }
+    const [modal, setModal] = useState<boolean>(false);
+    const toggleModal = useCallback(() => {
+        if (modal) {
+            setModal(false);
+        } else {
+            setModal(true);
+        }
+    }, [modal]);
     useEffect(() => {
 
         fetchData();
@@ -313,7 +370,7 @@ const List = () => {
                                                         </Link>}
                                                     </React.Fragment>
                                                 ))}
-                                                <Link to="#" className="avatar-group-item" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Add Members">
+                                                <Link to="#" className="avatar-group-item" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Add Members" onClick={() => { toggleModal(); }}>
                                                     <div className="avatar-xs" data-bs-toggle="modal" data-bs-target="#inviteMembersModal">
                                                         <div className="avatar-title fs-16 rounded-circle bg-light border-dashed border text-primary">
                                                             +
@@ -367,6 +424,61 @@ const List = () => {
                 </Col>
 
             </Row>}
+            <Modal isOpen={modal} toggle={toggleModal} centered className="border-0">
+                <ModalHeader toggle={toggleModal} className="p-3 ps-4 bg-success-subtle">
+                    Members
+                </ModalHeader>
+                <ModalBody className="p-4">
+                    <div className="search-box mb-3">
+                        <Input type="text" className="form-control bg-light border-light" id="search_member" placeholder="Search here..." onKeyPress={handleKeyPress} />
+                        <i className="ri-search-line search-icon"></i>
+                    </div>
+
+                    <div className="mb-4 d-flex align-items-center">
+                        <div className="me-2">
+                            <h5 className="mb-0 fs-13">Members :</h5>
+                        </div>
+                        <div className="avatar-group justify-content-center">
+                            {inviteMemberData && inviteMemberData.map((member: any, index: number) => {
+                                return (
+                                    <Link to="" className="avatar-group-item" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title={member.account_info.full_name ? member.account_info.full_name : ""} data-bs-original-title="Brent Gonzalez">
+                                        <div className="avatar-xs">
+                                            <img src={member.account_info.profile_ava_url ? member.account_info.profile_ava_url : avt_default} alt="" className="rounded-circle img-fluid" />
+                                        </div>
+                                    </Link>);
+                            })}
+                        </div>
+                    </div>
+                    <SimpleBar className="mx-n4 px-4" data-simplebar="init" style={{ maxHeight: "225px" }}>
+                        <div className="vstack gap-3">
+
+                            {
+                                searchMember.id > 0 && <div className="d-flex align-items-center">
+                                    <div className="avatar-xs flex-shrink-0 me-3">
+                                        <img src={searchMember.profile_ava_url ? searchMember.profile_ava_url : ""} alt="" className="img-fluid rounded-circle" />
+                                    </div>
+                                    <div className="flex-grow-1">
+                                        <h5 className="fs-13 mb-0"><Link to="#" className="text-body d-block">{searchMember.full_name ? searchMember.full_name : ""}</Link></h5>
+                                    </div>
+                                    <div className="flex-shrink-0">
+                                        <button type="button" className="btn btn-light btn-sm" onClick={InviteMember(searchMember.email,'3')}>Add</button>
+                                    </div>
+                                </div>
+                            }
+                            {
+                                errorMessage != "" && <div>{errorMessage} </div>
+                            }
+
+                        </div>
+
+                    </SimpleBar>
+                </ModalBody>
+                <div className="modal-footer">
+                    <button type="button" className="btn btn-success w-xs" onClick={toggleModal}>Done</button>
+
+                </div>
+
+            </Modal>
         </React.Fragment>
     );
 };

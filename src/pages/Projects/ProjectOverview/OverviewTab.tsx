@@ -93,19 +93,21 @@ const OverviewTab = ({ dataProject, startDate, deadlineDate }: { dataProject: an
         const data = await dispatch(getUninvited(dataAPI));
         console.log(data)
         if (data.payload && !isObjectEmpty(data.payload)) {
-            if (!data.payload.is_invited) {
+            if (!data.payload.is_invited&&!data.payload.message) {
                 setSearchMember(data.payload);
                 setErrorMessage("");
+            }
+            else if(data.payload.message) {
+                console.log(data.payload.message);
+                setErrorMessage(data.payload.message)
+                setSearchMember(memberInit);
             }
             else {
                 setErrorMessage("Member is invited!")
                 setSearchMember(memberInit);
             }
         }
-        else {
-            setErrorMessage(data.error.message)
-            setSearchMember(memberInit);
-        }
+       
         return data;
     }
     const [toastData, setToastData] = useState("");

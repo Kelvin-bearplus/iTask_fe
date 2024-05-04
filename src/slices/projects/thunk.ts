@@ -54,7 +54,7 @@ export const getUninvited = createAsyncThunk("getUninvited", async ({email,proje
     } catch (error:any) {
         console.log(error);
         var message:any = error.response.data.error.message?error.response.data.error.message:"Lỗi";
-       throw message;
+       throw error;
     }
 });
 export const updateProjectById = createAsyncThunk("updateProjectById", async({ id, project }:{id:string,project:any}) => {
