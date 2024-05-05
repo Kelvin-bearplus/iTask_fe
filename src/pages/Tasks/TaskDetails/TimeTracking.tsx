@@ -3,10 +3,10 @@ import { Input, Card, CardBody, DropdownItem, DropdownMenu, DropdownToggle, Unco
 import SimpleBar from "simplebar-react";
 
 import avt_default from "../../../assets/images/users/anh_mac_dinh.jpg";
-
+import Flatpickr from "react-flatpickr";
 import { Link } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
-import { inviteMember, getMemberAssignees, deleteAssign, assignMember } from "../../../slices/thunks";
+import { inviteMember, getMemberAssignees, deleteAssign, assignMember, updateTask } from "../../../slices/thunks";
 
 const TimeTracking = (dataTask: any) => {
     function checkInvite(member: any) {
@@ -30,10 +30,10 @@ const TimeTracking = (dataTask: any) => {
             setListMemberAssignees(listMemberAssignees.filter(
                 (item: any) => {
                     // Kiểm tra nếu item.user_info không tồn tại
-                    if(item.user_info){
+                    if (item.user_info) {
                         return item.user_info.id !== userId;
                     }
-                    else{
+                    else {
                         return item.account_info.id !== userId;
                     }
                 }
@@ -42,10 +42,10 @@ const TimeTracking = (dataTask: any) => {
             const filteredItems = listMemberAssignees.filter(
                 (item: any) => {
                     // Kiểm tra nếu item.user_info không tồn tại
-                    if(item.user_info){
+                    if (item.user_info) {
                         return item.user_info.id == userId;
                     }
-                    else{
+                    else {
                         return item.account_info.id == userId;
                     }
                 }
@@ -61,10 +61,10 @@ const TimeTracking = (dataTask: any) => {
             console.log(listMemberNoAssignees);
             setListMemberNoAssignees(listMemberNoAssignees.filter(
                 (item: any) => {
-                    if(item.user_info){
+                    if (item.user_info) {
                         return item.user_info.id !== userId;
                     }
-                    else{
+                    else {
                         return item.account_info.id !== userId;
                     }
                 }
@@ -72,10 +72,10 @@ const TimeTracking = (dataTask: any) => {
             const newListMemberAssignees = [...listMemberAssignees];
             const filteredItems = listMemberNoAssignees.filter(
                 (item: any) => {
-                    if(item.user_info){
+                    if (item.user_info) {
                         return item.user_info.id == userId;
                     }
-                    else{
+                    else {
                         return item.account_info.id == userId;
                     }
                 }
@@ -170,9 +170,62 @@ const TimeTracking = (dataTask: any) => {
         var year = dateData.getFullYear();
         return (day < 10 ? '0' : '') + day + ' ' + month + ', ' + year;
     }
+    const titleTaskChang = (e: any) => {
+        const data = {
+            id: dataTask.prop.id,
 
-    console.log(listMemberAssignees)
-    console.log(listMemberNoAssignees)
+            task: {
+                name: e.target.value,
+                project_id: dataTask.prop.project_info.id
+            }
+        }
+        console.log(data)
+        dispatch(updateTask(data))
+    }
+    const priorityTaskChange = (e: any) => {
+        const data = {
+            id: dataTask.prop.id,
+
+            task: {
+                priority: parseInt(e.target.value),
+                project_id: dataTask.prop.project_info.id
+            }
+        }
+        console.log(data)
+        dispatch(updateTask(data))
+    }
+    const statusTaskChange = (e: any) => {
+        const data = {
+            id: dataTask.prop.id,
+
+            task: {
+                status: parseInt(e.target.value),
+                project_id: dataTask.prop.project_info.id
+            }
+        }
+        console.log(data)
+        dispatch(updateTask(data))
+    }
+ const onChangeDueDate = (selectedDates:any, dateStr:any) => {
+    const selectedDate = selectedDates.length > 0 ? selectedDates[0] : null;
+
+    if (selectedDate) {
+        // Chuyển đổi đối tượng Date thành chuỗi có định dạng ISO 8601
+        const isoDateString = selectedDate.toISOString();
+        console.log(isoDateString);
+        const data = {
+            id: dataTask.prop.id,
+    
+            task: {
+                due_date: isoDateString,
+                project_id: dataTask.prop.project_info.id
+            }
+        }
+        // console.log(e.target.value)
+        dispatch(updateTask(data))
+    }
+  
+}
     return (
         <React.Fragment>
             {/* <Card>
@@ -207,23 +260,47 @@ const TimeTracking = (dataTask: any) => {
 
                                 <tr>
                                     <td className="fw-medium">Tasks Title</td>
-                                    <td>{dataTask.prop.name}</td>
+                                    {/* <td>{dataTask.prop.name}</td> */}
+                                    <td><input type="text" className='__input_custom' defaultValue={dataTask.prop.name} onBlur={titleTaskChang} /></td>
                                 </tr>
                                 <tr>
                                     <td className="fw-medium">Project Name</td>
-                                    <td>Velzon - Admin Dashboard</td>
+                                    <td>{dataTask.prop.project_info.name}</td>
                                 </tr>
                                 <tr>
                                     <td className="fw-medium">Priority</td>
-                                    <td><span className={`badge bg-danger-subtle text-${convertColorPrority(dataTask.prop.priority)}`}>{convertPriority(dataTask.prop.priority)}</span></td>
+                                    <td><select className={`badge bg-danger-subtle text-${convertColorPrority(dataTask.prop.priority)} select_custom`} onChange={priorityTaskChange}>
+                                        <option value="1" {...dataTask.prop.priority === 1 && { selected: true }}>High</option>
+                                        <option value="2" {...dataTask.prop.priority === 2 && { selected: true }}>Medium</option>
+                                        <option value="3" {...dataTask.prop.priority === 3 && { selected: true }}>Low</option>
+                                    </select></td>
                                 </tr>
                                 <tr>
                                     <td className="fw-medium">Status</td>
-                                    <td><span className={`badge bg-secondary-subtle text-${convertColorStatus(dataTask.prop.status)}`}>{convertStatus(dataTask.prop.status)}</span></td>
+                                    <td><select className={`badge border-0 text-${convertColorStatus(dataTask.prop.status)} `} onChange={statusTaskChange}>
+                                        <option value="1" {...dataTask.prop.status === 0 && { selected: true }}>Unassigned</option>
+                                        <option value="1" {...dataTask.prop.status === 1 && { selected: true }}>Pending</option>
+                                        <option value="2" {...dataTask.prop.status === 2 && { selected: true }}>In-progress</option>
+                                        <option value="3" {...dataTask.prop.status === 3 && { selected: true }}>Done</option>
+                                    </select></td>
                                 </tr>
                                 <tr>
                                     <td className="fw-medium">Due Date</td>
-                                    <td>{convertDate(dataTask.prop.due_date)}</td>
+                                    <td>
+                                        <Flatpickr
+                                            name="dueDate"
+                                            id="duedate-field"
+                                            className="form-control"
+                                            placeholder="Select a date"
+                                            options={{
+                                                altInput: true,
+                                                altFormat: "d M, Y",
+                                                dateFormat: "d M, Y",
+                                            }}
+                                            onChange={onChangeDueDate}
+                                            value={convertDate(dataTask.prop.due_date)}
+                                        />
+                                    </td>
                                 </tr>
                             </tbody>
                         </table>
@@ -243,16 +320,16 @@ const TimeTracking = (dataTask: any) => {
                             return (
                                 <li key={index}>
                                     {
-                                        member.user_info && <div className={`d-flex align-items-center ${member.user_info.id==dataTask.prop.owner.id ? "bg_own_main" : ""}`}>
+                                        member.user_info && <div className={`d-flex align-items-center ${member.user_info.id == dataTask.prop.owner.id ? "bg_own_main" : ""}`}>
                                             <div className="flex-shrink-0">
                                                 <img src={member.user_info.profile_ava_url ? member.user_info.profile_ava_url : avt_default} alt="" className="avatar-xs rounded-circle" />
                                             </div>
                                             <div className="flex-grow-1 ms-2">
                                                 <h6 className="mb-1"><Link to="/pages-profile">{member.user_info.full_name ? member.user_info.full_name : "New User"}</Link></h6>
-                                                {member.user_info.id!==dataTask.prop.owner.id  &&<p className="text-muted mb-0">{member.user_info.title ? member.user_info.title : "Member"}</p>}
-                                                {member.user_info.id==dataTask.prop.owner.id  &&<p className="text-muted mb-0">Owner Project</p>}
+                                                {member.user_info.id !== dataTask.prop.owner.id && <p className="text-muted mb-0">{member.user_info.title ? member.user_info.title : "Member"}</p>}
+                                                {member.user_info.id == dataTask.prop.owner.id && <p className="text-muted mb-0">Owner Project</p>}
                                             </div>
-                                           {member.user_info.id!==dataTask.prop.owner.id  && <div className="flex-shrink-0">
+                                            {member.user_info.id !== dataTask.prop.owner.id && <div className="flex-shrink-0">
                                                 <i className="ri-delete-bin-5-fill text-muted me-2 align-bottom icon_delete" onClick={() => deleteAssignHandle(member.user_info.id)}></i>
                                             </div>}
                                         </div>
@@ -280,34 +357,34 @@ const TimeTracking = (dataTask: any) => {
                         {listMemberNoAssignees && listMemberNoAssignees.map((member: any, index: number) => {
                             return (
                                 <li key={index}>
-                                   {
-                                    member.user_info && <div className="d-flex align-items-center">
-                                    <div className="flex-shrink-0">
-                                        <img src={member.user_info.profile_ava_url ? member.user_info.profile_ava_url : avt_default} alt="" className="avatar-xs rounded-circle" />
-                                    </div>
-                                    <div className="flex-grow-1 ms-2">
-                                        <h6 className="mb-1"><Link to="/pages-profile">{member.user_info.full_name ? member.user_info.full_name : "New User"}</Link></h6>
-                                        <p className="text-muted mb-0">{member.user_info.title ? member.user_info.title : "Member"}</p>
-                                    </div>
-                                    <div className="flex-shrink-0">
-                                        <button type="button" className="btn btn-light btn-sm" onClick={() => assignMemberHandle(member.user_info.id)}>Assign</button>
-                                    </div>
-                                </div>
-                                   }
-                                         {
-                                    member.account_info && <div className="d-flex align-items-center">
-                                    <div className="flex-shrink-0">
-                                        <img src={member.account_info.profile_ava_url ? member.account_info.profile_ava_url : avt_default} alt="" className="avatar-xs rounded-circle" />
-                                    </div>
-                                    <div className="flex-grow-1 ms-2">
-                                        <h6 className="mb-1"><Link to="/pages-profile">{member.account_info.full_name ? member.account_info.full_name : "New User"}</Link></h6>
-                                        <p className="text-muted mb-0">{member.account_info.title ? member.account_info.title : "Member"}</p>
-                                    </div>
-                                    <div className="flex-shrink-0">
-                                        <button type="button" className="btn btn-light btn-sm" onClick={() => assignMemberHandle(member.account_info.id)}>Assign</button>
-                                    </div>
-                                </div>
-                                   }
+                                    {
+                                        member.user_info && <div className="d-flex align-items-center">
+                                            <div className="flex-shrink-0">
+                                                <img src={member.user_info.profile_ava_url ? member.user_info.profile_ava_url : avt_default} alt="" className="avatar-xs rounded-circle" />
+                                            </div>
+                                            <div className="flex-grow-1 ms-2">
+                                                <h6 className="mb-1"><Link to="/pages-profile">{member.user_info.full_name ? member.user_info.full_name : "New User"}</Link></h6>
+                                                <p className="text-muted mb-0">{member.user_info.title ? member.user_info.title : "Member"}</p>
+                                            </div>
+                                            <div className="flex-shrink-0">
+                                                <button type="button" className="btn btn-light btn-sm" onClick={() => assignMemberHandle(member.user_info.id)}>Assign</button>
+                                            </div>
+                                        </div>
+                                    }
+                                    {
+                                        member.account_info && <div className="d-flex align-items-center">
+                                            <div className="flex-shrink-0">
+                                                <img src={member.account_info.profile_ava_url ? member.account_info.profile_ava_url : avt_default} alt="" className="avatar-xs rounded-circle" />
+                                            </div>
+                                            <div className="flex-grow-1 ms-2">
+                                                <h6 className="mb-1"><Link to="/pages-profile">{member.account_info.full_name ? member.account_info.full_name : "New User"}</Link></h6>
+                                                <p className="text-muted mb-0">{member.account_info.title ? member.account_info.title : "Member"}</p>
+                                            </div>
+                                            <div className="flex-shrink-0">
+                                                <button type="button" className="btn btn-light btn-sm" onClick={() => assignMemberHandle(member.account_info.id)}>Assign</button>
+                                            </div>
+                                        </div>
+                                    }
                                 </li>
                             );
                         })}

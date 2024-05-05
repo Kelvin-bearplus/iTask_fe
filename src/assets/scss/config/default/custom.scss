@@ -44,3 +44,142 @@ File: Custom Css File
   font-weight: 600;
   background-color: white !important;
 }
+.box_sprin{
+  padding: 20px;
+  border-radius: 5px;
+  background-color: white;
+}
+
+.name_sprin{
+  color: #000;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.2rem;
+  margin-right: 10px;
+}
+.time_sprin{
+  color: #2f2e2e98;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.2rem;
+}
+.complete_sprin{
+  cursor: pointer;
+
+  color: #09090998;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.2rem;
+  padding: 8px;
+  border-radius: 4px;
+  background-color: #f3f1f1;
+  margin-right: 10px;
+}
+.dropdown_sprin .arrow-none{
+  cursor: pointer;
+  padding:0 8px;
+  border-radius: 4px;
+  background-color: #f3f1f1;
+font-size: 25px ;
+}
+.dec_sprin{
+  color: #2f2e2e98;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.2rem;
+  margin-bottom: 20px;
+  margin-top: 10px;
+}
+.task_status{
+  cursor: pointer;
+  border-radius: 4px;
+  width: max-content;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 3px;
+  border: none;
+}
+.task_name{
+  font-size: 16px;
+  color: #000;
+  font-size: 500;
+}
+.box_task:hover .edit_task,.box_task:hover .__task{
+  opacity: 1;
+}
+.edit_task{
+  opacity: 0;
+  cursor: pointer;
+  font-size: 20px;
+  font-weight: 700;
+  transition: all .5s ease;
+}
+.box_task{
+  padding: 8px 20px;
+  border-width:1px 1px 0 1px ;
+  border-color: #b2b1b1;
+  border-style: solid;
+}
+.__task{
+  opacity: 0;
+  transition: all 1s ease;
+}
+.box_task:last-child{
+  border-width:1px 1px 1px 1px ;
+}
+.__sprint p{
+
+  margin-bottom: 0 !important;
+}
+.avt_user{
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+.name_eric{
+  font-size: 16px;
+  font-weight: 500;
+  background-color: #DFD8FD;
+  padding: 3px;
+  border-radius: 4px 8px;
+color: #403294;
+}
+.__create_task{
+  font-size: 16px;
+  font-weight: 500;
+  padding: 7px 10px;
+
+}
+.__create_task:hover{
+  background-color: #DFD8FD;
+  cursor: pointer;
+}
+.task_status.unassigned{
+  background-color:#85b8ffa4 ;
+  color: #0055CC;
+}
+.task_status.pending{
+  background-color:#fd9891a3 ;
+  color: #C9372C;
+}
+.task_status.in_progress{
+  background-color:#f8e6a09d ;
+  color: #E2B203;
+}
+.task_status.done{
+  background-color:#DCFFF1 ;
+  color: #1F845A;
+}
+.__input_custom,.select_custom{
+  border: none;
+  background-color: transparent;
+  padding: 5px;
+}
+.__input_custom:focus,.select_custom:focus{
+  border: 1px solid #b2b1b1;
+  border-radius: 5px;
+}
+.__modal_task_detail{
+  max-width: 80% !important;
+}

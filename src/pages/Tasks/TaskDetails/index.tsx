@@ -9,7 +9,7 @@ import {
     getTaskById
   } from "../../../slices/thunks";
 
-const TaskDetails = () => {
+const TaskDetails = (prop?:any) => {
     document.title="Tasks Details ";
   const dispatch: any = useDispatch();
   const [dataTask, setDataTask] = React.useState({});
@@ -30,6 +30,11 @@ const TaskDetails = () => {
           var id_parse = parseInt(id);
           getDataTask(id_parse);
       }
+      else{
+        if(prop.idTask!=undefined && prop.idTask!=0){
+            getDataTask(prop.idTask);
+        }
+      }
   }, []);
   function isObjectEmpty(obj:any) {
     return Object.keys(obj).length === 0;
@@ -48,6 +53,7 @@ const TaskDetails = () => {
                             <Col xxl={9}>
                                 <Summary prop={dataTask} />
                                 {id!=undefined && <Comments taskId={parseInt(id)} />}
+                                {prop.idTask!=undefined && <Comments taskId={parseInt(prop.idTask)} />}
 
                             </Col>
                         </Row>

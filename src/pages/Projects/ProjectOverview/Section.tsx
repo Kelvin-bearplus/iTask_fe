@@ -7,6 +7,7 @@ import slack from '../../../assets/images/brands/slack.png';
 import OverviewTab from './OverviewTab';
 import AllTasks from '../../Tasks/TaskList/AllTasks';
 import TasksKanban from '../../Tasks/KanbanBoard/MainPage';
+import Backlog from '../../Backlog/index';
 import ActivitiesTab from './ActivitiesTab';
 import TeamTab from './TeamTab';
 
@@ -41,7 +42,7 @@ const Section = (dataProject:any) => {
       useEffect(() => {
         setStartDate(formatDate(dataProject.prop.started_at))
       setDeadlineDate(formatDate(dataProject.prop.deadline))
-      },[])
+      },[dataProject])
     console.log(dataProject)
     return (
         <React.Fragment>
@@ -117,7 +118,14 @@ const Section = (dataProject:any) => {
                                             Kanban Board Task
                                         </NavLink>
                                     </NavItem>
-                                    
+                                    <NavItem>
+                                        <NavLink
+                                            className={classnames({ active: activeTab === '4' }, "fw-semibold")}
+                                            onClick={() => { toggleTab('4'); }}
+                                            href="#">
+                                            Backlog
+                                        </NavLink>
+                                    </NavItem>
                                 </Nav>
                             </CardBody>
                         </div>
@@ -130,6 +138,7 @@ const Section = (dataProject:any) => {
                 {activeTab === '1' &&     <OverviewTab dataProject={dataProject} startDate={startDate} deadlineDate={deadlineDate}/>}
           {activeTab === '2' && <AllTasks project_id={dataProject.prop.id}/>}
           {activeTab === '3' && <TasksKanban project_id={dataProject.prop.id}/>}
+          {activeTab === '4' && <Backlog project_id={dataProject.prop.id}/>}
           {/* {activeTab === '4' && <TeamTab />} */}
                 </Col>
             </Row>

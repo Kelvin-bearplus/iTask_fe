@@ -52,3 +52,26 @@ export const formatDateFromAPI = (date: string): string => {
 
   return formattedDateTime;
 };
+export const formatDateSprintFromAPI = (date: string): string => {
+  console.log(date);
+  const dateData = new Date(date);
+  
+  // Mảng các tên tháng
+  const monthNames = [
+    "January", "February", "March",
+    "April", "May", "June", "July",
+    "August", "September", "October",
+    "November", "December"
+  ];
+
+  // Lấy số thứ tự của tháng và trích xuất tên tháng tương ứng
+  const monthIndex = dateData.getMonth();
+  const monthName = monthNames[monthIndex];
+
+  const day = dateData.getDate().toString().padStart(2, '0');
+
+  // Tạo chuỗi đầu ra theo định dạng mong muốn
+  const formattedDateTime = `${day} ${monthName} `;
+  
+  return formattedDateTime;
+};

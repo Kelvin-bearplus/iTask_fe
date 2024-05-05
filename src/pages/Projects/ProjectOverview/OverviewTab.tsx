@@ -45,7 +45,7 @@ const OverviewTab = ({ dataProject, startDate, deadlineDate }: { dataProject: an
     const [inviteMemberData, setInviteMemberData] = useState([]);
     useEffect(() => {
         setInviteMemberData(dataProject.prop.members);
-    }, [])
+    }, [dataProject])
     console.log(inviteMemberData);
     interface memberData {
         id: number,
@@ -190,75 +190,6 @@ const OverviewTab = ({ dataProject, startDate, deadlineDate }: { dataProject: an
                                         </Col>
                                     </Row>
                                 </div>
-
-                                {/* <div className="pt-3 border-top border-top-dashed mt-4">
-                                    <h6 className="mb-3 fw-semibold text-uppercase">Resources</h6>
-                                    <Row className="g-3">
-                                        <Col xxl={4} lg={6}>
-                                            <div className="border rounded border-dashed p-2">
-                                                <div className="d-flex align-items-center">
-                                                    <div className="flex-shrink-0 me-3">
-                                                        <div className="avatar-sm">
-                                                            <div className="avatar-title bg-light text-secondary rounded fs-24">
-                                                                <i className="ri-folder-zip-line"></i>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div className="flex-grow-1 overflow-hidden">
-                                                        <h5 className="fs-13 mb-1"><Link to="#" className="text-body text-truncate d-block">App pages.zip</Link></h5>
-                                                        <div>2.2MB</div>
-                                                    </div>
-                                                    <div className="flex-shrink-0 ms-2">
-                                                        <div className="d-flex gap-1">
-                                                            <button type="button" className="btn btn-icon text-muted btn-sm fs-18"><i className="ri-download-2-line"></i></button>
-                                                            <UncontrolledDropdown>
-                                                                <DropdownToggle tag="button" className="btn btn-icon text-muted btn-sm fs-18 dropdown">
-                                                                    <i className="ri-more-fill"></i>
-                                                                </DropdownToggle>
-                                                                <DropdownMenu>
-                                                                    <li><DropdownItem><i className="ri-pencil-fill align-bottom me-2 text-muted"></i> Rename</DropdownItem></li>
-                                                                    <li><DropdownItem><i className="ri-delete-bin-fill align-bottom me-2 text-muted"></i> Delete</DropdownItem></li>
-                                                                </DropdownMenu>
-                                                            </UncontrolledDropdown>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </Col>
-
-                                        <Col xxl={4} lg={6}>
-                                            <div className="border rounded border-dashed p-2">
-                                                <div className="d-flex align-items-center">
-                                                    <div className="flex-shrink-0 me-3">
-                                                        <div className="avatar-sm">
-                                                            <div className="avatar-title bg-light text-secondary rounded fs-24">
-                                                                <i className="ri-file-ppt-2-line"></i>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div className="flex-grow-1 overflow-hidden">
-                                                        <h5 className="fs-13 mb-1"><Link to="#" className="text-body text-truncate d-block">Velzon admin.ppt</Link></h5>
-                                                        <div>2.4MB</div>
-                                                    </div>
-                                                    <div className="flex-shrink-0 ms-2">
-                                                        <div className="d-flex gap-1">
-                                                            <button type="button" className="btn btn-icon text-muted btn-sm fs-18"><i className="ri-download-2-line"></i></button>
-                                                            <UncontrolledDropdown>
-                                                                <DropdownToggle tag="button" className="btn btn-icon text-muted btn-sm fs-18 dropdown">
-                                                                    <i className="ri-more-fill"></i>
-                                                                </DropdownToggle>
-                                                                <DropdownMenu>
-                                                                    <li><DropdownItem><i className="ri-pencil-fill align-bottom me-2 text-muted"></i> Rename</DropdownItem></li>
-                                                                    <li><DropdownItem><i className="ri-delete-bin-fill align-bottom me-2 text-muted"></i> Delete</DropdownItem></li>
-                                                                </DropdownMenu>
-                                                            </UncontrolledDropdown>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </Col>
-                                    </Row>
-                                </div> */}
                             </div>
                         </CardBody>
 

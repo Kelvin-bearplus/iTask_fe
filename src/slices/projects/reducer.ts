@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { getProjectList, addProjectList, deleteProjectList,getProjectById,updateProjectById ,getSimpleProject,getUninvited} from './thunk';
+import { getProjectList, addProjectList, deleteProjectList,getProjectById,updateProjectById ,getSimpleProject,getUninvited,getMemberList} from './thunk';
 export const initialState : any= {
     projectLists: [],
     error: "",
@@ -33,6 +33,12 @@ const ProjectsSlice = createSlice({
         });
         builder.addCase(getSimpleProject.rejected,(state:any, action:any) => {
             state.error = action.payload.error || null;
+        });
+        builder.addCase(getMemberList.fulfilled, (state:any, action:any) => {
+            // state.projectLists = action.payload;
+        });
+        builder.addCase(getMemberList.rejected,(state:any, action:any) => {
+            state.error = action.payload || null;
         });
         builder.addCase(addProjectList.fulfilled, (state:any, action:any) => {
             state.toastData=action.payload.toastData;

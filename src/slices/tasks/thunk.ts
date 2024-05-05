@@ -65,8 +65,8 @@ export const addNewTask = createAsyncThunk("tasks/addNewTask", async (task: any)
         toast.success("Task Added Successfully", { autoClose: 3000 });
         return response;
     } catch (error:any) {
-        toast.error(error.response.data.error, { autoClose: 3000 });
-        throw error.response.data.error;
+        toast.error(error.response.data.message, { autoClose: 3000 });
+        throw error.response.data.message;
     }
 });
 export const updateTask = createAsyncThunk("tasks/updateTask", async (data: any) => {
@@ -75,12 +75,12 @@ export const updateTask = createAsyncThunk("tasks/updateTask", async (data: any)
         const url =getTaskListAPI+"/"+data.id;
         
         const response = await api.create(url,data.task)
-        toast.success("Task Updated Successfully", { autoClose: 3000 });
+        toast.success("Task Updated Successfully", { autoClose: 2000 });
         console.log(response.data)
         return response.data;
     } catch (error:any) {
         console.log(error)
-        toast.error(error.response.data.message, { autoClose: 3000 });
+        toast.error(error.response.data.message, { autoClose: 2000 });
         throw error.response.data.message;
     }
 });

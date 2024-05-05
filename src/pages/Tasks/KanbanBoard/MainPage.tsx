@@ -34,7 +34,7 @@ import {
   addNewTask,
   updateTask,
   deleteTask,
-  getSimpleProject
+  getSimpleProject,getMemberList
 } from "../../../slices/thunks"
 
 //redux
@@ -416,32 +416,6 @@ const TasksKanban: React.FC<prop> = (props) => {
 
     },
   });
-
-
-
-  // const handleCardEdit = (arg: any, line: any) => {
-  //   setModal(true)
-  //   setCard(arg)
-
-  //   let card = arg
-  //   setCard({
-  //     id: card.id,
-  //     title: card.title,
-  //     text: card.text,
-  //     botId: card.botId,
-  //     userImages: card.userImages,
-  //     eye: card.eye,
-  //     que: card.que,
-  //     clip: card.clip,
-  //     badge1: card.badge1
-  //   })
-
-  //   setKanbanTasksCards(line.id)
-  //   setIsEdit(true)
-
-  //   toggle()
-  // }
-
   const handleAddNewCard = (line: any) => {
     setIsEdit(false)
     toggleCreate()
@@ -483,7 +457,17 @@ const TasksKanban: React.FC<prop> = (props) => {
     validation.setFieldValue('userImages', updatedImages)
 
   }
-
+const [memberList, setMemberList]=useState([]);
+async function getMember(){
+  const dataResponse = await dispatch(getMemberList(props.project_id));
+ if(dataResponse.payload.data){
+  setMemberList(dataResponse.payload.data);
+ }
+}
+useEffect(() => {
+  getMember();
+},[props.project_id])
+console.log(memberList)
   return (
     <React.Fragment>
       <DeleteModal
@@ -509,8 +493,8 @@ const TasksKanban: React.FC<prop> = (props) => {
             </div>
             <div className="col-auto ms-sm-auto">
               <div className="avatar-group" id="newMembar">
-                {(headData || []).map((item: any, key: any) => (<Link to="#" className="avatar-group-item" data-bs-toggle="tooltip" key={key} data-bs-trigger="hover" data-bs-placement="top" aria-label={item.name} data-bs-original-title={item.name}>
-                  <img src={item.picture} alt="" title={item.name} className="rounded-circle avatar-xs" />
+                {memberList.length>0 && memberList.map((item: any, key: any) => (<Link to="#" className="avatar-group-item" data-bs-toggle="tooltip" key={key} data-bs-trigger="hover" data-bs-placement="top" aria-label={item.name} data-bs-original-title={item.name}>
+                  <img src={item.account_info.profile_ava_url?item.account_info.profile_ava_url:avt_default} alt="" title={item.account_info.full_name?item.account_info.full_name:""} className="rounded-circle avatar-xs" />
                 </Link>))}
                 <Link to="#addmemberModal" data-bs-toggle="modal" className="avatar-group-item" >
                   <div className="avatar-xs">

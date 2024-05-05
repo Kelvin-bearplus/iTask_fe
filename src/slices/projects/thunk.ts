@@ -1,11 +1,11 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import 'react-toastify/dist/ReactToastify.css';
-import { getListProjects, uploadFile,simpleProjectAPI,uninvitedAPI } from '../../helpers/url_api'
+import { getListProjects, uploadFile,simpleProjectAPI,uninvitedAPI ,getMemberAPI} from '../../helpers/url_api'
 import { APIClient } from "../../helpers/api_helper";
 import { resetProjectFlagChange } from "./reducer"
 
 const api = new APIClient();
-export const getProjectList = createAsyncThunk("getListProjects", async ({ inPage, limit, keyword, created_day_range  }: { inPage:number, limit:number, keyword: any , created_day_range:string}) => {
+export const getProjectList = createAsyncThunk("getListProjects", async ({ inPage, limit, keyword, created_day_range  }: { inPage?:number, limit?:number, keyword?: any , created_day_range?:string}) => {
     try {
     
             const params = {
@@ -18,6 +18,19 @@ export const getProjectList = createAsyncThunk("getListProjects", async ({ inPag
             console.log(params);
             // Sử dụng tham số inPage và limit trong request API
             const response = await api.get(getListProjects, params);
+            console.log(response);
+            return response;
+        
+
+    }catch (error:any) {
+        var message:any = error.response.data.error.message?error.response.data.error.message:"Lỗi";
+        throw message;
+    }
+});
+export const getMemberList=createAsyncThunk("getMemberList", async (id:number) => {
+    try {
+            var url=getMemberAPI+'/'+id;
+            const response = await api.get(url);
             console.log(response);
             return response;
         

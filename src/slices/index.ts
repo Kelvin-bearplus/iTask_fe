@@ -15,6 +15,7 @@ import chatReducer from "./chat/reducer";
 
 //Project
 import ProjectsReducer from "./projects/reducer";
+import SprintReducer from "./sprint/reducer";
 import Member from "./member/reducer";
 
 // Tasks
@@ -41,7 +42,7 @@ const rootReducer = combineReducers({
     Tasks: TasksReducer,
     DashboardProject: DashboardProjectReducer,
     Comment:CommentReducer,
-
+    Sprint:SprintReducer
 });
 
 export default rootReducer;

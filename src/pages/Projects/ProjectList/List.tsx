@@ -83,6 +83,35 @@ const List = () => {
         dispatch(inviteMember(dataUrl));
         setSearchMember(memberInit);
     }
+    function isObjectEmpty(obj: any) {
+        return Object.keys(obj).length === 0;
+    }
+    const searchMembers = async (email: any,project_id:number) => {
+        const dataAPI = {
+            email: email,
+            projectId: project_id
+        }
+        const data = await dispatch(getUninvited(dataAPI));
+        console.log(data)
+        if (data.payload && !isObjectEmpty(data.payload)) {
+            if (!data.payload.is_invited&&!data.payload.message) {
+                setSearchMember(data.payload);
+                setErrorMessage("");
+            }
+            else if(data.payload.message) {
+                console.log(data.payload.message);
+                setErrorMessage(data.payload.message)
+                setSearchMember(memberInit);
+            }
+            else {
+                setErrorMessage("Member is invited!")
+                setSearchMember(memberInit);
+            }
+        }
+       
+        return data;
+    }
+
     async function fetchData() {
         //  dataProject = await dispatch(onGetProjectList({ inPage: inPage, limit: limit }));
         const dataProject = await dispatch(onGetProjectList({ inPage: inPage, limit: limit, keyword: keyWord, created_day_range: createdDayRange }));
@@ -276,19 +305,19 @@ const List = () => {
             </Row>
 
             <div className="row">
-                {projectLists != undefined && projectLists.data.map((item: any, index: any) => (
-                    <React.Fragment key={item.id}>
+                {projectLists != undefined && projectLists.data.map((project: any, index: any) => (
+                    <React.Fragment key={project.id}>
                         <Col xxl={3} sm={6} className="project-card">
                             <Card className="card-height-100">
                                 <CardBody>
                                     <div className="d-flex flex-column h-100">
                                         <div className="d-flex">
                                             <div className="flex-grow-1">
-                                                <p className="text-muted mb-4">Updated {timeUpdate(item.updated_at)}</p>
+                                                <p className="text-muted mb-4">Updated {timeUpdate(project.updated_at)}</p>
                                             </div>
                                             <div className="flex-shrink-0">
                                                 <div className="d-flex gap-1 align-items-center">
-                                                    <button type="button" className={`btn avatar-xs mt-n1 p-0 favourite-btn ${item.ratingClass}`} onClick={(e) => activebtn(e.target)}>
+                                                    <button type="button" className={`btn avatar-xs mt-n1 p-0 favourite-btn ${project.ratingClass}`} onClick={(e) => activebtn(e.target)}>
                                                         <span className="avatar-title bg-transparent fs-15">
                                                             <i className="ri-star-fill"></i>
                                                         </span>
@@ -299,19 +328,19 @@ const List = () => {
                                                         </DropdownToggle>
 
                                                         <DropdownMenu className="dropdown-menu-end">
-                                                            <DropdownItem href={`apps-projects-overview/${item.id}`}><i className="ri-eye-fill align-bottom me-2 text-muted"></i> View</DropdownItem>
+                                                            <DropdownItem href={`apps-projects-overview/${project.id}`}><i className="ri-eye-fill align-bottom me-2 text-muted"></i> View</DropdownItem>
                                                             {
-                                                                userId != null && userId == item.owner.id && (
+                                                                userId != null && userId == project.owner.id && (
                                                                     <DropdownItem
-                                                                        href={`apps-projects-update?id=${item.id}`}
+                                                                        href={`apps-projects-update?id=${project.id}`}
                                                                     >
                                                                         <i className="ri-pencil-fill align-bottom me-2 text-muted"></i> Edit
                                                                     </DropdownItem>
                                                                 )
                                                             }
                                                             {
-                                                                userId != null && userId == item.owner.id && (
-                                                                    <DropdownItem href="#" onClick={() => onClickData(item.id)} data-bs-toggle="modal" data-bs-target="#removeProjectModal"><i className="ri-delete-bin-fill align-bottom me-2 text-muted"></i> Remove</DropdownItem>
+                                                                userId != null && userId == project.owner.id && (
+                                                                    <DropdownItem href="#" onClick={() => onClickData(project.id)} data-bs-toggle="modal" data-bs-target="#removeProjectModal"><i className="ri-delete-bin-fill align-bottom me-2 text-muted"></i> Remove</DropdownItem>
                                                                 )
                                                             }
 
@@ -323,14 +352,14 @@ const List = () => {
                                         <div className="d-flex mb-2">
                                             <div className="flex-shrink-0 me-3">
                                                 <div className="avatar-sm">
-                                                    <span className={"avatar-title rounded  bg-" + item.imgbgColor + "-subtle"}>
-                                                        <img src={item.thumbnail_url} alt="" className="img-fluid " />
+                                                    <span className={"avatar-title rounded  bg-" + project.imgbgColor + "-subtle"}>
+                                                        <img src={project.thumbnail_url} alt="" className="img-fluid " />
                                                     </span>
                                                 </div>
                                             </div>
                                             <div className="flex-grow-1">
-                                                <h5 className="mb-1 fs-15"><div className="text-body">{item.name}</div></h5>
-                                                <div className="text-muted text-truncate-two-lines mb-3" dangerouslySetInnerHTML={{ __html: item.description }} />
+                                                <h5 className="mb-1 fs-15"><div className="text-body">{project.name}</div></h5>
+                                                <div className="text-muted text-truncate-two-lines mb-3" dangerouslySetInnerHTML={{ __html: project.description }} />
                                             </div>
                                         </div>
                                         <div className="mt-auto">
@@ -339,13 +368,13 @@ const List = () => {
                                                     <div>Tasks</div>
                                                 </div>
                                                 <div className="flex-shrink-0">
-                                                    <div><i className="ri-list-check align-bottom me-1 text-muted"></i> {item.completed_tasks}/{item.total_tasks}</div>
+                                                    <div><i className="ri-list-check align-bottom me-1 text-muted"></i> {project.completed_tasks}/{project.total_tasks}</div>
                                                 </div>
                                             </div>
                                             <div className="progress progress-sm animated-progess">
                                                 <div className="progress-bar bg-success"
                                                     role="progressbar"
-                                                    style={{ width: `${getProgress(item.completed_tasks, item.total_tasks) * 100}%` }}>
+                                                    style={{ width: `${getProgress(project.completed_tasks, project.total_tasks) * 100}%` }}>
                                                 </div>
                                             </div>
                                         </div>
@@ -355,7 +384,7 @@ const List = () => {
                                     <div className="d-flex align-items-center">
                                         <div className="flex-grow-1">
                                             <div className="avatar-group">
-                                                {item.members.map((item: any, key: any) => (
+                                                {project.members.map((item: any, key: any) => (
                                                     <React.Fragment key={key}>
                                                         {item.account_info.profile_ava_url ? <Link to="#" className="avatar-group-item" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Darline Williams">
                                                             <div className="avatar-xxs">
@@ -370,18 +399,12 @@ const List = () => {
                                                         </Link>}
                                                     </React.Fragment>
                                                 ))}
-                                                <Link to="#" className="avatar-group-item" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title="Add Members" onClick={() => { toggleModal(); }}>
-                                                    <div className="avatar-xs" data-bs-toggle="modal" data-bs-target="#inviteMembersModal">
-                                                        <div className="avatar-title fs-16 rounded-circle bg-light border-dashed border text-primary">
-                                                            +
-                                                        </div>
-                                                    </div>
-                                                </Link>
+                                             
                                             </div>
                                         </div>
                                         <div className="flex-shrink-0">
                                             <div className="text-muted">
-                                                <i className="ri-calendar-event-fill me-1 align-bottom"></i> {formatDate(item.created_at)}
+                                                <i className="ri-calendar-event-fill me-1 align-bottom"></i> {formatDate(project.created_at)}
                                             </div>
                                         </div>
                                     </div>
@@ -424,61 +447,7 @@ const List = () => {
                 </Col>
 
             </Row>}
-            <Modal isOpen={modal} toggle={toggleModal} centered className="border-0">
-                <ModalHeader toggle={toggleModal} className="p-3 ps-4 bg-success-subtle">
-                    Members
-                </ModalHeader>
-                <ModalBody className="p-4">
-                    <div className="search-box mb-3">
-                        <Input type="text" className="form-control bg-light border-light" id="search_member" placeholder="Search here..." onKeyPress={handleKeyPress} />
-                        <i className="ri-search-line search-icon"></i>
-                    </div>
-
-                    <div className="mb-4 d-flex align-items-center">
-                        <div className="me-2">
-                            <h5 className="mb-0 fs-13">Members :</h5>
-                        </div>
-                        <div className="avatar-group justify-content-center">
-                            {inviteMemberData && inviteMemberData.map((member: any, index: number) => {
-                                return (
-                                    <Link to="" className="avatar-group-item" data-bs-toggle="tooltip" data-bs-trigger="hover" data-bs-placement="top" title={member.account_info.full_name ? member.account_info.full_name : ""} data-bs-original-title="Brent Gonzalez">
-                                        <div className="avatar-xs">
-                                            <img src={member.account_info.profile_ava_url ? member.account_info.profile_ava_url : avt_default} alt="" className="rounded-circle img-fluid" />
-                                        </div>
-                                    </Link>);
-                            })}
-                        </div>
-                    </div>
-                    <SimpleBar className="mx-n4 px-4" data-simplebar="init" style={{ maxHeight: "225px" }}>
-                        <div className="vstack gap-3">
-
-                            {
-                                searchMember.id > 0 && <div className="d-flex align-items-center">
-                                    <div className="avatar-xs flex-shrink-0 me-3">
-                                        <img src={searchMember.profile_ava_url ? searchMember.profile_ava_url : ""} alt="" className="img-fluid rounded-circle" />
-                                    </div>
-                                    <div className="flex-grow-1">
-                                        <h5 className="fs-13 mb-0"><Link to="#" className="text-body d-block">{searchMember.full_name ? searchMember.full_name : ""}</Link></h5>
-                                    </div>
-                                    <div className="flex-shrink-0">
-                                        <button type="button" className="btn btn-light btn-sm" onClick={InviteMember(searchMember.email,'3')}>Add</button>
-                                    </div>
-                                </div>
-                            }
-                            {
-                                errorMessage != "" && <div>{errorMessage} </div>
-                            }
-
-                        </div>
-
-                    </SimpleBar>
-                </ModalBody>
-                <div className="modal-footer">
-                    <button type="button" className="btn btn-success w-xs" onClick={toggleModal}>Done</button>
-
-                </div>
-
-            </Modal>
+           
         </React.Fragment>
     );
 };

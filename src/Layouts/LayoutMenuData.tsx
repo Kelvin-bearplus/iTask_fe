@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {  useDispatch,useSelector } from "react-redux";
 import { createSelector } from 'reselect';
-import {getSimpleProject} from "../slices/thunks"
+import {getSimpleProject,getProjectList} from "../slices/thunks"
 import { useParams } from 'react-router-dom';
 const Navdata = () => {
     const dispatch: any = useDispatch();
@@ -20,6 +20,10 @@ const Navdata = () => {
         }
       }
     var project = useSelector(projectData);
+    useEffect(()=>{
+         dispatch(getProjectList({ inPage: 1, limit: 10, keyword: '' }));
+
+      },[])
       useEffect(()=>{
         getProject();
       },[project])

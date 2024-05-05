@@ -1,5 +1,9 @@
-import React from 'react';
+import React ,{useState}from 'react';
 import { Card, CardBody, Input, Label } from 'reactstrap';
+import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
+import { CKEditor } from "@ckeditor/ckeditor5-react";
+import {  updateTask } from "../../../slices/thunks";
+import {  useDispatch } from "react-redux";
 
 const Summary = (dataTask:any) => {
     var items = [];
@@ -10,14 +14,36 @@ const Summary = (dataTask:any) => {
     const parseHTML = (htmlString: string) => {
         return <div dangerouslySetInnerHTML={{ __html: htmlString }} />;
     };
+  const [editorData, setEditorData] = useState("");
+  const dispatch: any = useDispatch();
+
+    const handleEditorChange = (event: any, editor: any) => {
+        const descriptionText = editor.getData();
+        const data = {
+            id: dataTask.prop.id,
+
+            task: {
+                description: descriptionText,
+                project_id: dataTask.prop.project_info.id
+            }
+        }
+        console.log(data)
+        dispatch(updateTask(data))
+        setEditorData(descriptionText);
+      };
     return (
         <React.Fragment>
             <Card>
                 <CardBody>
                     <div className="text-muted">
                         <h6 className="mb-3 fw-semibold text-uppercase">Summary</h6>
-                        <p>{parseHTML(dataTask.prop.description)}</p>
-
+                        <CKEditor
+                    editor={ClassicEditor}
+                    data={dataTask.prop.description}
+                    onBlur={handleEditorChange}
+                    onReady={(editor) => {
+                    }}
+                  />
                         {/* <h6 className="mb-3 fw-semibold text-uppercase">Sub-tasks</h6>
                         <ul className=" ps-3 list-unstyled vstack gap-2">
                             <li>
