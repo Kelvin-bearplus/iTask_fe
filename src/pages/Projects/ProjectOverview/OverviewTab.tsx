@@ -7,6 +7,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { toast, ToastContainer } from 'react-toastify';
 import { createSelector } from 'reselect';
 import avt_default from "../../../assets/images/users/anh_mac_dinh.jpg";
+import Comments from'./Comment'
 //SimpleBar
 import SimpleBar from "simplebar-react";
 const userId = localStorage.getItem('userId');
@@ -29,11 +30,11 @@ const OverviewTab = ({ dataProject, startDate, deadlineDate }: { dataProject: an
             projectId: dataProject.prop.id, // Match the property name with the expected parameter name
             email: email
         };
-        console.log(dataProject)
 
         dispatch(inviteMember(dataUrl));
         setSearchMember(memberInit);
     }
+    console.log(dataProject)
 
     const handleKeyPress = async (event: React.KeyboardEvent<HTMLInputElement>) => {
         if (event.key === 'Enter') {
@@ -119,7 +120,7 @@ const OverviewTab = ({ dataProject, startDate, deadlineDate }: { dataProject: an
         }
         const data = await dispatch(deleteMember(dataDelete));
         console.log(data);
-        if (data.payload != undefined && data.payload.data) {
+        if (data.payload !== undefined && data.payload.data) {
             setErrorData("")
             console.log("vào")
             const messageSuccess = "Delete member " + name + " success!";
@@ -136,13 +137,13 @@ const OverviewTab = ({ dataProject, startDate, deadlineDate }: { dataProject: an
     console.log(errorData)
     return (
         <React.Fragment>
-            {toastData && toastData != "" ? (
+            {toastData && toastData !== "" ? (
                 <>
                     {toast(toastData, { position: "top-right", hideProgressBar: false, className: 'bg-success text-white', progress: undefined, toastId: "" })}
                     <ToastContainer autoClose={2000} limit={1} />
                 </>
             ) : null}
-            {errorData && errorData != "" ? (
+            {errorData && errorData !== "" ? (
                 <>
                     {toast(errorData, { position: "top-right", hideProgressBar: false, className: 'bg-danger text-white', progress: undefined, toastId: "" })}
                     <ToastContainer autoClose={2000} limit={1} />
@@ -194,6 +195,7 @@ const OverviewTab = ({ dataProject, startDate, deadlineDate }: { dataProject: an
                         </CardBody>
 
                     </Card>
+                    {dataProject.prop.id!==undefined && <Comments taskId={parseInt(dataProject.prop.id)} />}
                    
 
                 </Col>
@@ -213,7 +215,7 @@ const OverviewTab = ({ dataProject, startDate, deadlineDate }: { dataProject: an
                     </Card>
 
 
-                    {userId == dataProject.prop.owner.id &&
+                    {userId === dataProject.prop.owner.id &&
                         <Card>
                             <CardHeader className="align-items-center d-flex border-bottom-dashed">
                                 <h4 className="card-title mb-0 flex-grow-1">Members</h4>
@@ -227,7 +229,7 @@ const OverviewTab = ({ dataProject, startDate, deadlineDate }: { dataProject: an
                                     <div className="vstack gap-3">
                                         {inviteMemberData && inviteMemberData.map((member: any, index: number) => (
 
-                                            <div key={index} className={`d-flex align-items-center ${userId == member.account_info.id ? "bg_own_main" : ""}`}>
+                                            <div key={index} className={`d-flex align-items-center ${userId === member.account_info.id ? "bg_own_main" : ""}`}>
                                                 <div className="avatar-xs flex-shrink-0 me-3">
                                                     <img src={member.account_info.profile_ava_url} alt="" className="img-fluid rounded-circle" />
                                                 </div>
@@ -246,7 +248,7 @@ const OverviewTab = ({ dataProject, startDate, deadlineDate }: { dataProject: an
                                                             <DropdownMenu>
                                                                 <li><DropdownItem><i className="ri-eye-fill text-muted me-2 align-bottom"></i>View</DropdownItem></li>
                                                                 <li><DropdownItem><i className="ri-star-fill text-muted me-2 align-bottom"></i>Favourite</DropdownItem></li>
-                                                                {userId != member.account_info.id && <li onClick={() => deleteMemberHandel(member.account_info.id, member.account_info.full_name)}><DropdownItem><i className="ri-delete-bin-5-fill text-muted me-2 align-bottom" ></i>Delete</DropdownItem></li>}
+                                                                {userId !== member.account_info.id && <li onClick={() => deleteMemberHandel(member.account_info.id, member.account_info.full_name)}><DropdownItem><i className="ri-delete-bin-5-fill text-muted me-2 align-bottom" ></i>Delete</DropdownItem></li>}
                                                             </DropdownMenu>
                                                         </UncontrolledDropdown>
                                                     </div>

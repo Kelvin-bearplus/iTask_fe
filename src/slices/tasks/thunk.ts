@@ -8,7 +8,7 @@ import {
     updateTasks as updateTasksApi,
     deleteTasks as deleteTasksApi
 } from "../../helpers/fakebackend_helper";
-import { getTaskListAPI,deleteTaskAPI,getTaskByIdAPI ,assigneesAPI,getUnassignessAPI,getTaskKanbanAPI} from '../../helpers/url_api'
+import { getTaskListAPI,deleteTaskAPI,getTaskByIdAPI ,assigneesAPI,getUnassignessAPI,getTaskKanbanAPI,updateTasksListAPI} from '../../helpers/url_api'
 import { APIClient } from "../../helpers/api_helper";
 const api = new APIClient();
 export const getTaskList = createAsyncThunk("tasks/getTaskList", async (project_id:number) => {
@@ -76,7 +76,23 @@ export const updateTask = createAsyncThunk("tasks/updateTask", async (data: any)
         
         const response = await api.create(url,data.task)
         toast.success("Task Updated Successfully", { autoClose: 2000 });
-        console.log(response.data)
+        console.log(response)
+        return response.data;
+    } catch (error:any) {
+        console.log(error)
+        toast.error(error.response.data.message, { autoClose: 2000 });
+        throw error.response.data.message;
+    }
+});
+export const updateTasks = createAsyncThunk("tasks/updateTasks", async (data: any) => {
+    try {
+        console.log(data);
+        const queryString = data.id.map((id:number) => `ids=${id}`).join("&");
+        const url =updateTasksListAPI+"?"+queryString;
+        
+        const response = await api.create(url,data.dataSprint)
+        toast.success("Task Updated Successfully", { autoClose: 2000 });
+        console.log(response)
         return response.data;
     } catch (error:any) {
         console.log(error)

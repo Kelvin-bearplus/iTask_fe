@@ -309,11 +309,16 @@ async function refreshTaskList(){
   const [selectedCheckBoxDelete, setSelectedCheckBoxDelete] = useState<any>([]);
   const [isMultiDeleteButton, setIsMultiDeleteButton] = useState<boolean>(false);
 
-  const deleteMultiple = () => {
+  const deleteMultiple = async () => {
     const checkall: any = document.getElementById("checkBoxAll");
-    selectedCheckBoxDelete.forEach((element: any) => {
-      dispatch(deleteTask(element.value));
-      setTimeout(() => { toast.clearWaitingQueue(); }, 3000);
+    selectedCheckBoxDelete.forEach(async (element: any) => {
+      const dataResponse = await dispatch(deleteTask(element.value));
+      if (dataResponse.payload) {
+        refreshTaskList();
+      }
+      setTimeout(() => {
+        toast.clearWaitingQueue();
+      }, 3000);
     });
     setIsMultiDeleteButton(false);
     checkall.checked = false;

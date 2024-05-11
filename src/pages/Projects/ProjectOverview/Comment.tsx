@@ -50,20 +50,20 @@ const Comments = (dataTask: any) => {
                 'task_id': dataTask.taskId,
                 'parent_comment_id': replyId,
                 'message': values.contentComment,
-                'type':3
+                type:1
             }
             const response = await dispatch(createComment(valueSubmit));
             console.log(response);
             if (response.payload) {
                 resetForm();
-                getCommentData({ limit: limit, page: page, taskId: dataTask.taskId,type:3 })
+                getCommentData({ limit: limit, page: page, taskId: dataTask.taskId,type:1 })
             setReplyId(0)
             }
         }
     });
     useEffect(() => {
         if (dataTask != undefined) {
-            getCommentData({ limit: limit, page: page, taskId: dataTask.taskId, type:3 })
+            getCommentData({ limit: limit, page: page, taskId: dataTask.taskId, type:1 })
         }
     }, []);
     console.log(dataComment);

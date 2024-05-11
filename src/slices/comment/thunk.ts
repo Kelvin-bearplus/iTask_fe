@@ -5,14 +5,14 @@ import { APIClient } from "../../helpers/api_helper";
 // import { resetProjectFlagChange } from "./reducer"
 
 const api = new APIClient();
-export const getComment = createAsyncThunk("getComment", async ({ page, limit, taskId  }: { page:number, limit:number , taskId:number}) => {
+export const getComment = createAsyncThunk("getComment", async ({ page, limit, taskId,type  }: { page:number, limit:number , taskId:number,type:number}) => {
     try {
     
             const params = {
                 page: page,
                 limit: limit,
-                task_id: taskId,
-                
+                object_id: taskId,
+                type:type
             };
             console.log(params);
             // Sử dụng tham số inPage và limit trong request API
@@ -27,14 +27,14 @@ export const getComment = createAsyncThunk("getComment", async ({ page, limit, t
     }
 });
 
-export const createComment = createAsyncThunk("createComment", async ({ task_id, parent_comment_id, message  }: { task_id:number, parent_comment_id:number, message:string}) => {
+export const createComment = createAsyncThunk("createComment", async ({ task_id, parent_comment_id, message ,type }: {type:number, task_id:number, parent_comment_id:number, message:string}) => {
     try {
     
             const data = {
-                task_id: task_id,
+                type:type,
+                object_id: task_id,
                 parent_comment_id: parent_comment_id,
                 message: message,
-                
             };
             console.log(data)
             const response = await api.create(getCommentAPI, data);
@@ -44,6 +44,7 @@ export const createComment = createAsyncThunk("createComment", async ({ task_id,
 
     } catch (error:any) {
         var errorMessage:any = error.response.data.error.message?error.response.data.error.message:"Lỗi";
+        console.log(error)
        throw errorMessage;
     }
 });
