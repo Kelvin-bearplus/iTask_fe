@@ -18,21 +18,15 @@ const DashboardProject = () => {
                 <Container fluid>
                     <BreadCrumb title="Projects" pageTitle="Dashboards" />
                     <Row className="project-wrapper">
-                        <Col xxl={8}>
+                        <Col >
                             <Widgets />
-                            <ProjectsOverview />
                         </Col>
-                        <UpcomingSchedules />
                     </Row>
                     <Row>
                         <ActiveProjects />
                         <MyTasks />
                     </Row>
-                    <Row>
-                        <TeamMembers />
-                        <Chat />
-                        <ProjectsStatus />
-                    </Row>
+ 
                 </Container>
             </div>
         </React.Fragment>

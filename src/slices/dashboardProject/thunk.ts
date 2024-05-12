@@ -10,6 +10,9 @@ import {
   getMonthProjectStatusData as getMonthProjectStatusDataApi,
   getQuarterProjectStatusData as getQuarterProjectStatusDataApi
 } from "../../helpers/fakebackend_helper";
+import { getProjectActiveAPI,getTotalTaskDoneAPI,getTotalTaskAssignedAPI} from '../../helpers/url_api'
+import { APIClient } from "../../helpers/api_helper";
+const api = new APIClient();
 
 export const getProjectChartsData = createAsyncThunk("dashboardProject/getProjectChartsData", async (data:any) => {
   try {
@@ -49,6 +52,30 @@ export const getProjectStatusChartsData = createAsyncThunk("dashboardProject/get
     }
     return response;
   } catch (error) {
+    return error;
+  }
+});
+export const getProjectActive = createAsyncThunk("dashboardProject/getProjectActive", async () => {
+  try {
+  const response= await api.get(getProjectActiveAPI);
+    return response.data;
+  } catch (error:any) {
+    return error;
+  }
+});
+export const getPTaskDone = createAsyncThunk("dashboardProject/getPTaskDone", async () => {
+  try {
+  const response= await api.get(getTotalTaskDoneAPI);
+    return response.data;
+  } catch (error:any) {
+    return error;
+  }
+});
+export const getTaskAssigned= createAsyncThunk("dashboardProject/getTaskAssigned", async () => {
+  try {
+  const response= await api.get(getTotalTaskAssignedAPI);
+    return response.data;
+  } catch (error:any) {
     return error;
   }
 });
