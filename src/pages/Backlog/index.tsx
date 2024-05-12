@@ -407,17 +407,27 @@ const [sprinId, setSprintId]=useState(0);
       const incompleteTasksIds = sprintEdit.tasks && sprintEdit.tasks.filter((item:any) => item.status !== 3).map((item:any) => item.id);
     
     console.log(incompleteTasksIds);
+    if(incompleteTasksIds.length>0){
       const dataTask = {
-      id: incompleteTasksIds,
-      dataSprint:{
-       sprint_id:values.sprintIdTo,
-       project_id:props.project_id
-      }
-      };
-
+        id: incompleteTasksIds,
+        dataSprint:{
+         sprint_id:parseInt(values.sprintIdTo),
+         project_id:props.project_id,
+        }
+        };
+     
       const dataResponse = await dispatch(updateTasks(dataTask));
       console.log(dataResponse)
-      if (dataResponse.payload) {
+
+    }
+    const dataSprint={
+      id:idSprintEdit,
+      data:{
+       closed:true
+      }
+       }
+      const dataSprintResponse = await dispatch(editSprintAPI(dataSprint));
+      if ( dataSprintResponse.payload) {
         refreshList()
         validationCreateSprint.resetForm();
         setEditorData('');
@@ -426,7 +436,7 @@ const [sprinId, setSprintId]=useState(0);
 
     },
   });
-  const statusTaskChange = (id: number, e: React.ChangeEvent<HTMLSelectElement>) => {
+  const statusTaskChange =async(id: number, e: React.ChangeEvent<HTMLSelectElement>) => {
     const data = {
       id: id,
       task: {
@@ -435,7 +445,7 @@ const [sprinId, setSprintId]=useState(0);
       }
     }
     console.log(data)
-    dispatch(updateTask(data))
+    await dispatch(updateTask(data))
     refreshList()
   }
 async  function updateTaskToSprint(sprinIdTask:number,taskIdSprint:number){
@@ -511,13 +521,13 @@ console.log(sprintEdit)
               <div className="col-7"><div className="name_sprin">{item.name} <span className="time_sprin">{formatDateSprintFromAPI(item.started_at)} - {formatDateSprintFromAPI(item.ended_at)} ({item.tasks != null && item.tasks.length > 0 && item.tasks.length} {item.tasks == null && 0} issues)</span></div>
               </div>
               <div className="col-5 d-flex justify-content-end">
-                {item.id !== 0 &&item.started && <p className={`complete_sprin mb-0 complete_sprint`} onClick={()=>isCompleteSprint(item.id)}>
+                {item.id !== 0 &&item.started && <p className={`complette_sprin mb-0 complete_sprint`} onClick={()=>isCompleteSprint(item.id)}>
                 Complete sprint
                 </p>}
                 {item.id !== 0 &&!item.started&& <p className={`complete_sprin mb-0 `} onClick={( )=>isStartSprint(item.id)}>
                  Start sprint
                 </p>}
-                {item.id!==0 && <UncontrolledDropdown className="float-end dropdown_sprin">
+                {item.id!==0&&  <UncontrolledDropdown className="float-end dropdown_sprin">
                   <DropdownToggle
                     className="arrow-none "
                     tag="a"
@@ -1158,7 +1168,10 @@ console.log(sprintEdit)
             <Row className="g-3">
               <Col >
               <div className="__name_sprint_modal">Complete {sprintEdit.name}</div>
-              <div className="__sub_sprint">This sprint contains task done:</div>
+              { 
+    sprintEdit.tasks&&sprintEdit.tasks.some((task:any) => task.status === 3) && 
+  <div className="__sub_sprint">This sprint contains tasks done:</div> 
+}
               <ul className="__done_task">
                 {sprintEdit.tasks && sprintEdit.tasks.map((item:any,key:number)=>{
                   return(
@@ -1166,7 +1179,10 @@ console.log(sprintEdit)
                   )
                 })}
               </ul>
-              <div className="__sub_sprint">This sprint contains task open:</div>
+              { 
+    sprintEdit.tasks&&sprintEdit.tasks.some((task:any) => task.status !== 3) && 
+  <div className="__sub_sprint">This sprint contains tasks open:</div> 
+}
               <ul className="__no_done_task">
                 {sprintEdit.tasks && sprintEdit.tasks.map((item:any,key:number)=>{
                   return(
@@ -1175,7 +1191,7 @@ console.log(sprintEdit)
                 })}
               </ul>
               </Col>
-            <Col lg={12}>
+           {sprintEdit.tasks&&sprintEdit.tasks.some((task:any) => task.status !== 3)&& <Col lg={12}>
                 <Label for="priority-field" className="form-label">Move open task to</Label>
                 <Input
                   name="sprintIdTo"
@@ -1198,7 +1214,7 @@ console.log(sprintEdit)
                 {validationCompleteSprint.touched.sprintIdTo && validationCompleteSprint.errors.sprintIdTo ? (
                   <FormFeedback type="invalid">{validationCompleteSprint.errors.sprintIdTo}</FormFeedback>
                 ) : null}
-              </Col>
+              </Col>}
             </Row>
           </ModalBody>
           <div className="modal-footer">

@@ -183,12 +183,26 @@ color: #403294;
 .__modal_task_detail{
   max-width: 80% !important;
 }
-.complete_sprint{
+p.complete_sprint{
   background-color: #2eac77;
   color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  border-radius: 5px;
+  margin-right: 8px;
+  cursor: pointer;
 }
 .__name_sprint_modal{
   font-size: 20px;
   font-weight: 600;
   color: #000;
+  margin-bottom: 20px;
+}
+.__sub_sprint{
+  font-size: 16px;
+  font-weight: 500;
+  color: #000;
+  margin: 8px 0;
 }

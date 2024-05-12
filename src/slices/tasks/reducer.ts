@@ -42,11 +42,7 @@ const TasksSlice = createSlice({
             state.isTaskAddFail = true;
         });
         builder.addCase(updateTask.fulfilled, (state: any, action: any) => {
-            state.taskList = state.taskList.map((task: any) =>
-                task.id === action.payload.id
-                    ? { ...task, ...action.payload }
-                    : task
-            );
+            state.taskList =state.payload;
       
             state.isTaskUpdate = true;
             state.isTaskUpdateFail = false;

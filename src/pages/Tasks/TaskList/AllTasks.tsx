@@ -97,8 +97,8 @@ useEffect(()=>{
   const [modal, setModal] = useState<boolean>(false);
 
   const toggle = useCallback(() => {
-    
-    if (modal) {
+     
+            if (modal) {
       setModal(false);
       setTask(null);
     } else {

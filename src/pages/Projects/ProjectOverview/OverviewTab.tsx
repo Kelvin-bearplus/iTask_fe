@@ -205,7 +205,7 @@ const OverviewTab = ({ dataProject, startDate, deadlineDate }: { dataProject: an
                         <CardBody>
                             <h5 className="card-title mb-4">Skills</h5>
                             <div className="d-flex flex-wrap gap-2 fs-16">
-                                {dataProject.prop.tags.split(', ').length > 0 && dataProject.prop.tags.split(', ').map((item: string, index: number) => (
+                                {dataProject.prop.tags && dataProject.prop.tags.split(', ').map((item: string, index: number) => (
                                     <div key={index} className="badge fw-medium bg-secondary-subtle text-secondary">
                                         {item}
                                     </div>
