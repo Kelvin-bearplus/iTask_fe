@@ -10,7 +10,7 @@ import {
   getMonthProjectStatusData as getMonthProjectStatusDataApi,
   getQuarterProjectStatusData as getQuarterProjectStatusDataApi
 } from "../../helpers/fakebackend_helper";
-import { getProjectActiveAPI,getTotalTaskDoneAPI,getTotalTaskAssignedAPI} from '../../helpers/url_api'
+import { getProjectActiveAPI,getTotalTaskDoneAPI,getTotalTaskAssignedAPI,getProjectActiveDetailAPI,getUpcomingTaskAPI} from '../../helpers/url_api'
 import { APIClient } from "../../helpers/api_helper";
 const api = new APIClient();
 
@@ -75,6 +75,30 @@ export const getTaskAssigned= createAsyncThunk("dashboardProject/getTaskAssigned
   try {
   const response= await api.get(getTotalTaskAssignedAPI);
     return response.data;
+  } catch (error:any) {
+    return error;
+  }
+});
+export const getProjectActiveDetail= createAsyncThunk("dashboardProject/getProjectActiveDetail", async () => {
+  try {
+  const response= await api.get(getProjectActiveDetailAPI);
+    return response.data;
+  } catch (error:any) {
+    return error;
+  }
+});
+export const getUpcomingTask= createAsyncThunk("dashboardProject/getUpcomingTask", async (month?:number) => {
+  try {
+    if(month!=null){
+      const monthWithLeadingZero = month < 10 ? `0${month}` : month;
+    const response= await api.get(getUpcomingTaskAPI+`?due_date_from=2024-${monthWithLeadingZero}-01`);
+      return response.data;
+      
+    }else{
+      const response= await api.get(getUpcomingTaskAPI);
+      return response.data;
+    }
+
   } catch (error:any) {
     return error;
   }

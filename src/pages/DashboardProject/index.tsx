@@ -20,6 +20,7 @@ const DashboardProject = () => {
                     <Row className="project-wrapper">
                         <Col >
                             <Widgets />
+                            <UpcomingSchedules/>
                         </Col>
                     </Row>
                     <Row>
