@@ -40,7 +40,7 @@ const ActiveProjects = () => {
       }
     return (
         <React.Fragment>
-            <Col xl={7}>
+            <Col xl={6}>
                 <Card>
                     <CardHeader className="d-flex align-items-center">
                         <h4 className="card-title flex-grow-1 mb-0">Active Projects</h4>

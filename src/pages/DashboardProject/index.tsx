@@ -25,9 +25,13 @@ const DashboardProject = () => {
                     </Row>
                     <Row>
                         <ActiveProjects />
-                        <MyTasks />
+                    <MyTasks />
+
                     </Row>
- 
+                    <Row>
+                    <ProjectsStatus/>
+
+                    </Row>
                 </Container>
             </div>
         </React.Fragment>

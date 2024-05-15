@@ -30,3 +30,5 @@ export const getTotalTaskDoneAPI:string= baseURL+"api/v1/taskAssignees/total-don
 export const getTotalTaskAssignedAPI:string= baseURL+"api/v1/taskAssignees/total-assigned"
 export const getProjectActiveDetailAPI:string= baseURL+"api/v1/projects/active-list"
 export const getUpcomingTaskAPI:string= baseURL+"api/v1/tasks/upcoming"
+export const getMyTaskDashboardAPI:string= baseURL+"api/v1/tasks/my-tasks"
+export const getProjectStatusAPI:string= baseURL+"api/v1/projects/statuses"

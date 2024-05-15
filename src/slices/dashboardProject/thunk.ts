@@ -10,7 +10,7 @@ import {
   getMonthProjectStatusData as getMonthProjectStatusDataApi,
   getQuarterProjectStatusData as getQuarterProjectStatusDataApi
 } from "../../helpers/fakebackend_helper";
-import { getProjectActiveAPI,getTotalTaskDoneAPI,getTotalTaskAssignedAPI,getProjectActiveDetailAPI,getUpcomingTaskAPI} from '../../helpers/url_api'
+import { getProjectActiveAPI,getTotalTaskDoneAPI,getTotalTaskAssignedAPI,getProjectActiveDetailAPI,getUpcomingTaskAPI,getMyTaskDashboardAPI,getProjectStatusAPI} from '../../helpers/url_api'
 import { APIClient } from "../../helpers/api_helper";
 const api = new APIClient();
 
@@ -93,13 +93,43 @@ export const getUpcomingTask= createAsyncThunk("dashboardProject/getUpcomingTask
       const monthWithLeadingZero = month < 10 ? `0${month}` : month;
     const response= await api.get(getUpcomingTaskAPI+`?due_date_from=2024-${monthWithLeadingZero}-01`);
       return response.data;
-      
     }else{
       const response= await api.get(getUpcomingTaskAPI);
       return response.data;
     }
 
   } catch (error:any) {
+    return error;
+  }
+});
+export const getMyTaskDashboard= createAsyncThunk("dashboardProject/getMyTaskDashboard", async (status?:number) => {
+  try {
+    if(status!=null){
+    const response= await api.get(getMyTaskDashboardAPI+`?status=${status}`);
+      return response.data;
+    }else{
+      const response= await api.get(getMyTaskDashboardAPI);
+      return response.data;
+    }
+
+  } catch (error:any) {
+    return error;
+  }
+});
+export const getProjectStatus= createAsyncThunk("dashboardProject/getProjectStatus", async (status?:number) => {
+  try {
+    if(status!=null){
+    const response= await api.get(getProjectStatusAPI+`?status=${status}`);
+      return response.data;
+    }else{
+      const response= await api.get(getProjectStatusAPI);
+    console.log(response)
+
+      return response.data;
+    }
+
+  } catch (error:any) {
+    console.log(error)
     return error;
   }
 });

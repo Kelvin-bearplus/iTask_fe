@@ -9,15 +9,17 @@ const UpcomingSchedules = () => {
     const dispatch = useDispatch<any>();
     const [taskListComing,setTaskListComing]=useState<any>([]);
   
-    async function getTaskComing(){
-      const dataResponse=await dispatch(getUpcomingTaskAPI());
+    async function getTaskComing(monthCurrent:number){
+      const dataResponse=await dispatch(getUpcomingTaskAPI(monthCurrent));
       console.log(dataResponse);
       if(dataResponse.payload){
         setTaskListComing(dataResponse.payload);
       }
       }
       useEffect(()=>{
-        getTaskComing();
+        const monthCurrent= new Date().getMonth()+1;
+      console.log(monthCurrent)
+        getTaskComing(monthCurrent);
         },[])
         console.log(taskListComing)
         function formatDate(inputDate:string) {
@@ -44,6 +46,8 @@ const UpcomingSchedules = () => {
             return day;
           }
           const [selectedMonth, setSelectedMonth] = useState<number>(0);
+        const [isLinkVisible, setIsLinkVisible] = useState(true);
+
         useEffect(() => {
             async function fetchData() {
                 const monthDropdown = document.querySelector(".flatpickr-monthDropdown-months");
@@ -55,6 +59,7 @@ const UpcomingSchedules = () => {
                         console.log(dataResponse);
                         if (dataResponse.payload) {
                             setTaskListComing(dataResponse.payload);
+                            setIsLinkVisible(true);
                         }
                     });
                 }
@@ -65,6 +70,14 @@ const UpcomingSchedules = () => {
             return <div dangerouslySetInnerHTML={{ __html: htmlString }} />;
           };
         console.log(selectedMonth);
+       async function GetAllTaskComing(){
+            const dataResponse=await dispatch(getUpcomingTaskAPI());
+      console.log(dataResponse);
+      if(dataResponse.payload){
+        setTaskListComing(dataResponse.payload);
+        setIsLinkVisible(false);
+      }
+        }
     return (
         <React.Fragment>
             <div className="col-12">
@@ -109,11 +122,11 @@ const UpcomingSchedules = () => {
                             )
                        })}
         {
-            taskListComing.length==0&&   <h6 className="mb-1">There are no tasks upcoming in the selected month</h6>
+            taskListComing.length==0&&   <h6 className="mb-1">There are no tasks upcoming in the current month</h6>
         }
 
                         <div className="mt-3 text-center">
-                            <Link to="#" className="text-muted text-decoration-underline">View all Events</Link>
+                          {isLinkVisible&& <Link to='#' className="text-muted text-decoration-underline" onClick={GetAllTaskComing}>View all Events</Link>}
                         </div>
 
                     </div>

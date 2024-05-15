@@ -169,7 +169,7 @@ const PrjectsStatusCharts = ({ dataColors, series }:any) => {
     var donutchartProjectsStatusColors = getChartColorsArray(dataColors);
 
     var options:any = {
-        labels: ["Completed", "In Progress", "Yet to Start", "Cancelled"],
+        labels: ["Pending", "In Progress", "Completed"],
         chart: {
             type: "donut",
             height: 230,

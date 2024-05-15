@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { getProjectChartsData, getProjectStatusChartsData,getProjectActive,getTaskAssigned,getPTaskDone ,getProjectActiveDetail,getUpcomingTask} from './thunk';
+import { getProjectChartsData,getProjectStatus, getProjectStatusChartsData,getProjectActive,getTaskAssigned,getPTaskDone ,getProjectActiveDetail,getUpcomingTask,getMyTaskDashboard} from './thunk';
 
 export const initialState = {
   projectData: [],
@@ -54,6 +54,18 @@ const DashboardProjectSlice = createSlice({
       state.projectData = action.payload;
     });
     builder.addCase(getUpcomingTask.rejected, (state:any, action:any) => {
+      state.error = action.payload || null;
+    });
+    builder.addCase(getMyTaskDashboard.fulfilled, (state:any, action:any) => {
+      // state.projectData = action.payload;
+    });
+    builder.addCase(getMyTaskDashboard.rejected, (state:any, action:any) => {
+      state.error = action.payload || null;
+    });
+    builder.addCase(getProjectStatus.fulfilled, (state:any, action:any) => {
+      state.projectStatusData = action.payload;
+    });
+    builder.addCase(getProjectStatus.rejected, (state:any, action:any) => {
       state.error = action.payload || null;
     });
   }
