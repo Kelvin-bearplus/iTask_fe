@@ -51,21 +51,18 @@ async function getProjectData(){
                                 <p className="fw-medium mb-0"><i className="ri-checkbox-blank-circle-fill text-warning align-middle me-2"></i> Pending</p>
                                 <div>
                                 <span className="text-muted pe-5">{chartData[0]} Projects</span>
-                                    <span className="text-success fw-medium fs-12">15870hrs</span>
                                 </div>
                             </div>
                             <div className="d-flex justify-content-between border-bottom border-bottom-dashed py-2">
                                 <p className="fw-medium mb-0"><i className="ri-checkbox-blank-circle-fill text-primary align-middle me-2"></i> In Progress</p>
                                 <div>
                                     <span className="text-muted pe-5">{chartData[1]} Projects</span>
-                                    <span className="text-success fw-medium fs-12">243hrs</span>
                                 </div>
                             </div>
                             <div className="d-flex justify-content-between border-bottom border-bottom-dashed py-2">
                                 <p className="fw-medium mb-0"><i className="ri-checkbox-blank-circle-fill text-success align-middle me-2"></i> Complete</p>
                                 <div>
                                     <span className="text-muted pe-5">{chartData[2]} Projects</span>
-                                    <span className="text-success fw-medium fs-12">~2050hrs</span>
                                 </div>
                             </div>
                             
