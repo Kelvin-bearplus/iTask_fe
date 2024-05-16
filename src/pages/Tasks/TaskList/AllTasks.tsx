@@ -6,6 +6,7 @@ import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 import { formatDateCreateProject } from "../../../helpers/format";
 // Import Scroll Bar - SimpleBar
 // import SimpleBar from 'simplebar-react';
+import TaskDetails from "pages/Tasks/TaskDetails";
 
 //Import Flatepicker
 import Flatpickr from "react-flatpickr";
@@ -20,7 +21,8 @@ import {
   addNewTask,
   updateTask,
   deleteTask,
-  getSimpleProject
+  getSimpleProject,
+  getTaskListAgain
 } from "../../../slices/thunks";
 
 import {
@@ -47,14 +49,16 @@ import { createSelector } from 'reselect';
 interface prop{
   project_id: number;
 }
+
 const AllTasks : React.FC<prop>= (props) => {
   const dispatch: any = useDispatch();
+  const [taskIdDetail, setTaskIdDetail] = useState(0);
   const [modalCreateTask, setModalCreateTask] = useState<boolean>(false);
   const selectLayoutState = (state: any) => state.Tasks;
   const selectLayoutProperties = createSelector(
     selectLayoutState,
     (state) => ({
-      taskList: state.taskList,
+      taskListData: state.taskList,
       isTaskSuccess: state.isTaskSuccess,
       error: state.error,
       isTaskAdd: state.isTaskAdd,
@@ -74,21 +78,14 @@ useEffect(()=>{
   
   },1500)
 },[])
-  // setTimeout(()=>{
-  //   console.log("1");
-
-  //   setIsLoad(false);
-  
-  // },1500)
-  // Inside your component
   const {
-    taskList, isTaskSuccess, error
+    taskListData, isTaskSuccess, error
   } = useSelector(selectLayoutProperties);
 
   const [isEdit, setIsEdit] = useState<boolean>(false);
 
   const [task, setTask] = useState<any>([]);
-  const [TaskList, setTaskList] = useState<any>([]);
+  const [taskList, setTaskList] = useState<any>([]);
   const [projectList, setProjectList] = useState<any>([]);
 
   // Delete Task
@@ -123,10 +120,7 @@ useEffect(()=>{
   };
   console.log(projectList);
 
-  useEffect(() => {
-    
-    setTaskList(taskList);
-  }, [taskList]);
+
 
   // Delete Data
   const handleDeleteTask =async () => {
@@ -250,7 +244,7 @@ useEffect(()=>{
   };
   const handleCustomerClick = useCallback((arg: any) => {
     const task = arg;
-    console.log(task)
+   setTaskIdDetail(task.id);
     setTask({
       id: task.id,
       name: task.name,
@@ -272,13 +266,13 @@ useEffect(()=>{
     toggle();
   };
 
-  // Get Data
-console.log("props: "+ props)
   useEffect(() => {
     // setTaskList(taskList);
     refreshTaskList();
   }, [props.project_id]);
-
+  useEffect(() => {
+    refreshTaskListAgain();
+  }, [taskListData]);
 async function refreshTaskList(){
   const dataResponse= await dispatch(getTaskList(props.project_id));
   if(dataResponse.payload){
@@ -286,7 +280,15 @@ async function refreshTaskList(){
   }
   // console.log(dataResponse)
 }
-
+async function refreshTaskListAgain(){
+    const dataResponse= await dispatch(getTaskListAgain({project_id:props.project_id}));
+  console.log(dataResponse)
+  if(dataResponse.payload){
+    setTaskList(dataResponse.payload);
+  }
+  
+  // console.log(dataResponse)
+}
   // Checked All
   const checkedAll = useCallback(() => {
     
@@ -445,7 +447,7 @@ async function refreshTaskList(){
     ],
     [handleCustomerClick, checkedAll]
   );
-console.log(TaskList);
+console.log(taskList);
 const [startDate, setStartDate] = useState<string | null>(null);
   const [endDate, setEndDate] = useState<string | null>(null);
   const [status, setStatus] = useState<string>('');
@@ -458,40 +460,50 @@ const [startDate, setStartDate] = useState<string | null>(null);
       console.log(selectedDates[0].toISOString());
     }
   };
+  const [filteredData, setFilteredData] = useState([]);
+  useEffect(() => {
+    const fetchData = async () => {
+      const dataResponse = await dispatch(getTaskListAgain({ project_id: props.project_id }));
+      if (dataResponse.payload) {
+        let filtered = dataResponse.payload;
+        console.log(filtered);
 
+        // Filter by date range
+        if (startDate && endDate) {
+          console.log(startDate);
+          console.log(endDate);
+          filtered = filtered.filter((item:any) => {
+            const itemDate = new Date(item.due_date);
+            console.log(itemDate >= new Date(startDate));
+            return itemDate >= new Date(startDate) && itemDate <= new Date(endDate);
+          });
+        }
+
+        // Filter by status
+        if (status !== "") {
+          console.log("2");
+          filtered = filtered.filter((item:any) => item.status === status);
+          console.log(filtered);
+        }
+
+        setFilteredData(filtered);
+      }
+    };
+
+    fetchData();
+  }, [dispatch, props.project_id, startDate, endDate, status, taskList]);
   // Handler for status change
   const handleStatusChange = (value:any) => {
-    setStatus(value);
+    if(value!=''){
+      value=parseInt(value)
+      setStatus(value);
+    }
+   
   };
   const handleFilterClick = () => {
- setTaskList(filteredData)
+    setTaskList(filteredData)
   };
-  const filteredData = useMemo(() => {
-    let filtered= taskList;
-console.log(taskList)
-    // Filter by date range
-    if (startDate && endDate) {
-      console.log(startDate)
-      console.log(endDate)
-      filtered = filtered.filter((item:any) => {
-        const itemDate = new Date(item.due_date);
-        console.log(itemDate >= new Date(startDate))
-        return itemDate >= new Date(startDate) && itemDate <= new Date(endDate);
-      });
-    }
-
-    // Filter by status
-    if (status!="") {
-      
-      console.log("2")
-
-      filtered = filtered.filter((item: any) => item.status == status);
-      console.log(filtered)
-
-    }
-
-    return filtered;
-  }, [taskList, startDate, endDate, status]);
+ 
   return (
     <React.Fragment>
       <DeleteModal
@@ -527,7 +539,7 @@ console.log(taskList)
                {!isLoad&&isTaskSuccess  &&
                 <TableContainer
                   columns={columns}
-                  data={(TaskList || [])}
+                  data={(taskList || [])}
                   isGlobalFilter={true}
                   isAddUserList={false}
                   customPageSize={8}
@@ -558,167 +570,16 @@ console.log(taskList)
         centered
         size="lg"
         className="border-0"
-        modalClassName='modal fade zoomIn'
+        modalClassName='modal fade zoomIn col-12 __modal_task_all'
       >
         <ModalHeader className="p-3 bg-info-subtle" toggle={toggle}>
           Edit Task
         </ModalHeader>
-        <Form className="tablelist-form" onSubmit={(e: any) => {
-          e.preventDefault();
-          validation.handleSubmit();
-          return false;
-        }}>
-          <ModalBody className="modal-body">
-            <Row className="g-3">
 
+          <ModalBody className="modal-body col-12">
+          <TaskDetails idTask={taskIdDetail} />
 
-
-              <Col lg={12}>
-                <div>
-                  <Label for="tasksTitle-field" className="form-label">Task name</Label>
-                  <Input
-                    name="name"
-                    id="tasksTitle-field"
-                    className="form-control"
-                    placeholder="Task name"
-                    type="text"
-                    validate={{
-                      required: { value: true },
-                    }}
-                    onChange={validation.handleChange}
-                    onBlur={validation.handleBlur}
-                    value={validation.values.name || ""}
-                    invalid={
-                      validation.touched.name && validation.errors.name ? true : false
-                    }
-                  />
-                  {validation.touched.name && validation.errors.name ? (
-                    <FormFeedback type="invalid">{validation.errors.name}</FormFeedback>
-                  ) : null}
-                </div>
-              </Col>
-              <Col lg={12}>
-                <div className="mb-3">
-                  <Label className="form-label">Project Description</Label>
-                  <CKEditor
-                    editor={ClassicEditor}
-                    data={editorData}
-                    onChange={handleEditorChange}
-                    onReady={(editor) => {
-                    }}
-                  />
-                </div>
-              </Col>
-
-              <Col lg={12}>
-                {/* <Label className="form-label">Assigned To</Label> */}
-                {/* <SimpleBar style={{ maxHeight: "95px" }}>
-                  <ul className="list-unstyled vstack gap-2 mb-0">
-                    {Assigned.map((item, key) => (<li key={key}>
-                      <div className="form-check d-flex align-items-center">
-                        <Input name="subItem" className="form-check-input me-3" type="checkbox"
-                          onChange={validation.handleChange}
-                          onBlur={validation.handleBlur}
-                          value={item.img}
-                          invalid={validation.touched.subItem && validation.errors.subItem ? true : false}
-                          id={item.imgId} />
-
-                        <Label className="form-check-label d-flex align-items-center" htmlFor={item.imgId}>
-                          <span className="flex-shrink-0">
-                            <img src={item.img} alt="" className="avatar-xxs rounded-circle" />
-                          </span>
-                          <span className="flex-grow-1 ms-2">
-                            {item.name}
-                          </span>
-                        </Label>
-                        {validation.touched.subItem && validation.errors.subItem ? (
-                          <FormFeedback type="invalid">{validation.errors.subItem}</FormFeedback>
-                        ) : null}
-                      </div>
-                    </li>))}
-                  </ul>
-                </SimpleBar> */}
-              </Col>
-
-              <Col lg={6}>
-                <Label for="duedate-field" className="form-label">Due Date</Label>
-                <Flatpickr
-                  name="dueDate"
-                  id="duedate-field"
-                  className="form-control"
-                  placeholder="Select a date"
-                  options={{
-                    altInput: true,
-                    altFormat: "d M, Y",
-                    dateFormat: "d M, Y",
-                  }}
-                  onChange={(dueDate: any) => validation.setFieldValue("dueDate", moment(dueDate[0]).format("DD MMMM ,YYYY"))}
-                  value={validation.values.dueDate|| ''}
-                />
-                {validation.errors.dueDate && validation.touched.dueDate ? (
-                  <FormFeedback type="invalid" className='d-block'>{validation.errors.dueDate}</FormFeedback>
-                ) : null}
-              </Col>
-              <Col lg={6}>
-                <Label for="ticket-status" className="form-label">Status</Label>
-                <Input
-                  name="status"
-                  type="select"
-                  className="form-select"
-                  id="ticket-field"
-                  onChange={validation.handleChange}
-                  onBlur={validation.handleBlur}
-                  value={validation.values.status || ""}
-                  invalid={
-                    validation.touched.status && validation.errors.status ? true : false
-                  }
-                >
-                  <option value="0">Unssigned</option>
-                  <option value="1">Pending</option>
-                  <option value="2">In-progress</option>
-                  <option value="3">Completed</option>
-                </Input>
-                {validation.touched.status && validation.errors.status ? (
-                  <FormFeedback type="invalid">{validation.errors.status}</FormFeedback>
-                ) : null}
-              </Col>
-              <Col lg={12}>
-                <Label for="priority-field" className="form-label">Priority</Label>
-                <Input
-                  name="priority"
-                  type="select"
-                  className="form-select"
-                  id="priority-field"
-                  onChange={validation.handleChange}
-                  onBlur={validation.handleBlur}
-                  value={validation.values.priority || ""}
-                  invalid={
-                    validation.touched.priority && validation.errors.priority ? true : false
-                  }
-                >
-                  <option value="1">High</option>
-                  <option value="2">Medium</option>
-                  <option value="3">Low</option>
-                </Input>
-                {validation.touched.priority && validation.errors.priority ? (
-                  <FormFeedback type="invalid">{validation.errors.priority}</FormFeedback>
-                ) : null}
-              </Col>
-            </Row>
-          </ModalBody>
-          <div className="modal-footer">
-            <div className="hstack gap-2 justify-content-end">
-              <Button
-                type="button"
-                onClick={() => {
-                  setModal(false);
-                }}
-                className="btn-light"
-              >Close</Button>
-              <button type="submit" className="btn btn-success" id="add-btn">Update Task</button>
-            </div>
-          </div>
-        </Form>
+           </ModalBody>
       </Modal>
       <Modal
         isOpen={modalCreateTask}

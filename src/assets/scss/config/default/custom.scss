@@ -206,3 +206,11 @@ p.complete_sprint{
   color: #000;
   margin: 8px 0;
 }
+.__modal_task_all {
+display: flex;
+justify-content: center;
+}
+.__modal_task_all .modal-lg, .modal-xl{
+  --vz-modal-width:80%;
+  margin: auto;
+  }

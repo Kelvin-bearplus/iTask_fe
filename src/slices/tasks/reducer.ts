@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { getTaskList, addNewTask, updateTask,updateTasks, deleteTask, updateCardData, deleteKanban, getTasksKanban, addCardData,getUnassigness,getTaskById,getAssigneesById } from './thunk';
+import { getTaskList, addNewTask,getTaskListAgain, updateTask,updateTasks, deleteTask, updateCardData, deleteKanban, getTasksKanban, addCardData,getUnassigness,getTaskById,getAssigneesById } from './thunk';
 export const initialState = {
     taskList: [],
     tasks: [],
@@ -42,7 +42,8 @@ const TasksSlice = createSlice({
             state.isTaskAddFail = true;
         });
         builder.addCase(updateTask.fulfilled, (state: any, action: any) => {
-            state.taskList =state.payload;
+            state.taskList =action.payload;
+            console.log(action.payload)
       
             state.isTaskUpdate = true;
             state.isTaskUpdateFail = false;
@@ -54,7 +55,6 @@ const TasksSlice = createSlice({
         });
         builder.addCase(updateTasks.fulfilled, (state: any, action: any) => {
             state.taskList = action.payload
-      
             state.isTaskUpdate = true;
             state.isTaskUpdateFail = false;
         });
@@ -146,6 +146,12 @@ const TasksSlice = createSlice({
         });
         builder.addCase(deleteKanban.rejected, (state: any, action: any) => {
             state.error = action.payload.error || null;
+        });
+        builder.addCase(getTaskListAgain.fulfilled, (state: any, action: any) => {
+            
+        });
+        builder.addCase(getTaskListAgain.rejected, (state: any, action: any) => {
+            
         });
     }
 });

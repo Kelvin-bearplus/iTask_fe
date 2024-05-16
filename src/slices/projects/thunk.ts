@@ -42,7 +42,7 @@ export const getMemberList=createAsyncThunk("getMemberList", async (id:number) =
 });
 export const getProjectById = createAsyncThunk("getProjectById", async (id:number) => {
     try {
-            var url=getListProjects+'/'+id;
+            var url=getListProjects+id;
             const response = await api.get(url);
             console.log(response);
             return response;
@@ -72,7 +72,7 @@ export const getUninvited = createAsyncThunk("getUninvited", async ({email,proje
 });
 export const updateProjectById = createAsyncThunk("updateProjectById", async({ id, project }:{id:string,project:any}) => {
     try {
-            var url=getListProjects+'/'+id;
+            var url=getListProjects+id;
             const response = await api.create(url,project);
             // console.log(response);
             return response.data;
@@ -83,7 +83,7 @@ export const updateProjectById = createAsyncThunk("updateProjectById", async({ i
 });
 export const deleteProjectList = createAsyncThunk("deleteProjectList", async(id:number) => {
     try {
-            var url=getListProjects+'/'+id;
+            var url=getListProjects+id;
             const response = await api.deleteRequest(url);
             console.log(response);
             return response.data;

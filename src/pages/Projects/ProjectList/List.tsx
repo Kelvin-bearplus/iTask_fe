@@ -149,9 +149,7 @@ const List = () => {
         if (projectId) {
             dispatch(onDeleteProjectList(projectId));
             setDeleteModal(false);
-            setTimeout(() => {
-                window.location.reload();
-            }, 1500)
+            fetchData();
         }
     };
 

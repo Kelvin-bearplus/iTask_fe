@@ -39,7 +39,7 @@ export const loginUser = (user : any, history : any) => async (dispatch : any) =
   localStorage.setItem('userId', responseInfo.data.id);
   dispatch(loginSuccess(user));
   // console.log("loggined");
-  history('/dashboard-projects')
+  window.location.href = '/dashboard-projects';
   return data;
  }
       }

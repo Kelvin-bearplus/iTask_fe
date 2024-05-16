@@ -23,6 +23,7 @@ import UpdateProject from "../pages/Projects/UpdateProject";
 
 // //Task
 import TaskDetails from "../pages/Tasks/TaskDetails";
+import Eric from "../pages/Eric/index";
 import TaskList from "../pages/Tasks/TaskList";
 
 
@@ -70,6 +71,7 @@ const authProtectedRoutes = [
   { path: "/apps-tasks-kanban", component: <Kanbanboard /> },
   { path: "/apps-tasks-list-view", component: <TaskList /> },
   { path: "/apps-tasks-details", component: <TaskDetails /> },
+  { path: "/eric", component: <Eric /> },
 
 
   //User Profile

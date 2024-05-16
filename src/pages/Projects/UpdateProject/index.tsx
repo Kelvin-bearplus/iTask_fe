@@ -57,8 +57,11 @@ const UpdateProject = () => {
     const [dataProjectById, setDataProjectById] = useState<Project>(unitProject);
     const getDataProject = async (id: number) => {
         const data = await dispatch(getProjectById(id));
+        console.log(data)
         setDataProjectById(data.payload.data);
+       if(data.payload.data.thumbnail_url!==undefined){
         setThumbnail_avai(data.payload.data.thumbnail_url)
+       }
         setEditorData(data.payload.data.description)
         const deadlineData = new Date(data.payload.data.deadline);
         const startData = new Date(data.payload.data.started_at);
@@ -66,7 +69,7 @@ const UpdateProject = () => {
         setSelectedStart(formatDateCreateProject(startData))
         setDataDeadline(deadlineData)
         setDataStart(startData)
-        if (data.payload.data.taga != "") {
+        if (data.payload.data.tags != "") {
             const items: { value: string; label: string }[] = data.payload.data.tags.split(',').map((item: string) => ({
                 value: item.trim(),
                 label: item.trim()

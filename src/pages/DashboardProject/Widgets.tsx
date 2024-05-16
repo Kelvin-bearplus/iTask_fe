@@ -1,17 +1,24 @@
 import React, { useEffect,useState } from 'react';
 import { projectsWidgets } from '../../common/data';
 import CountUp from "react-countup";
+import { createSelector } from 'reselect';
 
 //Import Icons
 import FeatherIcon from "feather-icons-react";
 import { Card, CardBody, Col, Row } from 'reactstrap';
-import { useDispatch } from "react-redux"
+import { useDispatch,useSelector } from "react-redux"
 import {
     getProjectActive as getProjectActiveAPI,
     getTaskAssigned as getTaskAssignedAPI,
     getPTaskDone as getPTaskDoneAPI,
   } from "../../slices/thunks"
 const Widgets = () => {
+    const userData = createSelector(
+        (state : any) => state.Login.user,
+        (user) => user
+      );
+    var user = useSelector(userData);
+
     const [projectActive,setProjectActive]=useState(0);
     const [taskDone,setTaskDone]=useState(0);
     const [taskAssigned,setTaskAssigned]=useState(0);
@@ -41,7 +48,7 @@ const Widgets = () => {
     getProjectActive();
     getTotalTaskDone();
     getTotalTaskAssigned();
-  },[])
+  },[user])
   console.log(projectActive)
     return (
         <React.Fragment>

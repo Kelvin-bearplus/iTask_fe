@@ -13,10 +13,28 @@ import { APIClient } from "../../helpers/api_helper";
 const api = new APIClient();
 export const getTaskList = createAsyncThunk("tasks/getTaskList", async (project_id:number) => {
     try {
-        const param={project_id:project_id}
+        const param={project_id:project_id,limit:1000}
         const response =await api.get(getTaskListAPI,param);
         console.log(response)
         return response.data;
+    } catch (error:any) {
+        throw error.response.data.message;
+    }
+});
+export const getTaskListAgain = createAsyncThunk("tasks/getTaskListAgain", async( {project_id,status}:{project_id:any, status?:number}) => {
+    try {
+     if(status!=null){
+        const param={project_id:project_id,limit:1000,status:status}
+        const response =await api.get(getTaskListAPI,param);
+        console.log(response)
+        return response.data;
+     }
+     else{
+        const param={project_id:project_id,limit:1000}
+        const response =await api.get(getTaskListAPI,param);
+        console.log(response)
+        return response.data;
+     }
     } catch (error:any) {
         throw error.response.data.message;
     }
@@ -77,7 +95,7 @@ export const updateTask = createAsyncThunk("tasks/updateTask", async (data: any)
         const response = await api.create(url,data.task)
         toast.success("Task Updated Successfully", { autoClose: 2000 });
         console.log(response)
-        return response.data;
+        return data;
     } catch (error:any) {
         console.log(error)
         toast.error(error.response.data.message, { autoClose: 2000 });

@@ -30,7 +30,6 @@ const DashboardProject = () => {
                     </Row>
                     <Row>
                     <ProjectsStatus/>
-
                     </Row>
                 </Container>
             </div>
