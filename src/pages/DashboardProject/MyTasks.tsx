@@ -14,14 +14,12 @@ const MyTasks = () => {
     async function getTaskComing(status?:number) {
         if(status){
             const dataResponse = await dispatch(getMyTaskDashboardAPI(status));
-            console.log(dataResponse);
             if (dataResponse.payload) {
                 setMyTaskList(dataResponse.payload);
             }
         }
         else{
         const dataResponse = await dispatch(getMyTaskDashboardAPI());
-        console.log(dataResponse);
         if (dataResponse.payload) {
             setMyTaskList(dataResponse.payload);
         }
@@ -32,7 +30,6 @@ const MyTasks = () => {
 
         getTaskComing();
     }, [])
-    console.log(myTaskList)
     function formatDate(inputDate: string) {
         // Tạo một đối tượng Date từ chuỗi đầu vào
         const date = new Date(inputDate);
@@ -91,7 +88,6 @@ const MyTasks = () => {
         }
         setSelectedItem(item);
         
-        console.log(`Selected item: ${item}`);
       };
     return (
         <React.Fragment>

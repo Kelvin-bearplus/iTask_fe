@@ -26,7 +26,6 @@ const TimeTracking = (dataTask: any) => {
     async function deleteAssignHandle(userId: number) {
         const dataDelete = await dispatch(deleteAssign({ task_id: dataTask.prop.id, user_id: userId }));
         if (dataDelete.payload && dataDelete.payload.data == true) {
-            console.log(listMemberNoAssignees);
             setListMemberAssignees(listMemberAssignees.filter(
                 (item: any) => {
                     // Kiểm tra nếu item.user_info không tồn tại
@@ -56,9 +55,7 @@ const TimeTracking = (dataTask: any) => {
     }
     async function assignMemberHandle(userId: number) {
         const assignData = await dispatch(assignMember({ task_id: dataTask.prop.id, user_id: userId }));
-        console.log(assignData)
         if (assignData.payload && assignData.payload.data == 0) {
-            console.log(listMemberNoAssignees);
             setListMemberNoAssignees(listMemberNoAssignees.filter(
                 (item: any) => {
                     if (item.user_info) {
@@ -88,7 +85,6 @@ const TimeTracking = (dataTask: any) => {
     const [listMemberAssignees, setListMemberAssignees] = useState([]);
     async function setListMemberAss() {
         const data = await dispatch(getMemberAssignees({ projectId: dataTask.prop.project_info.id, taskId: dataTask.prop.id }));
-        console.log(data);
         if (data.payload) {
             setListMemberNoAssignees(data.payload);
         }
@@ -97,7 +93,6 @@ const TimeTracking = (dataTask: any) => {
         setListMemberAss();
         setListMemberAssignees(dataTask.prop.assignees)
     }, [])
-    // console.log(listMemberAssignees)
     const [modal, setModal] = useState<boolean>(false);
     const toggleModal = useCallback(() => {
         if (modal) {
@@ -179,7 +174,6 @@ const TimeTracking = (dataTask: any) => {
                 project_id: dataTask.prop.project_info.id
             }
         }
-        console.log(data)
         dispatch(updateTask(data))
     }
     const priorityTaskChange = (e: any) => {
@@ -191,7 +185,6 @@ const TimeTracking = (dataTask: any) => {
                 project_id: dataTask.prop.project_info.id
             }
         }
-        console.log(data)
         dispatch(updateTask(data))
     }
     const statusTaskChange = (e: any) => {
@@ -203,7 +196,6 @@ const TimeTracking = (dataTask: any) => {
                 project_id: dataTask.prop.project_info.id
             }
         }
-        console.log(data)
         dispatch(updateTask(data))
     }
  const onChangeDueDate = (selectedDates:any, dateStr:any) => {
@@ -212,7 +204,6 @@ const TimeTracking = (dataTask: any) => {
     if (selectedDate) {
         // Chuyển đổi đối tượng Date thành chuỗi có định dạng ISO 8601
         const isoDateString = selectedDate.toISOString();
-        console.log(isoDateString);
         const data = {
             id: dataTask.prop.id,
     
@@ -221,39 +212,16 @@ const TimeTracking = (dataTask: any) => {
                 project_id: dataTask.prop.project_info.id
             }
         }
-        // console.log(e.target.value)
         dispatch(updateTask(data))
     }
   
 }
     return (
         <React.Fragment>
-            {/* <Card>
-                <CardBody className="text-center">
-                    <h6 className="card-title mb-3 flex-grow-1 text-start">Time Tracking</h6>
-                    <div className="mb-2">
-                    <i className="ri-time-line display-2 text-success"></i>
-                    </div>
-                    <h3 className="mb-1">9 hrs 13 min</h3>
-                    <h5 className="fs-14 mb-4">Profile Page Satructure</h5>
-                    <div className="hstack gap-2 justify-content-center">
-                        <button className="btn btn-danger btn-sm"><i className="ri-stop-circle-line align-bottom me-1"></i> Stop</button>
-                        <button className="btn btn-success btn-sm"><i className="ri-play-circle-line align-bottom me-1"></i> Start</button>
-                    </div>
-                </CardBody>
-            </Card> */}
+       
             <Card className="mb-3">
                 <CardBody>
-                    {/* <div className="mb-4">
-                        <select className="form-control" name="choices-single-default" data-choices data-choices-search-false>
-                            <option value="">Select Task board</option>
-                            <option value="Unassigned">Unassigned</option>
-                            <option value="To Do">To Do</option>
-                            <option value="Inprogress">Inprogress</option>
-                            <option defaultValue="In Reviews">In Reviews</option>
-                            <option value="Completed">Completed</option>
-                        </select>
-                    </div> */}
+                  
                     <div className="table-card">
                         <table className="table mb-0">
                             <tbody>

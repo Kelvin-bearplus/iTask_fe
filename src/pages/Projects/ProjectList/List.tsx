@@ -92,14 +92,12 @@ const List = () => {
             projectId: project_id
         }
         const data = await dispatch(getUninvited(dataAPI));
-        console.log(data)
         if (data.payload && !isObjectEmpty(data.payload)) {
             if (!data.payload.is_invited&&!data.payload.message) {
                 setSearchMember(data.payload);
                 setErrorMessage("");
             }
             else if(data.payload.message) {
-                console.log(data.payload.message);
                 setErrorMessage(data.payload.message)
                 setSearchMember(memberInit);
             }
@@ -116,7 +114,6 @@ const List = () => {
         //  dataProject = await dispatch(onGetProjectList({ inPage: inPage, limit: limit }));
         const dataProject = await dispatch(onGetProjectList({ inPage: inPage, limit: limit, keyword: keyWord, created_day_range: createdDayRange }));
 
-        console.log(dataProject)
         if (dataProject.payload) {
             setProjectLists(dataProject.payload)
             setTotalProject(dataProject.payload.paging.total);
@@ -161,7 +158,6 @@ const List = () => {
         }
     };
 
-    console.log(Date().toString());
 
     function timeUpdate(time: string) {
         let date = new Date(time);
@@ -239,9 +235,7 @@ const List = () => {
     }
     const handlePaging = async (numberPage: number) => {
         setInPage(numberPage);
-        console.log(numberPage)
         const dataProject = await dispatch(onGetProjectList({ inPage: numberPage, limit: limit, keyword: keyWord, created_day_range: createdDayRange }));
-        console.log(dataProject)
         if (dataProject.payload) {
             setProjectLists(dataProject.payload)
         }
@@ -266,7 +260,6 @@ const List = () => {
             setTotalPage(Math.ceil(dataProject.payload.paging.total / limit))
         }
     };
-    console.log(projectLists)
     return (
         <React.Fragment>
             <ToastContainer closeButton={false} />

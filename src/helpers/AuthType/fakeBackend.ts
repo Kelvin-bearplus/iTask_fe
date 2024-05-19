@@ -1609,7 +1609,6 @@ const fakeBackend = () => {
     });
   
     mock.onDelete(url.DELETE_TASKS).reply(config => {
-      console.log("config", config);
   
       return new Promise((resolve, reject) => {
         setTimeout(() => {

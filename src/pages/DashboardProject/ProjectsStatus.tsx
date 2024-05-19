@@ -13,7 +13,6 @@ const ProjectsStatus = () => {
     const [seletedMonth, setSeletedMonth] = useState("All Time");
 async function getProjectData(){
     const dataResponse=await dispatch(getProjectStatusAPI());
-    console.log(dataResponse.payload);
     if(dataResponse.payload){
         var dataArray= Object.values(dataResponse.payload);
         dataArray.shift();
@@ -24,7 +23,6 @@ async function getProjectData(){
     useEffect(() => {
         getProjectData()
     }, [dispatch]);
-    console.log(chartData)
     return (
         <React.Fragment>
             <Col  >

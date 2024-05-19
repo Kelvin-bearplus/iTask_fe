@@ -72,7 +72,6 @@ function GlobalFilter({
   const [value, setValue] = React.useState(globalFilter);
   const onChange = useAsyncDebounce((value  :any) => {
     setGlobalFilter(value || undefined);
-    console.log(globalFilter)
   }, 200);
 
   return (

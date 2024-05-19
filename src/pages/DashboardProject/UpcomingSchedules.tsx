@@ -11,17 +11,14 @@ const UpcomingSchedules = () => {
   
     async function getTaskComing(monthCurrent:number){
       const dataResponse=await dispatch(getUpcomingTaskAPI(monthCurrent));
-      console.log(dataResponse);
       if(dataResponse.payload){
         setTaskListComing(dataResponse.payload);
       }
       }
       useEffect(()=>{
         const monthCurrent= new Date().getMonth()+1;
-      console.log(monthCurrent)
         getTaskComing(monthCurrent);
         },[])
-        console.log(taskListComing)
         function formatDate(inputDate:string) {
             // Tạo một đối tượng Date từ chuỗi đầu vào
             const date = new Date(inputDate);
@@ -56,7 +53,6 @@ const UpcomingSchedules = () => {
                         const selectedMonthIndex = parseInt((monthDropdown as HTMLSelectElement).value) + 1;
                         setSelectedMonth(selectedMonthIndex); // Tháng bắt đầu từ 0 nên cần +1
                         const dataResponse = await dispatch(getUpcomingTaskAPI(selectedMonthIndex));
-                        console.log(dataResponse);
                         if (dataResponse.payload) {
                             setTaskListComing(dataResponse.payload);
                             setIsLinkVisible(true);
@@ -69,10 +65,8 @@ const UpcomingSchedules = () => {
         const parseHTML = (htmlString: string) => {
             return <div dangerouslySetInnerHTML={{ __html: htmlString }} />;
           };
-        console.log(selectedMonth);
        async function GetAllTaskComing(){
             const dataResponse=await dispatch(getUpcomingTaskAPI());
-      console.log(dataResponse);
       if(dataResponse.payload){
         setTaskListComing(dataResponse.payload);
         setIsLinkVisible(false);

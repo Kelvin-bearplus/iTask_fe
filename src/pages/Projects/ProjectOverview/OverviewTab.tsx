@@ -18,7 +18,6 @@ const OverviewTab = ({ dataProject, startDate, deadlineDate }: { dataProject: an
     };
     const [modal, setModal] = useState<boolean>(false);
     const toggleModal = useCallback(() => {
-        console.log(dataProject)
         if (modal) {
             setModal(false);
         } else {
@@ -34,7 +33,6 @@ const OverviewTab = ({ dataProject, startDate, deadlineDate }: { dataProject: an
         dispatch(inviteMember(dataUrl));
         setSearchMember(memberInit);
     }
-    console.log(dataProject)
 
     const handleKeyPress = async (event: React.KeyboardEvent<HTMLInputElement>) => {
         if (event.key === 'Enter') {
@@ -47,7 +45,6 @@ const OverviewTab = ({ dataProject, startDate, deadlineDate }: { dataProject: an
     useEffect(() => {
         setInviteMemberData(dataProject.prop.members);
     }, [dataProject])
-    console.log(inviteMemberData);
     interface memberData {
         id: number,
         role: string,
@@ -92,14 +89,12 @@ const OverviewTab = ({ dataProject, startDate, deadlineDate }: { dataProject: an
             projectId: dataProject.prop.id
         }
         const data = await dispatch(getUninvited(dataAPI));
-        console.log(data)
         if (data.payload && !isObjectEmpty(data.payload)) {
             if (!data.payload.is_invited&&!data.payload.message) {
                 setSearchMember(data.payload);
                 setErrorMessage("");
             }
             else if(data.payload.message) {
-                console.log(data.payload.message);
                 setErrorMessage(data.payload.message)
                 setSearchMember(memberInit);
             }
@@ -119,22 +114,18 @@ const OverviewTab = ({ dataProject, startDate, deadlineDate }: { dataProject: an
             user_id: userId
         }
         const data = await dispatch(deleteMember(dataDelete));
-        console.log(data);
         if (data.payload !== undefined && data.payload.data) {
             setErrorData("")
-            console.log("vào")
             const messageSuccess = "Delete member " + name + " success!";
             setToastData(messageSuccess);
             setInviteMemberData(inviteMemberData.filter((member: any) => member.account_info.id !== userId));
         }
         else {
-            console.log("khanh")
             setToastData("");
             setErrorData("Delete member " + name + " fail!")
         }
     }
 
-    console.log(errorData)
     return (
         <React.Fragment>
             {toastData && toastData !== "" ? (

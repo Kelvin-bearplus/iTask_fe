@@ -124,7 +124,6 @@ const TasksKanban: React.FC<prop> = (props) => {
   const [task, setTask] = useState<any>([]);
   const handleCustomerClick = useCallback((arg: any) => {
     const taskData = arg;
-    console.log(taskData)
     setTask({
       id: taskData.id,
       name: taskData.name,
@@ -137,7 +136,6 @@ const TasksKanban: React.FC<prop> = (props) => {
     setEditorData(taskData.description);
     toggle();
   }, [toggle]);
-  console.log(task)
   const [kanbanTasksCards, setKanbanTasksCards] = useState<any>()
 
   const validationCreate: any = useFormik({
@@ -181,7 +179,6 @@ const TasksKanban: React.FC<prop> = (props) => {
       };
 
       const dataResponse = await dispatch(addNewTask(dataTask));
-      console.log(dataResponse)
       if (dataResponse.payload) {
         refreshTaskList()
         validationCreate.resetForm();
@@ -207,7 +204,6 @@ const TasksKanban: React.FC<prop> = (props) => {
   const [cards, setCards] = useState<any>([])
   async function getDataTask(project_id: number) {
     const dataResponse = await dispatch(getTasksKanban(project_id));
-    console.log(dataResponse.payload)
     if (dataResponse.payload) {
       setCards(dataResponse.payload.data)
     }
@@ -218,11 +214,9 @@ const TasksKanban: React.FC<prop> = (props) => {
 
 
 
-  console.log(cards)
 
 
   const handleDragEnd = async (result: any) => {
-    console.log(result)
     if (result.destination != null) {
 
       if (!result.destination) return // If dropped outside a valid drop area, do nothing
@@ -247,7 +241,6 @@ const TasksKanban: React.FC<prop> = (props) => {
           }
         }
         const dataResponse = dispatch(updateTask(data));
-        console.log(positionTask);
       }
       // Reorder cards within the same card line
       if (source.droppableId == destination.droppableId) {
@@ -262,7 +255,6 @@ const TasksKanban: React.FC<prop> = (props) => {
           }
           return line
         })
-        // console.log("1")
         setCards(updatedLines)
       } else {
         // Move card between different card lines
@@ -290,7 +282,6 @@ const TasksKanban: React.FC<prop> = (props) => {
       }
     }
   }
-  console.log(cards);
   // create Modal
   const [modall, setModall] = useState<boolean>(false)
 
@@ -359,7 +350,6 @@ const TasksKanban: React.FC<prop> = (props) => {
 
   async function refreshTaskList() {
     const dataResponse = await dispatch(getTasksKanban(props.project_id));
-    console.log(dataResponse)
     if (dataResponse.payload.data) {
       setCards(dataResponse.payload.data)
 
@@ -388,7 +378,6 @@ const TasksKanban: React.FC<prop> = (props) => {
     }),
     onSubmit: async (values) => {
       var dataDate = formatDateCreateProject(new Date(values.dueDate))
-      console.log(values.dueDate)
       const updatedTask = {
         // id: task ? task.id : 0,
         // taskId: values.taskId,
@@ -422,7 +411,6 @@ const TasksKanban: React.FC<prop> = (props) => {
     setKanbanTasksCards(line.status)
 
   };
-  // console.log(kanbanTasksCards)
   const [images, setImages] = useState<any>([])
 
   const [deleteModal, setDeleteModal] = useState<boolean>(false);
@@ -434,10 +422,8 @@ const TasksKanban: React.FC<prop> = (props) => {
 
   const handleDeleteCard = async () => {
     if (cardIdDelete) {
-      console.log("card ===", cardIdDelete);
 
       const dataResponse = await dispatch(deleteTask(cardIdDelete));
-      console.log(dataResponse)
       if (dataResponse.payload) {
         refreshTaskList();
       }
@@ -452,7 +438,6 @@ const TasksKanban: React.FC<prop> = (props) => {
       : [...images, image];
 
     setImages(updatedImages);
-    console.log("updatedImages", updatedImages);
 
     validation.setFieldValue('userImages', updatedImages)
 
@@ -467,7 +452,6 @@ async function getMember(){
 useEffect(() => {
   getMember();
 },[props.project_id])
-console.log(memberList)
   return (
     <React.Fragment>
       <DeleteModal

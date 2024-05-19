@@ -328,3 +328,14 @@ border-radius: 4px;
     cursor: pointer;
     background-color: #f2efef;
   }
+  #__eric,#__task,#__story, #__bug,.__input_checkbox{
+    margin-right: 4px;
+
+  }
+  #__eric+label,#__task+label,#__story+label,#__bug+label,.__input_checkbox+label{
+    margin-bottom: 0;
+  }
+  .dropdown-item{
+    display: flex !important;
+    align-items: center;
+  }

@@ -97,7 +97,6 @@ export const addNewTask = createAsyncThunk("tasks/addNewTask", async (task: any)
     try {
         console.log(task)
         const response =await api.create(getTaskListAPI,task);
-
         console.log(response)
         toast.success("Task Added Successfully", { autoClose: 3000 });
         return response;

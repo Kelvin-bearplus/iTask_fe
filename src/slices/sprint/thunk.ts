@@ -9,12 +9,20 @@ import { emit } from "process";
 const api = new APIClient();
 export const getSprint = createAsyncThunk(
     "getSprint",
-    async (projectId:number) => {
+    async({projectId,type}:{projectId:number,type?:number[]}) => {
       try {
-        console.log(projectId);
+        if(type!==undefined){
+          const queryString = type.map((id: number) => `epic_id=${id}`).join("&");
+          const params = `${getSprintAPI}/${projectId}?${queryString}`;
+          const response = await api.get(params);
+          return response; // Return the response data to be handled by the slice reducer
+        }
+      else{
         const params = `${getSprintAPI}/${projectId}`;
         const response = await api.get(params);
         return response; // Return the response data to be handled by the slice reducer
+      }
+
       }  catch (error:any) {
         var message:any = error.response.data.error.message?error.response.data.error.message:"Lỗi";
         throw message;

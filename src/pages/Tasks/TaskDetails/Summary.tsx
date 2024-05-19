@@ -21,13 +21,11 @@ const Summary = (dataTask: any) => {
                 project_id: dataTask.prop.project_info.id
             }
         }
-        console.log(data)
         dispatch(updateTask(data))
     }
     var items = [];
     if (dataTask.prop.tags) {
         items = dataTask.prop.tags.split(', ');
-        console.log(dataTask);
     }
     const parseHTML = (htmlString: string) => {
         return <div dangerouslySetInnerHTML={{ __html: htmlString }} />;
@@ -46,7 +44,6 @@ const Summary = (dataTask: any) => {
                 project_id: dataTask.prop.project_info.id
             }
         }
-        console.log(data)
         dispatch(updateTask(data))
         setEditorData(descriptionText);
     };
@@ -71,16 +68,16 @@ const Summary = (dataTask: any) => {
     if (userIdString != null) {
       userId = parseInt(userIdString);
     }
-  const [modalCreateTask, setModalCreateTask] = useState<boolean>(false);
+  const [modalCreateTaskDetail, setModalCreateTaskDetail] = useState<boolean>(false);
     const toggleCreateDetail = useCallback(async () => {
 
-        if (modalCreateTask) {
-          setModalCreateTask(false);
+        if (modalCreateTaskDetail) {
+            setModalCreateTaskDetail(false);
         } else {
-          setModalCreateTask(true);
+            setModalCreateTaskDetail(true);
     
         }
-      }, [modalCreateTask]);
+      }, [modalCreateTaskDetail]);
     const validationCreateDetail: any = useFormik({
         // enableReinitialize : use this flag when initial values needs to be changed
         enableReinitialize: true,
@@ -124,7 +121,6 @@ const Summary = (dataTask: any) => {
     
           // dispatch(addNewTask(dataTask));
           const dataResponse = await dispatch(addNewTask(dataTaskInf));
-          console.log(dataResponse)
           if (dataResponse.payload) {
             validationCreateDetail.resetForm();
             setEditorDataDetail('');
@@ -191,7 +187,7 @@ const Summary = (dataTask: any) => {
                 </CardBody>
             </Card>
             <Modal
-        isOpen={modalCreateTask}
+        isOpen={modalCreateTaskDetail}
         toggle={toggleCreateDetail}
         centered
         size="lg"
@@ -213,12 +209,12 @@ const Summary = (dataTask: any) => {
 
               <Col lg={12}>
                 <div>
-                  <Label for="tasksTitle-field" className="form-label">Task name</Label>
+                  <Label for="tasksTitle-field" className="form-label">Issue name</Label>
                   <Input
                     name="name"
                     id="tasksTitle-field"
                     className="form-control"
-                    placeholder="Task name"
+                    placeholder="Issue name"
                     type="text"
                     validate={{
                       required: { value: true },

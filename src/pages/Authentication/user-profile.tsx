@@ -56,7 +56,6 @@ const Settings = () => {
 
     const handleDateChange = (date: Date[]) => {
         setSelectedDate(formatDateToApi(date[0])); // Lấy ngày đầu tiên trong mảng date
-        console.log('Selected date:', selectedDate);
     };
     const selectLayoutState = (state: any) => state.Profile;
     const userprofileData = createSelector(
@@ -71,7 +70,6 @@ const Settings = () => {
     const [thumbnailCover, setThumbnailCover] = useState("");
     const getThumbnail = async (e: any) => {
         var file = e.target.files[0];
-        // console.log("khanh"); 
         var urlThumbnail = await getPathImage(file);
         // urlThumbnail = "https://" + urlThumbnail;
         if(urlThumbnail){
@@ -81,14 +79,11 @@ const Settings = () => {
 
             }
         }
-        console.log(urlThumbnail)
         setThumbnail(urlThumbnail);
     }
     const getThumbnailCover = async (e: any) => {
         var file = e.target.files[0];
-        // console.log("khanh"); 
         var urlThumbnail = await getPathImage(file);
-        // urlThumbnail = "https://" + urlThumbnail;
         
     if(urlThumbnail){
         if (userInfoApi.id) {
@@ -96,7 +91,6 @@ const Settings = () => {
 
         }
     }
-        console.log(urlThumbnail)
         setThumbnailCover(urlThumbnail);
     }
     // Inside your component
@@ -108,7 +102,6 @@ const Settings = () => {
     const [checkProfile,setCheckProfile]=useState(0);
     const fetchUserProfile = async () => {
         try {
-            // console.log(userInfo.email)
             const storedUser = await dispatch(getUserProfileByEmail(userInfo));
             // return storedUser;
             if (storedUser) {
@@ -124,7 +117,6 @@ const Settings = () => {
                 setName(storedUser.full_name)
                 
             }
-            console.log(storedUser);
         } catch (error) {
             console.error("Error:", error);
         }
@@ -136,7 +128,6 @@ const Settings = () => {
     }
     useEffect(() => {
         if (userInfoApi.dob) {
-            console.log(dob)
             setDob(dateFormatFrontend(userInfoApi.dob));
         }
     }, [userInfoApi]);
@@ -240,9 +231,7 @@ const Settings = () => {
             if (userInfoApi.id) {
                 localStorage.setItem('user_avatar_url', thumbnail);
                 localStorage.setItem('user_name', values.full_name);
-                console.log(infoSubmit);
               const dataResponse=await  dispatch(editProfile(infoSubmit, userInfoApi.id));
-              console.log(dataResponse);
               if(dataResponse.data){
                 setTimeout(()=>{
                     refreshData();
@@ -268,7 +257,6 @@ const Settings = () => {
     }
    async function refreshData(){
     const data= await dispatch(getUserProfileByEmail(userInfo));
-    console.log(data);
     if(data){
         const count=countEmptyFields(data);
         setCheckProfile(Math.floor(count/13*100));
@@ -294,7 +282,6 @@ const Settings = () => {
             dispatch(resetProfileFlag());
         };
         if (error || success) {
-console.log("khanh123")
             const timeout = setTimeout(clearFlags, 3000);
             return () => clearTimeout(timeout);
         }

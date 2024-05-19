@@ -37,7 +37,6 @@ const ForgetPasswordPage = (props : any) => {
     onSubmit: async(values) => {
       const user={email:email,code:values.email_code}
      const data=await dispatch(userVerifyCode(user, props.history));
-     console.log(data);
       if(data=="Success"){
         window.location.href='/change-password?email='+email;
         }
@@ -65,7 +64,6 @@ const ForgetPasswordPage = (props : any) => {
     forgetError, forgetSuccessMsg
   } = useSelector(selectLayoutProperties);
   useEffect(() => {
-    // console.log(forgetSuccessMsg)
     if(forgetSuccessMsg !== null){
 setTimeout(()=>{
   // window.location.href='/verify-email'

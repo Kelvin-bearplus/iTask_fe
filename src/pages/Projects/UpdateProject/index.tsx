@@ -19,7 +19,6 @@ import { createSelector } from 'reselect';
 const UpdateProject = () => {
     const searchParams = new URLSearchParams(window.location.search);
     const id = searchParams.get('id');
-    // console.log(id);
 
 
     interface Project {
@@ -57,7 +56,6 @@ const UpdateProject = () => {
     const [dataProjectById, setDataProjectById] = useState<Project>(unitProject);
     const getDataProject = async (id: number) => {
         const data = await dispatch(getProjectById(id));
-        console.log(data)
         setDataProjectById(data.payload.data);
        if(data.payload.data.thumbnail_url!==undefined){
         setThumbnail_avai(data.payload.data.thumbnail_url)
@@ -74,18 +72,15 @@ const UpdateProject = () => {
                 value: item.trim(),
                 label: item.trim()
             }));
-            console.log(data.payload.data.tags)
             if (items[0].value != "") {
                 setselectedMulti(items)
 
             }
         }
-        console.log(dataProjectById);
         return data;
     };
     useEffect(() => {
         if (id != undefined) {
-            console.log(id);
             var id_parse = parseInt(id);
             getDataProject(id_parse);
         }
@@ -125,7 +120,6 @@ const UpdateProject = () => {
     const [dataTag, setDataTag] = useState<any>("");
 
     const handleMulti = (selectedMulti: any) => {
-        console.log(selectedMulti)
         setselectedMulti(selectedMulti);
         var selectedData = "";
         let lastIndex = selectedMulti.length - 1;
@@ -194,10 +188,8 @@ const UpdateProject = () => {
     const [showError, setShowError] = useState(false);
     const getThumbnail = async (e: any) => {
         var file = e.target.files[0];
-        // console.log(formData); 
         var urlThumbnail = await getPathImage(file);
         urlThumbnail = "https://" + urlThumbnail;
-        console.log(urlThumbnail)
         setThumbnail_avai(urlThumbnail)
         setThumbnail(urlThumbnail);
     }
@@ -230,7 +222,6 @@ const UpdateProject = () => {
                 created_by: userId,
                 tags: dataTag,
             }
-            console.log(valueSubmit);
             if (selectedDeadline && selectedStart && id != null) {
                 dispatch(updateProjectById({ id, project: valueSubmit }));
             }

@@ -30,15 +30,11 @@ const TaskDetails = (prop?:any) => {
   var id = searchParams.get('id');
   const getDataTask = async (id: number) => {
       const data = await dispatch(getTaskById(id));
-      console.log(data);
       setDataTask(data.payload);
 
   };
-  console.log(dataTask)
   useEffect(() => {
-      console.log(id)
       if (id != undefined) {
-          console.log(id);
           var id_parse = parseInt(id);
           getDataTask(id_parse);
       }

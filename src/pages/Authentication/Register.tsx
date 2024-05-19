@@ -43,7 +43,6 @@ const Register = () => {
                 .required('Confirm Password is required')
         }),
         onSubmit: (values) => {
-            console.log(values);
             dispatch(registerUser(values));
             setLoader(true)
         }
@@ -84,7 +83,6 @@ const [hasSubmit, setHasSubmit]= useState<boolean>(true);
 const customHandleBlur = async (e: React.ChangeEvent<HTMLInputElement>) => {
     // Kiểm tra email
     const checkEmailResponse: boolean = await checkEmail(e.target.value);
-    console.log(checkEmailResponse)
     if (checkEmailResponse) {
         // Đặt trạng thái touched của trường email là true
         setHasEmail(true);
@@ -92,7 +90,6 @@ const customHandleBlur = async (e: React.ChangeEvent<HTMLInputElement>) => {
         // Đặt thông báo lỗi cho trường email
         // validation.setFieldError('email', 'Email has been Register Before, Please Use Another Email Address...');
         setHasSubmit(false)
-        console.log(validation.errors.email)
 
     } else {
         // Nếu email không tồn tại, xóa thông báo lỗi cho trường email
@@ -104,8 +101,6 @@ const customHandleBlur = async (e: React.ChangeEvent<HTMLInputElement>) => {
     
     // Kích hoạt sự kiện onBlur của trường email
     validation.handleChange(e);
-    console.log(validation.errors.email)
-  console.log(hasSubmit);
     // Log thông báo lỗi của trường email sau khi đã được cập nhật
 }
 

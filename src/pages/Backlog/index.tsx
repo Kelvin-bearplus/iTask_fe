@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react"
+import React, { useState, useEffect, useCallback ,ChangeEvent} from "react"
 import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 import { CKEditor } from "@ckeditor/ckeditor5-react";
 import avt_default from '../../assets/images/users/anh_mac_dinh.jpg';
@@ -10,6 +10,7 @@ import {
   CardBody,
   Col,
   Row,
+  Dropdown,
   DropdownMenu,
   DropdownItem,
   DropdownToggle,
@@ -33,6 +34,7 @@ import {
   updateTask,
   updateTasks,
   deleteTask,
+  getTaskListAgain,
   getMemberList, getSprint,createSprint,deleteSprint as deleteSprintAPI,editSprint as editSprintAPI
 } from "../../slices/thunks"
 
@@ -86,7 +88,7 @@ const Backlog: React.FC<prop> = (props) => {
   const [sprint, setSprint] = useState([]);
   async function getMember() {
     const dataResponse = await dispatch(getMemberList(props.project_id));
-    const sprintResponse = await dispatch(getSprint(props.project_id));
+    const sprintResponse = await dispatch(getSprint({projectId:props.project_id}));
     if (dataResponse.payload.data) {
       setMemberList(dataResponse.payload.data);
     }
@@ -94,7 +96,6 @@ const Backlog: React.FC<prop> = (props) => {
       setSprint(sprintResponse.payload.data);
     }
   }
-  console.log(sprint)
   const parseHTML = (htmlString: string) => {
     return <div dangerouslySetInnerHTML={{ __html: htmlString }} />;
   };
@@ -181,7 +182,6 @@ const Backlog: React.FC<prop> = (props) => {
   useEffect(() => {
     getMember();
   }, [props.project_id, taskList])
-  console.log(sprint)
   const [showTaskDetail, setShowTaskDetail] = useState(false);
   const handleDeleteTask = async () => {
     const dataResponse = await dispatch(deleteTask(idDeleteTask));
@@ -202,11 +202,19 @@ const Backlog: React.FC<prop> = (props) => {
   const [idDeleteSprint, setIdDeleteSprint] = useState(0);
   const [idDeleteTask, setIdDeleteTask] = useState(0);
   async function refreshList() {
-    const sprintResponse = await dispatch(getSprint(props.project_id));
+    if(selectedValues.length>0){
+    const sprintResponse = await dispatch(getSprint({projectId:props.project_id,type:selectedValues}));
     if (sprintResponse.payload.data) {
       setSprint(sprintResponse.payload.data);
-
     }
+  }
+  else{
+    const sprintResponse = await dispatch(getSprint({projectId:props.project_id}));
+    if (sprintResponse.payload.data) {
+      setSprint(sprintResponse.payload.data);
+    }
+  
+  }
   }
   const onClickDeleteSprint = (id: number) => {
     setIdDeleteSprint(id);
@@ -265,7 +273,6 @@ const [sprinId, setSprintId]=useState(0);
 
       // dispatch(addNewTask(dataTask));
       const dataResponse = await dispatch(addNewTask(dataTask));
-      console.log(dataResponse)
       if (dataResponse.payload) {
         refreshList()
         validationCreate.resetForm();
@@ -303,7 +310,6 @@ const [sprinId, setSprintId]=useState(0);
 
       // dispatch(addNewTask(dataTask));
       const dataResponse = await dispatch(createSprint(dataTask));
-      console.log(dataResponse)
       if (dataResponse.payload) {
         refreshList()
         validationCreateSprint.resetForm();
@@ -344,7 +350,6 @@ const [sprinId, setSprintId]=useState(0);
 
       // dispatch(addNewTask(dataTask));
       const dataResponse = await dispatch(editSprintAPI(dataTask));
-      console.log(dataResponse)
       if (dataResponse.payload) {
         refreshList()
         validationCreateSprint.resetForm();
@@ -385,7 +390,6 @@ const [sprinId, setSprintId]=useState(0);
 
       // dispatch(addNewTask(dataTask));
       const dataResponse = await dispatch(editSprintAPI(dataTask));
-      console.log(dataResponse)
       if (dataResponse.payload) {
         refreshList()
         validationCreateSprint.resetForm();
@@ -406,7 +410,6 @@ const [sprinId, setSprintId]=useState(0);
     onSubmit: async (values) => {
       const incompleteTasksIds = sprintEdit.tasks && sprintEdit.tasks.filter((item:any) => item.status !== 3).map((item:any) => item.id);
     
-    console.log(incompleteTasksIds);
     if(incompleteTasksIds.length>0){
       const dataTask = {
         id: incompleteTasksIds,
@@ -417,7 +420,6 @@ const [sprinId, setSprintId]=useState(0);
         };
      
       const dataResponse = await dispatch(updateTasks(dataTask));
-      console.log(dataResponse)
 
     }
     const dataSprint={
@@ -444,7 +446,6 @@ const [sprinId, setSprintId]=useState(0);
         project_id: props.project_id
       }
     }
-    console.log(data)
     await dispatch(updateTask(data))
     refreshList()
   }
@@ -474,8 +475,37 @@ async  function updateTaskToSprint(sprinIdTask:number,taskIdSprint:number){
 
     fetchData();
   }, [idSprintEdit]);
-    
-console.log(sprintEdit)
+  const [epicList, setEpicList]=useState([])
+  useEffect(() => {
+    async function fetchData() {
+      const dataResponse = await dispatch(getTaskListAgain({ project_id: props.project_id, type: [1] }));
+      if (dataResponse.payload) {
+        setEpicList(dataResponse.payload);
+      }
+    }
+    fetchData();
+  }, [])
+
+
+  const [selectedValues, setSelectedValues] = useState<number[]>([]);
+
+  const handleCheckboxChange = (id:number,event: ChangeEvent<HTMLInputElement>) => {
+    if (event.target.checked) {
+      // Thêm id vào mảng selectedItems
+      setSelectedValues(prevSelectedValues => [...prevSelectedValues, id]);
+    } else {
+      // Loại bỏ id khỏi mảng SelectedValues
+      setSelectedValues(prevSelectedValues => prevSelectedValues.filter(item => item !== id));
+    }
+  };
+  
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+
+  const toggleDropdown = () => setDropdownOpen(true);
+  const onClickToggle = () => setDropdownOpen(!dropdownOpen)
+  useEffect(() => {
+    refreshList()
+  }, [selectedValues]);
   return (
     <React.Fragment>
       <DeleteModal
@@ -495,11 +525,74 @@ console.log(sprintEdit)
               <div className="hstack gap-2">
               </div>
             </div>
-            <div className="col-lg-3 col-auto">
+            <div className="col-lg-8 col-auto d-flex">
               <div className="search-box">
                 <input type="text" className="form-control search" id="search-task-options" placeholder="Search for project, tasks..." />
                 <i className="ri-search-line search-icon"></i>
               </div>
+              <div  className="ms-3">
+                      <p className="__text_fillter_task" onClick={onClickToggle}>Type</p>
+                      <Dropdown isOpen={dropdownOpen} toggle={toggleDropdown}>
+
+                        <DropdownMenu>
+                        {epicList.length>0&& epicList.map((item:any,key:number)=>{
+                          return(
+                            <DropdownItem tag="div">
+                            <input
+                              type="checkbox"
+                              name={item.name}
+                              id={item.name}
+                              // checked={checkedItems.eric}
+                              onChange={(e)=>handleCheckboxChange(item.id,e)}
+                              className="__input_checkbox"
+                            />
+                            <label htmlFor={item.name}>{item.name}</label>
+                          </DropdownItem>
+                          )
+                        })}
+                          {/* <DropdownItem tag="div">
+                            <input
+                              type="checkbox"
+                              name="eric"
+                              id="__eric"
+                              checked={checkedItems.eric}
+                              onChange={handleCheckboxChange}
+                            />
+                            <label htmlFor="__eric">Eric</label>
+                          </DropdownItem>
+                          <DropdownItem tag="div">
+                            <input
+                              type="checkbox"
+                              name="task"
+                              id="__task"
+                              checked={checkedItems.task}
+                              onChange={handleCheckboxChange}
+                            />
+                            <label htmlFor="__task">Task</label>
+                          </DropdownItem>
+                          <DropdownItem tag="div">
+                            <input
+                              type="checkbox"
+                              name="story"
+                              id="__story"
+                              checked={checkedItems.story}
+                              onChange={handleCheckboxChange}
+                            />
+                            <label htmlFor="__story">Story</label>
+                          </DropdownItem>
+                          <DropdownItem tag="div">
+                            <input
+                              type="checkbox"
+                              name="bug"
+                              id="__bug"
+                              checked={checkedItems.bug}
+                              onChange={handleCheckboxChange}
+                            />
+                            <label htmlFor="__bug">Bug</label>
+                          </DropdownItem> */}
+                        </DropdownMenu>
+                      </Dropdown >
+                    </div>
             </div>
             <div className="col-auto ms-sm-auto">
               <div className="avatar-group" id="newMembar">

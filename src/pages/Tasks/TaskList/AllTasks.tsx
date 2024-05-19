@@ -87,7 +87,6 @@ const AllTasks: React.FC<prop> = (props) => {
       );
     }
   };
-  console.log(selectedValues)
   const dispatch: any = useDispatch();
   const [taskIdDetail, setTaskIdDetail] = useState(0);
   const [modalCreateTask, setModalCreateTask] = useState<boolean>(false);
@@ -109,7 +108,6 @@ const AllTasks: React.FC<prop> = (props) => {
   const [isLoad, setIsLoad] = useState(true);
   useEffect(() => {
     setTimeout(() => {
-      console.log("1");
 
       setIsLoad(false);
 
@@ -155,7 +153,6 @@ const AllTasks: React.FC<prop> = (props) => {
     setTask(task);
     setDeleteModal(true);
   };
-  console.log(projectList);
   // Delete Data
   const handleDeleteTask = async () => {
     if (task) {
@@ -186,7 +183,6 @@ const AllTasks: React.FC<prop> = (props) => {
     }),
     onSubmit: async (values) => {
       var dataDate = formatDateCreateProject(new Date(values.dueDate))
-      console.log(values.dueDate)
       const updatedTask = {
         // id: task ? task.id : 0,
         // taskId: values.taskId,
@@ -234,9 +230,10 @@ const AllTasks: React.FC<prop> = (props) => {
       project: '',
       deadlineDate: '',
       startDate: '',
+      type:'1',
     },
     validationSchema: Yup.object({
-      name: Yup.string().required("Please Enter Task Name"),
+      name: Yup.string().required("Please Enter Issue Name"),
       dueDate: Yup.string().required("Please Select Due Date"),
       deadlineDate: Yup.string().required("Please Select Deadline Date"),
       startDate: Yup.string().required("Please Select Start Date"),
@@ -256,12 +253,11 @@ const AllTasks: React.FC<prop> = (props) => {
         position: 1,
         created_by: userId,
         project_id: props.project_id,
-        // assignees: values.assignees,
+        type: parseInt(values.type),
       };
 
       // dispatch(addNewTask(dataTask));
       const dataResponse = await dispatch(addNewTask(dataTask));
-      console.log(dataResponse)
       if (dataResponse.payload) {
         refreshTaskList()
         validationCreate.resetForm();
@@ -289,7 +285,6 @@ const AllTasks: React.FC<prop> = (props) => {
       assignees: task.assignees
     });
     setEditorData(task.description);
-    console.log(task)
     toggle();
   }, [toggle]);
 
@@ -313,7 +308,6 @@ const AllTasks: React.FC<prop> = (props) => {
     if (dataResponse.payload) {
       setTaskList(dataResponse.payload);
     }
-    // console.log(dataResponse)
   }
 
   async function refreshTaskListAgain() {
@@ -330,7 +324,6 @@ const AllTasks: React.FC<prop> = (props) => {
       }
     }
 
-    // console.log(dataResponse)
   }
   // Checked All
   const checkedAll = useCallback(() => {
@@ -490,7 +483,6 @@ const AllTasks: React.FC<prop> = (props) => {
     ],
     [handleCustomerClick, checkedAll]
   );
-  console.log(taskList);
   const [startDate, setStartDate] = useState<string | null>(null);
   const [endDate, setEndDate] = useState<string | null>(null);
   const [status, setStatus] = useState<string>('');
@@ -500,7 +492,6 @@ const AllTasks: React.FC<prop> = (props) => {
     if (selectedDates.length === 2) {
       setStartDate(selectedDates[0].toISOString()); // Convert Date to ISO string
       setEndDate(selectedDates[1].toISOString());
-      console.log(selectedDates[0].toISOString());
     }
   };
   const [filteredData, setFilteredData] = useState([]);
@@ -518,20 +509,15 @@ const AllTasks: React.FC<prop> = (props) => {
       if (dataResponse.payload) {
         let filtered = dataResponse.payload;
         if (startDate && endDate) {
-          console.log(startDate);
-          console.log(endDate);
           filtered = filtered.filter((item: any) => {
             const itemDate = new Date(item.due_date);
-            console.log(itemDate >= new Date(startDate));
             return itemDate >= new Date(startDate) && itemDate <= new Date(endDate);
           });
         }
 
         // Filter by status
         if (status !== "") {
-          console.log("2");
           filtered = filtered.filter((item: any) => item.status === status);
-          console.log(filtered);
         }
 
         setFilteredData(filtered);
@@ -630,7 +616,7 @@ const AllTasks: React.FC<prop> = (props) => {
 
                   </div>
                   <div className="d-flex flex-wrap gap-2">
-                    <button className="btn btn-primary add-btn me-1" onClick={() => { toggleCreate(); }}><i className="ri-add-line align-bottom me-1"></i> Create Task</button>
+                    <button className="btn btn-primary add-btn me-1" onClick={() => { toggleCreate(); }}><i className="ri-add-line align-bottom me-1"></i> Create Issue</button>
                     {isMultiDeleteButton && <button className="btn btn-soft-danger" onClick={() => setDeleteModalMulti(true)} ><i className="ri-delete-bin-2-line"></i></button>}
                   </div>
                 </div>
@@ -693,7 +679,7 @@ const AllTasks: React.FC<prop> = (props) => {
         modalClassName='modal fade zoomIn'
       >
         <ModalHeader className="p-3 bg-info-subtle" toggle={toggleCreate}>
-          Create Task
+          Create Issue
         </ModalHeader>
         <Form className="tablelist-form" onSubmit={(e: any) => {
           e.preventDefault();
@@ -707,12 +693,12 @@ const AllTasks: React.FC<prop> = (props) => {
 
               <Col lg={12}>
                 <div>
-                  <Label for="tasksTitle-field" className="form-label">Task name</Label>
+                  <Label for="tasksTitle-field" className="form-label">Issue name</Label>
                   <Input
                     name="name"
                     id="tasksTitle-field"
                     className="form-control"
-                    placeholder="Task name"
+                    placeholder="Issue name"
                     type="text"
                     validate={{
                       required: { value: true },
@@ -852,7 +838,7 @@ const AllTasks: React.FC<prop> = (props) => {
                 ) : null}
               </Col>
 
-              <Col lg={12}>
+              <Col lg={6}>
                 <Label for="priority-field" className="form-label">Priority</Label>
                 <Input
                   name="priority"
@@ -874,6 +860,29 @@ const AllTasks: React.FC<prop> = (props) => {
                   <FormFeedback type="invalid">{validationCreate.errors.priority}</FormFeedback>
                 ) : null}
               </Col>
+              <Col lg={6}>
+                <Label for="priority-field" className="form-label">Type</Label>
+                <Input
+                  name="type"
+                  type="select"
+                  className="form-select"
+                  id="priority-field"
+                  onChange={validationCreate.handleChange}
+                  onBlur={validationCreate.handleBlur}
+                  value={validationCreate.values.type || ""}
+                  invalid={
+                    validationCreate.touched.priority && validationCreate.errors.type ? true : false
+                  }
+                >
+                  <option value="1">Epic</option>
+                  <option value="2">Story</option>
+                  <option value="3">Task</option>
+                  <option value="4">Bug</option>
+                </Input>
+                {validationCreate.touched.priority && validationCreate.errors.priority ? (
+                  <FormFeedback type="invalid">{validationCreate.errors.priority}</FormFeedback>
+                ) : null}
+              </Col>
             </Row>
           </ModalBody>
           <div className="modal-footer">
@@ -885,7 +894,7 @@ const AllTasks: React.FC<prop> = (props) => {
                 }}
                 className="btn-light"
               >Close</Button>
-              <button type="submit" className="btn btn-success" id="add-btn">Create Task</button>
+              <button type="submit" className="btn btn-success" id="add-btn">Create Issue</button>
             </div>
           </div>
         </Form>

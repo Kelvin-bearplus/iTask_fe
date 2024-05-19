@@ -12,7 +12,6 @@ const ActiveProjects = () => {
 
   async function getProjectActiveDetail(){
     const dataResponse=await dispatch(getProjectActiveDetailAPI());
-    console.log(dataResponse);
     if(dataResponse.payload){
         setProjectActiveList(dataResponse.payload);
     }
@@ -20,7 +19,6 @@ const ActiveProjects = () => {
     useEffect(()=>{
         getProjectActiveDetail();
       },[])
-      console.log(projectActiveList)
       function formatDate(inputDate:string) {
         // Tạo một đối tượng Date từ chuỗi đầu vào
         const date = new Date(inputDate);

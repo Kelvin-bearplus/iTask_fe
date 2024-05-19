@@ -25,21 +25,18 @@ const Widgets = () => {
   const dispatch = useDispatch<any>();
   async function getProjectActive(){
   const dataResponse=await dispatch(getProjectActiveAPI());
-  console.log(dataResponse);
   if(dataResponse.payload){
     setProjectActive(dataResponse.payload);
   }
   }
   async function getTotalTaskDone(){
     const dataResponse=await dispatch(getPTaskDoneAPI());
-    console.log(dataResponse);
     if(dataResponse.payload){
         setTaskDone(dataResponse.payload);
     }
     }
     async function getTotalTaskAssigned(){
         const dataResponse=await dispatch(getTaskAssignedAPI());
-        console.log(dataResponse);
         if(dataResponse.payload){
             setTaskAssigned(dataResponse.payload);
         }
@@ -49,7 +46,6 @@ const Widgets = () => {
     getTotalTaskDone();
     getTotalTaskAssigned();
   },[user])
-  console.log(projectActive)
     return (
         <React.Fragment>
             <Row className='w-100'>

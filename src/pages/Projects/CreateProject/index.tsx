@@ -106,13 +106,11 @@ const CreateProject = () => {
 
     const handleStartChange = (date: Date[]) => {
         setSelectedStart(formatDateCreateProject(date[0])); // Lấy ngày đầu tiên trong mảng date
-        console.log('Selected Start:', setSelectedStart);
     };
     const [selectedDeadline, setSelectedDeadline] = useState<string>('');
 
     const handleDeadlineChange = (date: Date[]) => {
         setSelectedDeadline(formatDateCreateProject(date[0])); // Lấy ngày đầu tiên trong mảng date
-        console.log('Selected Start:', setSelectedDeadline);
     };
     const userIdString:string|null = localStorage.getItem('userId'); 
     var userId:number=0;
@@ -123,11 +121,9 @@ const CreateProject = () => {
 const getThumbnail = async (e:any) => {
         var file = e.target.files[0];
 
-        // console.log(formData);
        
         var urlThumbnail = await getPathImage(file);
         // urlThumbnail="https://"+urlThumbnail;
-        console.log(urlThumbnail)
         setThumbnail(urlThumbnail);
 }
 
@@ -160,7 +156,6 @@ const getThumbnail = async (e:any) => {
                tags:dataTag,
                priority: parseInt(values.priority.toString()),
             }
-            console.log(typeof values.status.toString());
             if (selectedDeadline&&selectedStart){
                 dispatch(addProjectList(valueSubmit))
 

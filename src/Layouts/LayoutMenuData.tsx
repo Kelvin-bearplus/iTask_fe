@@ -14,7 +14,6 @@ const Navdata = () => {
       async function getProject(){
         let limit=100;
         const responseData=await dispatch(getSimpleProject(limit));
-        console.log(responseData);
         if(responseData.payload){
             setProjects(responseData.payload);
         }
@@ -175,7 +174,6 @@ const Navdata = () => {
                         e.preventDefault();
                         setIsProjects(!isProjects);
                         setActiveTab(project.id)
-                        console.log(activeTab)
                     },
                     link: `/apps-projects-overview/${project.id}`,
                     // parentId: "apps",

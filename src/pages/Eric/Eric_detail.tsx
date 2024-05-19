@@ -42,7 +42,6 @@ const EricDetail: React.FC<prop> = (props) => {
       setEric(dataResponse.payload);
     }
   }
-  console.log(eric)
   function convertColorStatus(status: number) {
     switch (status) {
         case 1:

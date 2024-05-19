@@ -17,7 +17,6 @@ const Section = (dataProject:any) => {
     const toggleTab = (tab:any) => {
         if (activeTab !== tab) {
             setActiveTab(tab);
-            console.log(activeTab)
         }
     };
     const[startDate,setStartDate]=useState<any>();
@@ -43,7 +42,6 @@ const Section = (dataProject:any) => {
         setStartDate(formatDate(dataProject.prop.started_at))
       setDeadlineDate(formatDate(dataProject.prop.deadline))
       },[dataProject])
-    console.log(dataProject)
     return (
         <React.Fragment>
             <Row>

@@ -8,7 +8,6 @@ const api = new APIClient();
 export const userForgetPassword = (email: any, history: any) => async (dispatch: any) => {
     try {
         const url = forgotPassword + '?email=' + email;
-        console.log(url)
         const data = await api.create(url, '');
 
         if (data) {

@@ -14,7 +14,6 @@ import { formatDateFromAPI } from "../../../helpers/format"
 const Comments = (dataTask: any) => {
     const [limit, setLimit] = useState(100);
     const [page, setPage] = useState(1);
-    console.log(dataTask)
     const dispatch: any = useDispatch();
     const [activeTab, setActiveTab] = useState<any>('1');
     const toggleTab = (tab: any) => {
@@ -53,7 +52,6 @@ const Comments = (dataTask: any) => {
                 type:1
             }
             const response = await dispatch(createComment(valueSubmit));
-            console.log(response);
             if (response.payload) {
                 resetForm();
                 getCommentData({ limit: limit, page: page, taskId: dataTask.taskId,type:1 })
@@ -66,13 +64,11 @@ const Comments = (dataTask: any) => {
             getCommentData({ limit: limit, page: page, taskId: dataTask.taskId, type:1 })
         }
     }, []);
-    console.log(dataComment);
     const selectCommentData = createSelector(
         (state: any) => state.Comment.commentList,
         (commentList) => commentList
     );
     const commentList = useSelector(selectCommentData);
-    console.log(replyId)
     return (
         <React.Fragment>
             <Card>
