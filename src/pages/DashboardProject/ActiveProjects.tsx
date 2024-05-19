@@ -86,7 +86,7 @@ const ActiveProjects = () => {
                                                 </div>))}
                                             </div>
                                         </td>
-                                        <td><span className={`badge bg-${item.status==='In Progress'?'warning':''}${item.status==='Pending'?'danger':''}${item.status==='Complete'?'success':''}-subtle text-${item.status==='In Progress'?'warning':''}${item.status==='Pending'?'danger':''}${item.status==='Complete'?'success':''}`}>{item.status}</span></td>
+                                        <td><span className={`badge bg-${item.status==='In Progress'?'warning':''}${item.status==='Pending'?'danger':''}${item.status==='Done'?'success':''}-subtle text-${item.status==='In Progress'?'warning':''}${item.status==='Pending'?'danger':''}${item.status==='Done'?'success':''}`}>{item.status}</span></td>
                                         <td className="text-muted">{formatDate(item.deadline)}</td>
                                     </tr>))}
                                 </tbody>
