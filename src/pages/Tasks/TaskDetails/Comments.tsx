@@ -50,7 +50,7 @@ const Comments = (dataTask: any) => {
                 'task_id': dataTask.taskId,
                 'parent_comment_id': replyId,
                 'message': values.contentComment,
-                'type':3
+                'type':2
             }
             const response = await dispatch(createComment(valueSubmit));
             console.log(response);
@@ -63,7 +63,7 @@ const Comments = (dataTask: any) => {
     });
     useEffect(() => {
         if (dataTask != undefined) {
-            getCommentData({ limit: limit, page: page, taskId: dataTask.taskId, type:3 })
+            getCommentData({ limit: limit, page: page, taskId: dataTask.taskId, type:2 })
         }
     }, []);
     console.log(dataComment);
@@ -97,15 +97,7 @@ const Comments = (dataTask: any) => {
                                     Attachments File (4)
                                 </NavLink>
                             </NavItem>
-                            <NavItem>
-                                <NavLink
-                                    href="#"
-                                    className={classnames({ active: activeTab === '3' })}
-                                    onClick={() => { toggleTab('3'); }}
-                                >
-                                    Time Entries (9 hrs 13 min)
-                                </NavLink>
-                            </NavItem>
+                          
                         </Nav>
                     </div>
                 </CardHeader>
@@ -335,66 +327,7 @@ const Comments = (dataTask: any) => {
                                 </Table>
                             </div>
                         </TabPane>
-                        <TabPane tabId="3">
-                            <h6 className="card-title mb-4 pb-2">Time Entries</h6>
-                            <div className="table-responsive table-card">
-                                <table className="table align-middle mb-0">
-                                    <thead className="table-light text-muted">
-                                        <tr>
-                                            <th scope="col">Member</th>
-                                            <th scope="col">Date</th>
-                                            <th scope="col">Duration</th>
-                                            <th scope="col">Timer Idle</th>
-                                            <th scope="col">Tasks Title</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {/* <tr>
-                                            <th scope="row">
-                                                <div className="d-flex align-items-center">
-                                                    <img src={avatar8} alt="" className="rounded-circle avatar-xxs" />
-                                                    <div className="flex-grow-1 ms-2">
-                                                        <Link to="/pages-profile" className="fw-medium">Thomas Taylor</Link>
-                                                    </div>
-                                                </div>
-                                            </th>
-                                            <td>02 Jan, 2022</td>
-                                            <td>3 hrs 12 min</td>
-                                            <td>05 min</td>
-                                            <td>Apps Pages</td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <div className="d-flex align-items-center">
-                                                    <img src={avatar10} alt="" className="rounded-circle avatar-xxs" />
-                                                    <div className="flex-grow-1 ms-2">
-                                                        <Link to="/pages-profile" className="fw-medium">Tonya Noble</Link>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td>28 Dec, 2021</td>
-                                            <td>1 hrs 35 min</td>
-                                            <td>-</td>
-                                            <td>Profile Page Design</td>
-                                        </tr>
-                                        <tr>
-                                            <th scope="row">
-                                                <div className="d-flex align-items-center">
-                                                    <img src={avatar10} alt="" className="rounded-circle avatar-xxs" />
-                                                    <div className="flex-grow-1 ms-2">
-                                                        <Link to="/pages-profile" className="fw-medium">Tonya Noble</Link>
-                                                    </div>
-                                                </div>
-                                            </th>
-                                            <td>27 Dec, 2021</td>
-                                            <td>4 hrs 26 min</td>
-                                            <td>03 min</td>
-                                            <td>Ecommerce Dashboard</td>
-                                        </tr> */}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </TabPane>
+                      
                     </TabContent>
                 </CardBody>
             </Card>

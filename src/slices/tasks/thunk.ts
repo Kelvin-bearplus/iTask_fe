@@ -21,24 +21,41 @@ export const getTaskList = createAsyncThunk("tasks/getTaskList", async (project_
         throw error.response.data.message;
     }
 });
-export const getTaskListAgain = createAsyncThunk("tasks/getTaskListAgain", async( {project_id,status}:{project_id:any, status?:number}) => {
-    try {
-     if(status!=null){
-        const param={project_id:project_id,limit:1000,status:status}
-        const response =await api.get(getTaskListAPI,param);
-        console.log(response)
+interface TaskListParams {
+    project_id: any;
+    status?: number;
+    type?: number[];
+  }
+  export const getTaskListAgain = createAsyncThunk(
+    "tasks/getTaskListAgain",
+    async ({ project_id, status, type }: TaskListParams) => {
+      try {
+        const params: Record<string, any> = {
+          project_id,
+          limit: 1000,
+        };
+  
+        if (status !== undefined) {
+          params.status = status;
+        }
+  
+        let url = getTaskListAPI;
+  
+        if (type && type.length > 0) {
+          const queryString = type.map((id: number) => `type=${id}`).join("&");
+          url += `?${new URLSearchParams(params as any).toString()}&${queryString}`;
+        } else {
+          url += `?${new URLSearchParams(params as any).toString()}`;
+        }
+  
+        const response = await api.get(url);
+        console.log(response);
         return response.data;
-     }
-     else{
-        const param={project_id:project_id,limit:1000}
-        const response =await api.get(getTaskListAPI,param);
-        console.log(response)
-        return response.data;
-     }
-    } catch (error:any) {
-        throw error.response.data.message;
+      } catch (error: any) {
+        throw error.response?.data?.message || 'An error occurred';
+      }
     }
-});
+  );
 export const getTaskById = createAsyncThunk("tasks/getTaskById", async (id:number) => {
     try {
         const url = `${getTaskByIdAPI}/${id}`

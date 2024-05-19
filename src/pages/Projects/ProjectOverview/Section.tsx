@@ -107,7 +107,7 @@ const Section = (dataProject:any) => {
                                             className={classnames({ active: activeTab === '2' }, "fw-semibold")}
                                             onClick={() => { toggleTab('2'); }}
                                             href="#">
-                                            List View Task
+                                            List View Issue
                                         </NavLink>
                                     </NavItem>
                                     <NavItem>

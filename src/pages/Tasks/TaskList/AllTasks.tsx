@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, ChangeEvent } from 'react';
 import TableContainer from '../../../Components/Common/TableContainer';
 import DeleteModal from "../../../Components/Common/DeleteModal";
 import { CKEditor } from "@ckeditor/ckeditor5-react";
@@ -14,7 +14,12 @@ import * as moment from "moment";
 
 //redux
 import { useSelector, useDispatch } from "react-redux";
-import { Col, Modal, ModalBody, Row, Label, Input, Button, ModalHeader, FormFeedback, Form } from 'reactstrap';
+import {
+  Col, Modal, ModalBody, Row, Label, Input, Button, ModalHeader, FormFeedback, Form, DropdownMenu,
+  DropdownItem,
+  DropdownToggle,
+  Dropdown,
+} from 'reactstrap';
 
 import {
   getTaskList,
@@ -46,11 +51,43 @@ import Loader from "../../../Components/Common/Loader";
 import { createSelector } from 'reselect';
 
 
-interface prop{
+interface prop {
   project_id: number;
 }
 
-const AllTasks : React.FC<prop>= (props) => {
+const AllTasks: React.FC<prop> = (props) => {
+  const [checkedItems, setCheckedItems] = useState({
+    eric: false,
+    task: false,
+    story: false,
+    bug: false,
+  });
+
+  const [selectedValues, setSelectedValues] = useState<number[]>([]);
+
+  const handleCheckboxChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const { name, checked } = event.target;
+    const valueMap: { [key: string]: number } = {
+      eric: 1,
+      task: 3,
+      story: 2,
+      bug: 4,
+    };
+
+    setCheckedItems({
+      ...checkedItems,
+      [name]: checked,
+    });
+
+    if (checked) {
+      setSelectedValues((prevValues) => [...prevValues, valueMap[name]]);
+    } else {
+      setSelectedValues((prevValues) =>
+        prevValues.filter((value) => value !== valueMap[name])
+      );
+    }
+  };
+  console.log(selectedValues)
   const dispatch: any = useDispatch();
   const [taskIdDetail, setTaskIdDetail] = useState(0);
   const [modalCreateTask, setModalCreateTask] = useState<boolean>(false);
@@ -69,15 +106,15 @@ const AllTasks : React.FC<prop>= (props) => {
       isTaskUpdateFail: state.isTaskUpdateFail,
     })
   );
-  const [isLoad, setIsLoad]=useState(true);
-useEffect(()=>{
-    setTimeout(()=>{
-    console.log("1");
+  const [isLoad, setIsLoad] = useState(true);
+  useEffect(() => {
+    setTimeout(() => {
+      console.log("1");
 
-    setIsLoad(false);
-  
-  },1500)
-},[])
+      setIsLoad(false);
+
+    }, 1500)
+  }, [])
   const {
     taskListData, isTaskSuccess, error
   } = useSelector(selectLayoutProperties);
@@ -94,23 +131,23 @@ useEffect(()=>{
   const [modal, setModal] = useState<boolean>(false);
 
   const toggle = useCallback(() => {
-     
-            if (modal) {
+
+    if (modal) {
       setModal(false);
       setTask(null);
     } else {
       setModal(true);
     }
   }, [modal]);
-  const toggleCreate = useCallback(async() => {
-    
-     const projectListResponse= await dispatch(getSimpleProject());
-     setProjectList(projectListResponse.payload);
+  const toggleCreate = useCallback(async () => {
+
+    const projectListResponse = await dispatch(getSimpleProject());
+    setProjectList(projectListResponse.payload);
     if (modalCreateTask) {
       setModalCreateTask(false);
     } else {
       setModalCreateTask(true);
-     
+
     }
   }, [modalCreateTask]);
   // Delete Data
@@ -119,14 +156,11 @@ useEffect(()=>{
     setDeleteModal(true);
   };
   console.log(projectList);
-
-
-
   // Delete Data
-  const handleDeleteTask =async () => {
+  const handleDeleteTask = async () => {
     if (task) {
-    const dataResponse=await  dispatch(deleteTask(task.id));
-      if(dataResponse.payload){
+      const dataResponse = await dispatch(deleteTask(task.id));
+      if (dataResponse.payload) {
         refreshTaskList()
       }
       setDeleteModal(false);
@@ -141,16 +175,16 @@ useEffect(()=>{
       taskId: (task && task.id) || '',
       name: (task && task.name) || '',
       description: (task && task.description) || '',
-      dueDate: (task && task.due_date ? moment(task.due_date).format("DD MMM, YYYY"): '' ) || '',
+      dueDate: (task && task.due_date ? moment(task.due_date).format("DD MMM, YYYY") : '') || '',
       status: (task && task.status) || '',
       priority: (task && task.priority) || '',
       assignees: (task && task.assignees) || [],
     },
     validationSchema: Yup.object({
       name: Yup.string().required("Please Enter Task Name"),
-     
+
     }),
-    onSubmit:async (values) => {
+    onSubmit: async (values) => {
       var dataDate = formatDateCreateProject(new Date(values.dueDate))
       console.log(values.dueDate)
       const updatedTask = {
@@ -170,35 +204,35 @@ useEffect(()=>{
         task: updatedTask
       }
 
-     const dataResponse=await dispatch(updateTask(data));
-     if (dataResponse.payload){
-      refreshTaskList()
-     }
+      const dataResponse = await dispatch(updateTask(data));
+      if (dataResponse.payload) {
+        refreshTaskList()
+      }
       // validation.resetForm();
       toggle();
       validation.resetForm();
 
     },
   });
-  const userIdString:string|null = localStorage.getItem('userId'); 
-  var userId:number=0;
-  if (userIdString!=null){
-       userId = parseInt(userIdString);
+  const userIdString: string | null = localStorage.getItem('userId');
+  var userId: number = 0;
+  if (userIdString != null) {
+    userId = parseInt(userIdString);
   }
   const validationCreate: any = useFormik({
     // enableReinitialize : use this flag when initial values needs to be changed
     enableReinitialize: true,
 
     initialValues: {
-      taskId:  '',
-      name:  '',
-      description:  '',
-      dueDate:  '',
-      status:  '1',
+      taskId: '',
+      name: '',
+      description: '',
+      dueDate: '',
+      status: '1',
       priority: '1',
       assignees: [],
-      project:'',
-      deadlineDate:'',
+      project: '',
+      deadlineDate: '',
       startDate: '',
     },
     validationSchema: Yup.object({
@@ -207,32 +241,32 @@ useEffect(()=>{
       deadlineDate: Yup.string().required("Please Select Deadline Date"),
       startDate: Yup.string().required("Please Select Start Date"),
     }),
-    onSubmit:async (values) => {
+    onSubmit: async (values) => {
       var startDate = formatDateCreateProject(new Date(values.startDate))
       var deadlineDate = formatDateCreateProject(new Date(values.deadlineDate))
       var dueDate = formatDateCreateProject(new Date(values.dueDate))
       const dataTask = {
         name: values.name,
-        description: editorData?editorData:'',
+        description: editorData ? editorData : '',
         due_date: dueDate,
         started_at: startDate,
         deadline: deadlineDate,
         status: parseInt(values.status),
         priority: parseInt(values.priority),
-        position:1,
-        created_by:userId,
-        project_id:props.project_id,
+        position: 1,
+        created_by: userId,
+        project_id: props.project_id,
         // assignees: values.assignees,
       };
 
       // dispatch(addNewTask(dataTask));
-      const dataResponse=await dispatch(addNewTask(dataTask));
+      const dataResponse = await dispatch(addNewTask(dataTask));
       console.log(dataResponse)
-     if (dataResponse.payload){
-      refreshTaskList()
-      validationCreate.resetForm();
-      setEditorData('');
-     }
+      if (dataResponse.payload) {
+        refreshTaskList()
+        validationCreate.resetForm();
+        setEditorData('');
+      }
       toggleCreate();
 
     },
@@ -244,7 +278,7 @@ useEffect(()=>{
   };
   const handleCustomerClick = useCallback((arg: any) => {
     const task = arg;
-   setTaskIdDetail(task.id);
+    setTaskIdDetail(task.id);
     setTask({
       id: task.id,
       name: task.name,
@@ -272,26 +306,35 @@ useEffect(()=>{
   }, [props.project_id]);
   useEffect(() => {
     refreshTaskListAgain();
-  }, [taskListData]);
-async function refreshTaskList(){
-  const dataResponse= await dispatch(getTaskList(props.project_id));
-  if(dataResponse.payload){
-    setTaskList(dataResponse.payload);
+  }, [taskListData,selectedValues]);
+  async function refreshTaskList() {
+ 
+    const dataResponse = await dispatch(getTaskList(props.project_id));
+    if (dataResponse.payload) {
+      setTaskList(dataResponse.payload);
+    }
+    // console.log(dataResponse)
   }
-  // console.log(dataResponse)
-}
-async function refreshTaskListAgain(){
-    const dataResponse= await dispatch(getTaskListAgain({project_id:props.project_id}));
-  console.log(dataResponse)
-  if(dataResponse.payload){
-    setTaskList(dataResponse.payload);
+
+  async function refreshTaskListAgain() {
+    if(selectedValues.length>0){
+      const dataResponse = await dispatch(getTaskListAgain({ project_id: props.project_id, type: selectedValues }));
+      if (dataResponse.payload) {
+        setTaskList(dataResponse.payload);
+      }
+    }
+    else{
+      const dataResponse = await dispatch(getTaskListAgain({ project_id: props.project_id }));
+      if (dataResponse.payload) {
+        setTaskList(dataResponse.payload);
+      }
+    }
+
+    // console.log(dataResponse)
   }
-  
-  // console.log(dataResponse)
-}
   // Checked All
   const checkedAll = useCallback(() => {
-    
+
     const checkall: any = document.getElementById("checkBoxAll");
     const ele = document.querySelectorAll(".taskCheckBox");
 
@@ -334,9 +377,9 @@ async function refreshTaskListAgain(){
 
   const [filters, setFilters] = useState({});
 
-    const handleFilterChange = (newFilters:any) => {
-        setFilters(newFilters);
-    };
+  const handleFilterChange = (newFilters: any) => {
+    setFilters(newFilters);
+  };
   const columns = useMemo(
     () => [
       {
@@ -347,8 +390,8 @@ async function refreshTaskListAgain(){
         id: '#',
       },
       {
-        Header: "Order ID",
-        accessor: "id",
+        Header: "Type",
+        accessor: "type",
         filterable: false,
         Cell: (cellProps: any) => {
           return <OrdersId {...cellProps} />;
@@ -447,8 +490,8 @@ async function refreshTaskListAgain(){
     ],
     [handleCustomerClick, checkedAll]
   );
-console.log(taskList);
-const [startDate, setStartDate] = useState<string | null>(null);
+  console.log(taskList);
+  const [startDate, setStartDate] = useState<string | null>(null);
   const [endDate, setEndDate] = useState<string | null>(null);
   const [status, setStatus] = useState<string>('');
 
@@ -463,16 +506,21 @@ const [startDate, setStartDate] = useState<string | null>(null);
   const [filteredData, setFilteredData] = useState([]);
   useEffect(() => {
     const fetchData = async () => {
-      const dataResponse = await dispatch(getTaskListAgain({ project_id: props.project_id }));
+      // var data={project_id: props.project_id};
+      let data: { project_id: number; type?: any };
+      if(selectedValues.length>0){
+        data = { project_id: props.project_id, type: selectedValues }
+      }
+      else{
+        data = { project_id: props.project_id }
+      }
+      const dataResponse = await dispatch(getTaskListAgain(data));
       if (dataResponse.payload) {
         let filtered = dataResponse.payload;
-        console.log(filtered);
-
-        // Filter by date range
         if (startDate && endDate) {
           console.log(startDate);
           console.log(endDate);
-          filtered = filtered.filter((item:any) => {
+          filtered = filtered.filter((item: any) => {
             const itemDate = new Date(item.due_date);
             console.log(itemDate >= new Date(startDate));
             return itemDate >= new Date(startDate) && itemDate <= new Date(endDate);
@@ -482,7 +530,7 @@ const [startDate, setStartDate] = useState<string | null>(null);
         // Filter by status
         if (status !== "") {
           console.log("2");
-          filtered = filtered.filter((item:any) => item.status === status);
+          filtered = filtered.filter((item: any) => item.status === status);
           console.log(filtered);
         }
 
@@ -493,17 +541,21 @@ const [startDate, setStartDate] = useState<string | null>(null);
     fetchData();
   }, [dispatch, props.project_id, startDate, endDate, status, taskList]);
   // Handler for status change
-  const handleStatusChange = (value:any) => {
-    if(value!=''){
-      value=parseInt(value)
+  const handleStatusChange = (value: any) => {
+    if (value != '') {
+      value = parseInt(value)
       setStatus(value);
     }
-   
+
   };
   const handleFilterClick = () => {
     setTaskList(filteredData)
   };
- 
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+
+  const toggleDropdown = () => setDropdownOpen(true);
+  const onClickToggle = () => setDropdownOpen(!dropdownOpen)
+
   return (
     <React.Fragment>
       <DeleteModal
@@ -524,10 +576,61 @@ const [startDate, setStartDate] = useState<string | null>(null);
           <div className="card" id="tasksList">
             <div className="card-header border-0">
               <div className="d-flex align-items-center">
-                <h5 className="card-title mb-0 flex-grow-1">All Tasks</h5>
-                <div className="flex-shrink-0">
+                <h5 className="card-title mb-0 flex-grow-1">All Issue</h5>
+                <div className="flex-shrink-0 d-flex align-items-center">
                   <div className="d-flex flex-wrap gap-2">
-                    <button className="btn btn-primary add-btn me-1" onClick={() => {  toggleCreate(); }}><i className="ri-add-line align-bottom me-1"></i> Create Task</button>
+                    <div  >
+                      <p className="__text_fillter_task" onClick={onClickToggle}>Type</p>
+                      <Dropdown isOpen={dropdownOpen} toggle={toggleDropdown}>
+
+                        <DropdownMenu>
+                          <DropdownItem tag="div">
+                            <input
+                              type="checkbox"
+                              name="eric"
+                              id="__eric"
+                              checked={checkedItems.eric}
+                              onChange={handleCheckboxChange}
+                            />
+                            <label htmlFor="__eric">Eric</label>
+                          </DropdownItem>
+                          <DropdownItem tag="div">
+                            <input
+                              type="checkbox"
+                              name="task"
+                              id="__task"
+                              checked={checkedItems.task}
+                              onChange={handleCheckboxChange}
+                            />
+                            <label htmlFor="__task">Task</label>
+                          </DropdownItem>
+                          <DropdownItem tag="div">
+                            <input
+                              type="checkbox"
+                              name="story"
+                              id="__story"
+                              checked={checkedItems.story}
+                              onChange={handleCheckboxChange}
+                            />
+                            <label htmlFor="__story">Story</label>
+                          </DropdownItem>
+                          <DropdownItem tag="div">
+                            <input
+                              type="checkbox"
+                              name="bug"
+                              id="__bug"
+                              checked={checkedItems.bug}
+                              onChange={handleCheckboxChange}
+                            />
+                            <label htmlFor="__bug">Bug</label>
+                          </DropdownItem>
+                        </DropdownMenu>
+                      </Dropdown >
+                    </div>
+
+                  </div>
+                  <div className="d-flex flex-wrap gap-2">
+                    <button className="btn btn-primary add-btn me-1" onClick={() => { toggleCreate(); }}><i className="ri-add-line align-bottom me-1"></i> Create Task</button>
                     {isMultiDeleteButton && <button className="btn btn-soft-danger" onClick={() => setDeleteModalMulti(true)} ><i className="ri-delete-bin-2-line"></i></button>}
                   </div>
                 </div>
@@ -536,7 +639,7 @@ const [startDate, setStartDate] = useState<string | null>(null);
 
             <div className="card-body pt-0">
               {isLoad && <Loader error={error} isLoading={isLoad} />}
-               {!isLoad&&isTaskSuccess  &&
+              {!isLoad && isTaskSuccess &&
                 <TableContainer
                   columns={columns}
                   data={(taskList || [])}
@@ -555,7 +658,7 @@ const [startDate, setStartDate] = useState<string | null>(null);
                   handleDateChange={handleDateChange}
                   handleFilterClick={handleFilterClick}
                 />
-           
+
               }
               <ToastContainer closeButton={false} limit={1} />
             </div>
@@ -576,10 +679,10 @@ const [startDate, setStartDate] = useState<string | null>(null);
           Edit Task
         </ModalHeader>
 
-          <ModalBody className="modal-body col-12">
+        <ModalBody className="modal-body col-12">
           <TaskDetails idTask={taskIdDetail} />
 
-           </ModalBody>
+        </ModalBody>
       </Modal>
       <Modal
         isOpen={modalCreateTask}
@@ -681,7 +784,7 @@ const [startDate, setStartDate] = useState<string | null>(null);
                     dateFormat: "d M, Y",
                   }}
                   onChange={(startDate: any) => validationCreate.setFieldValue("startDate", moment(startDate[0]).format("DD MMMM ,YYYY"))}
-                  value={validationCreate.values.startDate|| ''}
+                  value={validationCreate.values.startDate || ''}
                 />
                 {validationCreate.errors.startDate && validationCreate.touched.startDate ? (
                   <FormFeedback type="invalid" className='d-block'>{validationCreate.errors.startDate}</FormFeedback>
@@ -700,7 +803,7 @@ const [startDate, setStartDate] = useState<string | null>(null);
                     dateFormat: "d M, Y",
                   }}
                   onChange={(deadlineDate: any) => validationCreate.setFieldValue("deadlineDate", moment(deadlineDate[0]).format("DD MMMM ,YYYY"))}
-                  value={validationCreate.values.deadlineDate|| ''}
+                  value={validationCreate.values.deadlineDate || ''}
                 />
                 {validationCreate.errors.deadlineDate && validationCreate.touched.deadlineDate ? (
                   <FormFeedback type="invalid" className='d-block'>{validationCreate.errors.deadlineDate}</FormFeedback>
@@ -719,7 +822,7 @@ const [startDate, setStartDate] = useState<string | null>(null);
                     dateFormat: "d M, Y",
                   }}
                   onChange={(dueDate: any) => validationCreate.setFieldValue("dueDate", moment(dueDate[0]).format("DD MMMM ,YYYY"))}
-                  value={validationCreate.values.dueDate|| ''}
+                  value={validationCreate.values.dueDate || ''}
                 />
                 {validationCreate.errors.dueDate && validationCreate.touched.dueDate ? (
                   <FormFeedback type="invalid" className='d-block'>{validationCreate.errors.dueDate}</FormFeedback>
@@ -748,28 +851,7 @@ const [startDate, setStartDate] = useState<string | null>(null);
                   <FormFeedback type="invalid">{validationCreate.errors.status}</FormFeedback>
                 ) : null}
               </Col>
-              {/* <Col lg={6}>
-                <Label for="priority-field" className="form-label">Project</Label>
-                <Input
-                  name="project"
-                  type="select"
-                  className="form-select"
-                  id="priority-field"
-                  onChange={validationCreate.handleChange}
-                  onBlur={validationCreate.handleBlur}
-                  value={validationCreate.values.project || ""}
-                  invalid={
-                    validationCreate.touched.project && validationCreate.errors.project ? true : false
-                  }
-                >
-                    {projectList.length>0&&projectList.map((item:any, key:any) =>(
-                  <option key={key} value={item.id}>{item.name}</option>
-                  ))}
-                </Input>
-                {validationCreate.touched.priority && validationCreate.errors.priority ? (
-                  <FormFeedback type="invalid">{validationCreate.errors.priority}</FormFeedback>
-                ) : null}
-              </Col> */}
+
               <Col lg={12}>
                 <Label for="priority-field" className="form-label">Priority</Label>
                 <Input

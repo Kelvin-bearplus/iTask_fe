@@ -1,18 +1,30 @@
-import React ,{useEffect} from 'react';
+import React ,{useEffect,useState} from 'react';
 import { Container, Col, Row } from 'reactstrap';
 import BreadCrumb from '../../../Components/Common/BreadCrumb';
 import Comments from './Comments';
 import Summary from './Summary';
 import TimeTracking from "./TimeTracking";
-import {  useDispatch } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+
 import {
     getTaskById
   } from "../../../slices/thunks";
+  import { createSelector } from 'reselect';
 
 const TaskDetails = (prop?:any) => {
     document.title="Tasks Details ";
   const dispatch: any = useDispatch();
-  const [dataTask, setDataTask] = React.useState({});
+  const [dataTask, setDataTask] =useState<any>({});
+  const selectLayoutState = (state: any) => state.Tasks;
+  const selectLayoutProperties = createSelector(
+    selectLayoutState,
+    (state) => ({
+      taskListData: state.taskList,
+    })
+  );
+  const {
+    taskListData
+  } = useSelector(selectLayoutProperties);
 
   const searchParams = new URLSearchParams(window.location.search);
   var id = searchParams.get('id');
@@ -35,7 +47,7 @@ const TaskDetails = (prop?:any) => {
             getDataTask(prop.idTask);
         }
       }
-  }, []);
+  }, [taskListData]);
   function isObjectEmpty(obj:any) {
     return Object.keys(obj).length === 0;
   }
@@ -45,12 +57,15 @@ const TaskDetails = (prop?:any) => {
             !isObjectEmpty(dataTask) && (
                 <div className="page-content">
                     <Container fluid>
-                        <BreadCrumb title="Tasks Details" pageTitle="Tasks" />
+                      {dataTask.type===3&& <BreadCrumb title="Tasks Details" pageTitle="Tasks" />}  
+                      {dataTask.type===2&& <BreadCrumb title="Story Details" pageTitle="Storys" />}  
+                      {dataTask.type===1&& <BreadCrumb title="Epic Details" pageTitle="Epics" />}  
+                      {dataTask.type===2&& <BreadCrumb title="Bug Details" pageTitle="Bugs" />}  
                         <Row>
-                            <Col xxl={3}>
+                            <Col lg={4}>
                                 <TimeTracking prop={dataTask} />
                             </Col>
-                            <Col xxl={9}>
+                            <Col lg={8}>
                                 <Summary prop={dataTask} />
                                 {id!=undefined && <Comments taskId={parseInt(id)} />}
                                 {prop.idTask!=undefined && <Comments taskId={parseInt(prop.idTask)} />}

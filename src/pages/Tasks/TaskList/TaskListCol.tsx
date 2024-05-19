@@ -1,7 +1,10 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import moment from "moment";
-
+import icon_eric from "../../../assets/images/clients/icon_eric.svg"
+import icon_task from "../../../assets/images/clients/icon_task.svg"
+import icon_bug from "../../../assets/images/clients/icon_bug.svg"
+import icon_story from "../../../assets/images/clients/icon_story.svg"
 const handleValidDate = (date:any) => {
     const date1 = moment(new Date(date)).format("DD MMM Y");
     return date1;
@@ -11,7 +14,19 @@ const handleValidDate = (date:any) => {
 const OrdersId = (cell:any) => {
     return (
         <React.Fragment>
-            <Link to="/apps-tasks-details" className="fw-medium link-primary">{cell.value}</Link>
+            {/* <Link to="/apps-tasks-details" className="fw-medium link-primary">{cell.value}</Link> */}
+            {cell.value==1&& 
+            <img src={icon_eric} alt="" />
+            }
+            {cell.value==2&& 
+            <img src={icon_story} alt="" />
+            }
+            {cell.value==3&& 
+            <img src={icon_task} alt="" />
+            }
+            {cell.value==4&& 
+            <img src={icon_bug} alt="" />
+            }
         </React.Fragment>
     );
 };

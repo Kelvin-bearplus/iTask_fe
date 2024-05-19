@@ -175,6 +175,7 @@ color: #403294;
   border: none;
   background-color: transparent;
   padding: 5px;
+  width: 100%;
 }
 .__input_custom:focus,.select_custom:focus{
   border: 1px solid #b2b1b1;
@@ -213,4 +214,117 @@ justify-content: center;
 .__modal_task_all .modal-lg, .modal-xl{
   --vz-modal-width:80%;
   margin: auto;
+  }
+  .box_detail{
+    padding: 0 40px 0 0;
+  }
+  .title_eric{
+    font-size: 24px;
+    font-weight: 600;
+    color: #000;
+  }
+  .label_eric{
+    font-size: 16px;
+    font-weight: 500;
+    color: #000;
+  }
+  .title_dec{
+    font-size: 16px;
+    font-weight: 400;
+    color: #000000b1;
+  }
+  .avt_owner{
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 10px;
+  }
+  .mt-100{
+    margin-top: 100px;
+    padding: 0 40px;
+  }
+  .box_task_child_eric{
+    justify-content: space-between;
+    align-items: center;
+    padding: 5px 10px;
+    border-bottom:1px solid #b4b4b4 ;
+  }
+  .box_task_child_eric:last-child{
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+  .box_task_child_eric:first-child{
+    // border-bottom: none;
+    padding-top: 0;
+  }
+ 
+  ._eric__title__name{
+    font-size: 14px;
+    line-height: 18px;
+    font-weight: 500;
+  }
+  .table_task_child{
+    padding: 10px 0;
+    border: 1px solid #b4b4b4;
+  }
+  .__btn_create{
+    font-size: 20px;
+    font-weight: 500;
+    padding: 7px 10px;
+    cursor: pointer;
+  }
+  .__eric_status{
+    font-size: 14px;
+    font-weight: 500;
+    padding: 5px 10px;
+    border-radius: 5px;
+    background-color: #f5f1f1;
+    color: #000;
+    border: none;
+    
+  }
+  .label_project_eric{
+    font-size: 16px;
+    font-weight: 600;
+    color: #000;
+  }
+  .__project_info_eric{
+    font-size: 14px;
+    font-weight: 400;
+    color: #000;
+  }
+  .__box_inf_detail_eric{
+border: 1px solid #b4b4b4;
+padding: 10px 0px 0px 0px;
+border-radius: 4px;
+  }
+  .__eric_inf__title{
+    font-size: 14px;
+    font-weight: 500;
+    color: #000;
+    padding-bottom:10px ;
+    border-bottom: 1px solid #b4b4b4;
+  }
+  .__eric_inf__content__title{
+    font-weight: 500;
+  }
+  p{
+    margin-bottom: 0;
+  }
+  .__eric_inf__content{
+    border-bottom: 1px solid #b4b4b4;
+  }
+  .__eric_inf__content:last-child{
+    border-bottom:0;
+  }
+  .__text_fillter_task{
+    font-size: 16px;
+    font-weight: 500;
+    margin-right: 12px;
+    border:none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    background-color: #f2efef;
   }
